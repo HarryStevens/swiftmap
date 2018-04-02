@@ -1,0 +1,27 @@
+{
+  "name": "quickmap",
+  "version": "0.0.1",
+  "description": "Make quick maps with D3 and TopoJSON.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HarryStevens/quickmap.git"
+  },
+  "keywords": [
+    "d3",
+    "mapping",
+    "cartography",
+    "topojson",
+    "map",
+    "maps"
+  ],
+  "author": "Harry Stevens <harryjosephstevens@gmail.com> (http://harryjstevens.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HarryStevens/quickmap/issues"
+  },
+  "homepage": "https://github.com/HarryStevens/quickmap#readme"
+}
