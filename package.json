@@ -1,6 +1,6 @@
 {
   "name": "swiftmap",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Make quick maps with D3 and TopoJSON.",
   "main": "dist/swiftmap.min.js",
   "scripts": {
