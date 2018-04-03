@@ -10,9 +10,9 @@ export default function drawSubUnits() {
     .enter().append("path")
       .attr("class", "subunit")
       .attr("d", this.path)
-      .style("stroke", "#fff")
-      .style("stroke-width", "1px")
-      .style("fill", "#ccc");
+      .attr("stroke", "#fff")
+      .attr("stroke-width", "1px")
+      .attr("fill", "#ccc");
 
   return this;
 }

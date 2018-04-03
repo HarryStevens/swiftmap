@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.10. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.11. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -3026,9 +3026,9 @@
       .enter().append("path")
         .attr("class", "subunit")
         .attr("d", this.path)
-        .style("stroke", "#fff")
-        .style("stroke-width", "1px")
-        .style("fill", "#ccc");
+        .attr("stroke", "#fff")
+        .attr("stroke-width", "1px")
+        .attr("fill", "#ccc");
 
     return this;
   }
