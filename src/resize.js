@@ -13,7 +13,7 @@ export default function resize() {
     +keepNumber(d3_selection.select(this.wrapper).style("height"));
   this.svg.attr("width", this.width).attr("height", this.height);
   
-  this.centerZoom();
+  this.fitSize();
 
   this.svg.selectAll("path").attr("d", this.path);
   var projection = this.projection;

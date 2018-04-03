@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.11. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.12. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2771,6 +2771,11 @@
         : new Selection([[selector]], root);
   }
 
+  function draw(){
+    this.fitSize().drawSubUnits().drawBoundary();
+    return this;
+  }
+
   function identity$3(x) {
     return x;
   }
@@ -2990,18 +2995,6 @@
     return arcs;
   }
 
-  // centers and zooms a projection
-  function centerZoom() {  
-    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
-    this.projection.fitSize([this.width, this.height], feature(this.data, data_object));
-    return this;
-  }
-
-  function draw(){
-    this.centerZoom().drawSubUnits().drawBoundary();
-    return this;
-  }
-
   // draws an outer boundary
   function drawBoundary() {
     var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
@@ -3033,6 +3026,13 @@
     return this;
   }
 
+  // centers and zooms a projection
+  function fitSize$1() {  
+    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
+    this.projection.fitSize([this.width, this.height], feature(this.data, data_object));
+    return this;
+  }
+
   function keepNumber(x){
     return x.replace(/[^\d.-]/g, "");
   }
@@ -3048,7 +3048,7 @@
       +keepNumber(select(this.wrapper).style("height"));
     this.svg.attr("width", this.width).attr("height", this.height);
     
-    this.centerZoom();
+    this.fitSize();
 
     this.svg.selectAll("path").attr("d", this.path);
     var projection = this.projection;
@@ -3086,10 +3086,10 @@
      this.svg = select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
 
     // functions
-    this.centerZoom = centerZoom;
     this.draw = draw;
     this.drawBoundary = drawBoundary;
     this.drawSubUnits = drawSubUnits;
+    this.fitSize = fitSize$1;
     this.resize = resize;
 
     return this;

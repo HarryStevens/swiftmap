@@ -1,4 +1,4 @@
 export default function draw(){
-  this.centerZoom().drawSubUnits().drawBoundary();
+  this.fitSize().drawSubUnits().drawBoundary();
   return this;
 }

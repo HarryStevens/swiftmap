@@ -3,10 +3,10 @@ import * as d3_geo from "d3-geo";
 import * as d3_selection from "d3-selection";
 
 // src
-import centerZoom from "./centerZoom";
 import draw from "./draw";
 import drawBoundary from "./drawBoundary";
 import drawSubUnits from "./drawSubUnits";
+import fitSize from "./fitSize";
 import resize from "./resize";
 
 // utility functions
@@ -39,10 +39,10 @@ export default function init(options){
    this.svg = d3_selection.select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
 
   // functions
-  this.centerZoom = centerZoom;
   this.draw = draw;
   this.drawBoundary = drawBoundary;
   this.drawSubUnits = drawSubUnits;
+  this.fitSize = fitSize;
   this.resize = resize;
 
   return this;

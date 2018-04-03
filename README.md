@@ -25,7 +25,7 @@ window.onresize = () => map.resize();
 Allows for chaining functions.
 
 ```js
-map.centerZoom().drawBoundary();
+map.fitSize().drawBoundary();
 ```
 
 [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
@@ -67,11 +67,7 @@ Initializes a <i>map</i>.
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>()
 
-Draws a map. This is a convenience method equivalent to <i>map</i>.<b>centerZoom</b>().<b>drawSubUnits</b>().<b>drawBoundary</b>().
-
-<a name="centerZoom" href="#centerZoom">#</a> <i>map</i>.<b>centerZoom</b>()
-
-Centers and zooms the map so that its outer boundary fits its wrapper element.
+Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fitSize</b>().<b>drawSubUnits</b>().<b>drawBoundary</b>().
 
 <a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>()
 
@@ -80,6 +76,10 @@ Draws the map's outer boundary.
 <a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>()
 
 Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
+
+<a name="fitSize" href="#fitSize">#</a> <i>map</i>.<b>fitSize</b>()
+
+Updates the projection so that the map's outer boundary fits its wrapper element.
 
 <a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>()
 
