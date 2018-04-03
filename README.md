@@ -102,6 +102,10 @@ map.subunits
     .style("stroke-width", function(d, i){ return (i / 4) + "px"; })
 ```
 
+<a name="svg" href="#svg">#</a> <i>map</i>.<b>svg</b>
+
+The D3 selection of the SVG element containing the map.
+
 <a name="wrapper" href="#wrapper">#</a> <i>map</i>.<b>wrapper</b>
 
 A string of the map's wrapper element.
