@@ -1,7 +1,7 @@
 # swiftmap
 A super simple API for making super simple maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
-## <a name="features" href="#example">Features</a>
+## <a name="features" href="#features">Features</a>
 
 Provides an insanely simple API for initializing and drawing maps.
 
