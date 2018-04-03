@@ -1,14 +1,17 @@
 {
-  "name": "quickmap",
+  "name": "swiftmap",
   "version": "0.0.1",
   "description": "Make quick maps with D3 and TopoJSON.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "minify": "uglifyjs lib/swiftmap.js --preamble \"$(preamble)\" -c -m -o lib/swiftmap.min.js",
+    "rollup": "rm -rf lib && mkdir lib && rollup -c --banner \"$(preamble)\"",
+    "build": "npm run rollup && npm run minify"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HarryStevens/quickmap.git"
+    "url": "git+https://github.com/HarryStevens/swiftmap.git"
   },
   "keywords": [
     "d3",
@@ -18,10 +21,26 @@
     "map",
     "maps"
   ],
-  "author": "Harry Stevens <harryjosephstevens@gmail.com> (http://harryjstevens.com/)",
+  "author": {
+    "name": "Harry Stevens",
+    "url": "https://harryjstevens.com/"
+  },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/HarryStevens/quickmap/issues"
+    "url": "https://github.com/HarryStevens/swiftmap/issues"
   },
-  "homepage": "https://github.com/HarryStevens/quickmap#readme"
+  "homepage": "https://github.com/HarryStevens/swiftmap#readme",
+  "devDependencies": {
+    "package-preamble": "^0.1.0",
+    "rollup": "^0.57.1",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "topojson-client": "^3.0.0",
+    "uglifyjs": "^2.4.11"
+  },
+  "dependencies": {
+    "d3-geo": "^1.10.0",
+    "d3-selection": "^1.3.0",
+    "topojson": "^3.0.2"
+  }
 }
