@@ -30,10 +30,10 @@ window.addEventListener("resize", function(){
 ### Web browser
 In vanilla, a `swiftmap` global is exported. You can use the CDN from unpkg.
 ```html
-<script src="https://unpkg.com/swiftmap/lib/swiftmap.js"></script>
-<script src="https://unpkg.com/swiftmap/lib/swiftmap.min.js"></script>
+<script src="https://unpkg.com/swiftmap/build/swiftmap.js"></script>
+<script src="https://unpkg.com/swiftmap/build/swiftmap.min.js"></script>
 ```
-If you'd rather host it yourself, download `swiftmap.js` or `swiftmap.min.js` from the [`lib` directory](https://github.com/HarryStevens/swiftmap/tree/master/lib).
+If you'd rather host it yourself, download `swiftmap.js` or `swiftmap.min.js` from the [`build` directory](https://github.com/HarryStevens/swiftmap/tree/master/build).
 ```html
 <script src="path/to/swiftmap.js"></script>
 <script src="path/to/swiftmap.min.js"></script>

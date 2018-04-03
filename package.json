@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "minify": "uglifyjs lib/swiftmap.js --preamble \"$(preamble)\" -c -m -o lib/swiftmap.min.js",
-    "rollup": "rm -rf lib && mkdir lib && rollup -c --banner \"$(preamble)\"",
+    "minify": "uglifyjs build/swiftmap.js --preamble \"$(preamble)\" -c -m -o build/swiftmap.min.js",
+    "rollup": "rm -rf build && mkdir build && rollup -c --banner \"$(preamble)\"",
     "build": "npm run rollup && npm run minify"
   },
   "repository": {
