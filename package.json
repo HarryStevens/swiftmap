@@ -2,7 +2,7 @@
   "name": "swiftmap",
   "version": "0.0.5",
   "description": "Make quick maps with D3 and TopoJSON.",
-  "main": "index.js",
+  "main": "dist/swiftmap.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "minify": "uglifyjs dist/swiftmap.js --preamble \"$(preamble)\" -c -m -o dist/swiftmap.min.js",
