@@ -1,19 +1,17 @@
 # swiftmap
-A super simple API for making super simple maps.
+A super simple API for making super simple maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
 ## <a name="examples" href="#example">Examples</a>
 
 Initialize and draw a map.
 
 ```js
-swiftmap.init({ data: topoJsonArray }).draw();
+var map = swiftmap.init({ data: topoJsonArray }).draw();
 ```
 
 Chain functions.
 
 ```js
-var map = swiftmap.init({ data: topoJsonArray });
-
 map.centerZoom().drawBoundary();
 ```
 
@@ -23,6 +21,13 @@ Resize the map.
 window.addEventListener("resize", function(){
   map.resize();
 });
+```
+
+Style the map.
+
+```js
+var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
+map.subUnits.style("fill", (d, i) => colors[i % colors.length] );
 ```
 
 ## <a name="installation" href="#installation">Installation</a>
