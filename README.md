@@ -19,9 +19,7 @@ map.subUnits.style("fill", (d, i) => colors[i % colors.length] );
 Makes it ridiculously easy to create resizable maps for responsive designs.
 
 ```js
-window.addEventListener("resize", function(){
-  map.resize();
-});
+window.addEventListener("resize", () => { map.resize(); });
 ```
 
 Allows for chaining functions.
