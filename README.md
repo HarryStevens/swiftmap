@@ -111,7 +111,7 @@ The projection used to render the map. For now, only the Mercator projection is 
 
 ### Styles
 
-Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as the class "boundary", and the subunits are exposed as the class "subunit".
+Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`.
 
 ## <a name="contributing" href="#contributing">Contributing</a>
 
