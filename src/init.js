@@ -14,12 +14,12 @@ import keepNumber from "./utils/keepNumber";
 
 // Initializes a swiftmap
 export default function init(options){
-	// errors
-	if (!options) throw new Error("You must specify options.");
-	if (!options.data) throw new Error ("Your options must contain data.");
+  // errors
+  if (!options) throw new Error("You must specify options.");
+  if (!options.data) throw new Error ("Your options must contain data.");
 
-	// defaults
-	if (!options.wrapper) options.wrapper = "body";
+  // defaults
+  if (!options.wrapper) options.wrapper = "body";
 
   // option attributes
   this.data = options.data;
@@ -30,13 +30,13 @@ export default function init(options){
 
   // size
   this.width = this.wrapper == "body" ? window.innerWidth :
-  	+keepNumber(d3_selection.select(this.wrapper).style("width"));
+    +keepNumber(d3_selection.select(this.wrapper).style("width"));
   this.height = this.wrapper == "body" ? window.innerHeight :
-  	+keepNumber(d3_selection.select(this.wrapper).style("height"));
+    +keepNumber(d3_selection.select(this.wrapper).style("height"));
 
- 	// derived attributes
- 	this.path = d3_geo.geoPath().projection(this.projection);
- 	this.svg = d3_selection.select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
+   // derived attributes
+   this.path = d3_geo.geoPath().projection(this.projection);
+   this.svg = d3_selection.select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
 
   // functions
   this.centerZoom = centerZoom;

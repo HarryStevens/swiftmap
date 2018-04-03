@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.5. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.10. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2991,20 +2991,20 @@
   }
 
   // centers and zooms a projection
-  function centerZoom() {	
-  	var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
+  function centerZoom() {  
+    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
     this.projection.fitSize([this.width, this.height], feature(this.data, data_object));
     return this;
   }
 
   function draw(){
-  	this.centerZoom().drawSubUnits().drawBoundary();
-  	return this;
+    this.centerZoom().drawSubUnits().drawBoundary();
+    return this;
   }
 
   // draws an outer boundary
   function drawBoundary() {
-  	var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
+    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
     var boundary = mesh(this.data, data_object, function(a, b) { return a === b; });
     
     this.boundary = this.svg.append("path")
@@ -3019,33 +3019,33 @@
 
   // draws an outer boundary
   function drawSubUnits() {
-  	var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
-  	
+    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
+    
     this.subUnits = this.svg.selectAll(".subunit")
-  	    .data(feature(this.data, data_object).features)
+        .data(feature(this.data, data_object).features)
       .enter().append("path")
-  	    .attr("class", "subunit")
-  	    .attr("d", this.path)
-  	    .style("stroke", "#fff")
-  	    .style("stroke-width", "1px")
-  	    .style("fill", "#ccc");
+        .attr("class", "subunit")
+        .attr("d", this.path)
+        .style("stroke", "#fff")
+        .style("stroke-width", "1px")
+        .style("fill", "#ccc");
 
-  	return this;
+    return this;
   }
 
   function keepNumber(x){
-  	return x.replace(/[^\d.-]/g, "");
+    return x.replace(/[^\d.-]/g, "");
   }
 
   // modules
 
   // resizes the map
   function resize() {
-  	// size attributes
+    // size attributes
     this.width = this.wrapper == "body" ? window.innerWidth :
-    	+keepNumber(select(this.wrapper).style("width"));
+      +keepNumber(select(this.wrapper).style("width"));
     this.height = this.wrapper == "body" ? window.innerHeight :
-    	+keepNumber(select(this.wrapper).style("height"));
+      +keepNumber(select(this.wrapper).style("height"));
     this.svg.attr("width", this.width).attr("height", this.height);
     
     this.centerZoom();
@@ -3061,12 +3061,12 @@
 
   // Initializes a swiftmap
   function init(options){
-  	// errors
-  	if (!options) throw new Error("You must specify options.");
-  	if (!options.data) throw new Error ("Your options must contain data.");
+    // errors
+    if (!options) throw new Error("You must specify options.");
+    if (!options.data) throw new Error ("Your options must contain data.");
 
-  	// defaults
-  	if (!options.wrapper) options.wrapper = "body";
+    // defaults
+    if (!options.wrapper) options.wrapper = "body";
 
     // option attributes
     this.data = options.data;
@@ -3077,13 +3077,13 @@
 
     // size
     this.width = this.wrapper == "body" ? window.innerWidth :
-    	+keepNumber(select(this.wrapper).style("width"));
+      +keepNumber(select(this.wrapper).style("width"));
     this.height = this.wrapper == "body" ? window.innerHeight :
-    	+keepNumber(select(this.wrapper).style("height"));
+      +keepNumber(select(this.wrapper).style("height"));
 
-   	// derived attributes
-   	this.path = index().projection(this.projection);
-   	this.svg = select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
+     // derived attributes
+     this.path = index().projection(this.projection);
+     this.svg = select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
 
     // functions
     this.centerZoom = centerZoom;
