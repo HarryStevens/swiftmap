@@ -1,21 +1,22 @@
 # swiftmap
 A super simple API for making super simple maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
-## <a name="examples" href="#example">Examples</a>
+## <a name="features" href="#example">Features</a>
 
-Initialize and draw a map.
+Provides an insanely simple API for initializing and drawing maps.
 
 ```js
 var map = swiftmap.init({ data: topoJsonArray }).draw();
 ```
 
-Chain functions.
+Exposes DOM elements for styling.
 
 ```js
-map.centerZoom().drawBoundary();
+var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
+map.subUnits.style("fill", (d, i) => colors[i % colors.length] );
 ```
 
-Resize the map.
+Makes it ridiculously easy to create resizable maps for responsive designs.
 
 ```js
 window.addEventListener("resize", function(){
@@ -23,12 +24,13 @@ window.addEventListener("resize", function(){
 });
 ```
 
-Style the map.
+Allows for chaining functions.
 
 ```js
-var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
-map.subUnits.style("fill", (d, i) => colors[i % colors.length] );
+map.centerZoom().drawBoundary();
 ```
+
+[See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
 ## <a name="installation" href="#installation">Installation</a>
 
