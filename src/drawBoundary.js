@@ -1,4 +1,3 @@
-import "d3-selection";
 import * as topojson from "topojson-client";
 
 // draws an outer boundary
