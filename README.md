@@ -99,7 +99,7 @@ D3 selections of the map's boundary and subunits. These attributes are only avai
 
 ```js
 map.subunits
-    .style("stroke-width", function(d, i){ return (i / 4) + "px"; })
+    .style("stroke-width", (d, i) => (i / 4) + "px" )
 ```
 
 <a name="svg" href="#svg">#</a> <i>map</i>.<b>svg</b>
