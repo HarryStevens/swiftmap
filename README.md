@@ -6,7 +6,7 @@ A super simple API for making super simple maps. [See it in action](https://bl.o
 Provides an insanely simple API for initializing and drawing maps.
 
 ```js
-var map = swiftmap.init({ data: topoJsonArray }).draw();
+var map = swiftmap.init({ data: topoJsonObject }).draw();
 ```
 
 Exposes DOM elements for styling.
