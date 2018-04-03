@@ -9,14 +9,14 @@ Provides an insanely simple API for initializing and drawing maps.
 var map = swiftmap.init({ data: topoJsonObject }).draw();
 ```
 
-Exposes DOM elements for styling.
+Exposes DOM elements as D3 selections for styling.
 
 ```js
 var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
 map.subunits.style("fill", (d, i) => colors[i % colors.length] );
 ```
 
-Makes it ridiculously easy to create resizable maps for responsive designs.
+Makes it easy to create resizable maps for responsive designs.
 
 ```js
 window.onresize = () => map.resize();

@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.15. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.16. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -3010,7 +3010,7 @@
     return this;
   }
 
-  // draws an outer boundary
+  // draws subunits
   function drawSubunits() {
     var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
     

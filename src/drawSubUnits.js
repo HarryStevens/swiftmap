@@ -1,7 +1,6 @@
-import "d3-selection";
 import * as topojson from "topojson-client";
 
-// draws an outer boundary
+// draws subunits
 export default function drawSubunits() {
   var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
   
