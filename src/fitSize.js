@@ -1,4 +1,3 @@
-import "d3-geo";
 import * as topojson from "topojson-client";
 
 // centers and zooms a projection
