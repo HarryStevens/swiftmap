@@ -1,4 +1,4 @@
 export default function draw(){
-  this.fitSize().drawSubUnits().drawBoundary();
+  this.fitSize().drawSubunits().drawBoundary();
   return this;
 }

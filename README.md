@@ -13,7 +13,7 @@ Exposes DOM elements for styling.
 
 ```js
 var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
-map.subUnits.style("fill", (d, i) => colors[i % colors.length] );
+map.subunits.style("fill", (d, i) => colors[i % colors.length] );
 ```
 
 Makes it ridiculously easy to create resizable maps for responsive designs.
@@ -67,7 +67,7 @@ Initializes a <i>map</i>.
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>()
 
-Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fitSize</b>().<b>drawSubUnits</b>().<b>drawBoundary</b>().
+Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fitSize</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
 
 <a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>()
 
@@ -93,12 +93,12 @@ Resizes the map. This method is useful if your map must respond to window resize
 The map's dimensions.
 
 <a name="boundary" href="#boundary">#</a> <i>map</i>.<b>boundary</b><br />
-<a name="subUnits" href="#subUnits">#</a> <i>map</i>.<b>subUnits</b>
+<a name="subunits" href="#subunits">#</a> <i>map</i>.<b>subunits</b>
 
 D3 selections of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.<b>drawBoundary</b>(), <i>map</i>.<b>drawSubunits</b>(), or <i>map</i>.<b>draw</b>(), which makes both available.
 
 ```js
-map.subUnits
+map.subunits
     .style("stroke-width", function(d, i){ return (i / 4) + "px"; })
 ```
 

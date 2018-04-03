@@ -2,10 +2,10 @@ import "d3-selection";
 import * as topojson from "topojson-client";
 
 // draws an outer boundary
-export default function drawSubUnits() {
+export default function drawSubunits() {
   var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
   
-  this.subUnits = this.svg.selectAll(".subunit")
+  this.subunits = this.svg.selectAll(".subunit")
       .data(topojson.feature(this.data, data_object).features)
     .enter().append("path")
       .attr("class", "subunit")

@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.13. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.14. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2772,7 +2772,7 @@
   }
 
   function draw(){
-    this.fitSize().drawSubUnits().drawBoundary();
+    this.fitSize().drawSubunits().drawBoundary();
     return this;
   }
 
@@ -3011,10 +3011,10 @@
   }
 
   // draws an outer boundary
-  function drawSubUnits() {
+  function drawSubunits() {
     var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
     
-    this.subUnits = this.svg.selectAll(".subunit")
+    this.subunits = this.svg.selectAll(".subunit")
         .data(feature(this.data, data_object).features)
       .enter().append("path")
         .attr("class", "subunit")
@@ -3088,7 +3088,7 @@
     // functions
     this.draw = draw;
     this.drawBoundary = drawBoundary;
-    this.drawSubUnits = drawSubUnits;
+    this.drawSubunits = drawSubunits;
     this.fitSize = fitSize$1;
     this.resize = resize;
 

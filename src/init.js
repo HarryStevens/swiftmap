@@ -5,7 +5,7 @@ import * as d3_selection from "d3-selection";
 // src
 import draw from "./draw";
 import drawBoundary from "./drawBoundary";
-import drawSubUnits from "./drawSubUnits";
+import drawSubunits from "./drawSubunits";
 import fitSize from "./fitSize";
 import resize from "./resize";
 
@@ -41,7 +41,7 @@ export default function init(options){
   // functions
   this.draw = draw;
   this.drawBoundary = drawBoundary;
-  this.drawSubUnits = drawSubUnits;
+  this.drawSubunits = drawSubunits;
   this.fitSize = fitSize;
   this.resize = resize;
 
