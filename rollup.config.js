@@ -4,7 +4,7 @@ import commonjs from "rollup-plugin-commonjs";
 export default {
   input: "index.js",
   output: {
-    file: "build/swiftmap.js",
+    file: "dist/swiftmap.js",
     format: "umd",
     name: "swiftmap",
     globals: {
