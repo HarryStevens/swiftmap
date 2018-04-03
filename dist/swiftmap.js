@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.17. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.18. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2998,10 +2998,9 @@
   // draws an outer boundary
   function drawBoundary() {
     var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
-    var boundary = mesh(this.data, data_object, function(a, b) { return a === b; });
     
     this.boundary = this.svg.append("path")
-      .datum(boundary)
+      .datum(mesh(this.data, data_object, function(a, b) { return a === b; }))
       .attr("d", this.path)
       .attr("class", "boundary")
       .attr("stroke", "#000")
