@@ -28,7 +28,8 @@
       d3.json("india_state.json", function(error, data){
 
         // Provides an insanely simple API for initializing and drawing maps.
-        var map = swiftmap.init({ data: data, wrapper: "#map" }).draw();
+        var map = swiftmap.init("#map").dataGeo(data).draw();
+        console.log(map);
 
         // Exposes DOM elements for styling.
         var colors = ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"];

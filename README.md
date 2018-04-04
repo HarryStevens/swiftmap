@@ -6,7 +6,7 @@ A super simple API for making super simple maps. [See it in action](https://bl.o
 Provides an insanely simple API for initializing and drawing maps.
 
 ```js
-var map = swiftmap.init({ data: topoJsonObject }).draw();
+var map = swiftmap.init().dataGeo(TopoJSONObject).draw();
 ```
 
 Exposes DOM elements as D3 selections for styling.
@@ -56,14 +56,13 @@ var swiftmap = require("swiftmap");
 
 ### Methods
 
-<a name="init" href="#init">#</a> swiftmap.<b>init</b>(<i>options</i>)
+<a name="init" href="#init">#</a> swiftmap.<b>init</b>([<i>wrapper</i>])
 
-Initializes a <i>map</i>.
+Initializes a <i>map</i>. If <i>wrapper</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the wrapper's selector. The <i>wrapper</i> must be specified as a string. If <i>wrapper</i> is not specified, `"body"` will be used as the wrapper.
 
-| option  | required | datatype | default  | description                                                        | 
-|---------|----------|----------|----------|--------------------------------------------------------------------|
-| data    | TRUE     | object   | none     | A TopoJSON object with the map's geometry.                         | 
-| wrapper | FALSE    | string   | `"body"` | The DOM selector in which to place the map. For example, `"#map"`. | 
+<a name="dataGeo" href="#dataGeo">#</a> <i>map</i>.<b>dataGeo</b>(<i>data</i>)
+
+Adds geospatial data the the <i>map</i>. The <i>data</i> must be a TopoJSON object. 
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>()
 

@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.18. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.19. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2997,10 +2997,10 @@
 
   // draws an outer boundary
   function drawBoundary() {
-    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
+    var data_object = this.data.geo.objects[Object.keys(this.data.geo.objects)[0]];
     
     this.boundary = this.svg.append("path")
-      .datum(mesh(this.data, data_object, function(a, b) { return a === b; }))
+      .datum(mesh(this.data.geo, data_object, function(a, b) { return a === b; }))
       .attr("d", this.path)
       .attr("class", "boundary")
       .attr("stroke", "#000")
@@ -3011,10 +3011,10 @@
 
   // draws subunits
   function drawSubunits() {
-    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
+    var data_object = this.data.geo.objects[Object.keys(this.data.geo.objects)[0]];
     
     this.subunits = this.svg.selectAll(".subunit")
-        .data(feature(this.data, data_object).features)
+        .data(feature(this.data.geo, data_object).features)
       .enter().append("path")
         .attr("class", "subunit")
         .attr("d", this.path)
@@ -3027,8 +3027,8 @@
 
   // centers and zooms a projection
   function fitSize$1() {  
-    var data_object = this.data.objects[Object.keys(this.data.objects)[0]];
-    this.projection.fitSize([this.width, this.height], feature(this.data, data_object));
+    var data_object = this.data.geo.objects[Object.keys(this.data.geo.objects)[0]];
+    this.projection.fitSize([this.width, this.height], feature(this.data.geo, data_object));
     return this;
   }
 
@@ -3056,20 +3056,39 @@
     return this;
   }
 
+  // draw functions
+
+  function dataGeo(data, key){
+  	// if no data is passed, then this is a getter function
+  	if (!data) {
+  		return this.data.geo;
+  	}
+
+  	// if data is passed, then this is a setter function
+  	this.data.geo = data;
+
+  	// if a key is passed, add it to the class
+  	if (key) this.keys.geo = key;
+
+  	// now we can add the draw functions to the Class
+  	this.draw = draw;
+    this.drawBoundary = drawBoundary;
+    this.drawSubunits = drawSubunits;
+    this.fitSize = fitSize$1;
+    this.resize = resize;
+    
+    return this;
+  }
+
   // modules
 
   // Initializes a swiftmap
-  function init(options){
+  function init(wrapper){
     // errors
-    if (!options) throw new Error("You must specify options.");
-    if (!options.data) throw new Error ("Your options must contain data.");
+    if (wrapper && typeof wrapper !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
 
-    // defaults
-    if (!options.wrapper) options.wrapper = "body";
-
-    // option attributes
-    this.data = options.data;
-    this.wrapper = options.wrapper;
+    // wrapper
+    this.wrapper = wrapper ? wrapper : "body";
     
     // projection
     this.projection = mercator();
@@ -3080,16 +3099,21 @@
     this.height = this.wrapper == "body" ? window.innerHeight :
       +keepNumber(select(this.wrapper).style("height"));
 
-     // derived attributes
-     this.path = index().projection(this.projection);
-     this.svg = select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
+    // derived attributes
+    this.path = index().projection(this.projection);
+    this.svg = select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
 
-    // functions
-    this.draw = draw;
-    this.drawBoundary = drawBoundary;
-    this.drawSubunits = drawSubunits;
-    this.fitSize = fitSize$1;
-    this.resize = resize;
+    // data object
+    this.data = {
+      geo: [],
+      tab: []
+    };
+
+    // keys object
+    this.keys = {};
+
+    // data functions
+    this.dataGeo = dataGeo;
 
     return this;
   }

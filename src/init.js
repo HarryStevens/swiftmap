@@ -2,28 +2,19 @@
 import * as d3_geo from "d3-geo";
 import * as d3_selection from "d3-selection";
 
-// src
-import draw from "./draw";
-import drawBoundary from "./drawBoundary";
-import drawSubunits from "./drawSubunits";
-import fitSize from "./fitSize";
-import resize from "./resize";
+// data functions
+import dataGeo from "./dataGeo";
 
 // utility functions
 import keepNumber from "./utils/keepNumber";
 
 // Initializes a swiftmap
-export default function init(options){
+export default function init(wrapper){
   // errors
-  if (!options) throw new Error("You must specify options.");
-  if (!options.data) throw new Error ("Your options must contain data.");
+  if (wrapper && typeof wrapper !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
 
-  // defaults
-  if (!options.wrapper) options.wrapper = "body";
-
-  // option attributes
-  this.data = options.data;
-  this.wrapper = options.wrapper;
+  // wrapper
+  this.wrapper = wrapper ? wrapper : "body";
   
   // projection
   this.projection = d3_geo.geoMercator();
@@ -34,16 +25,21 @@ export default function init(options){
   this.height = this.wrapper == "body" ? window.innerHeight :
     +keepNumber(d3_selection.select(this.wrapper).style("height"));
 
-   // derived attributes
-   this.path = d3_geo.geoPath().projection(this.projection);
-   this.svg = d3_selection.select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
+  // derived attributes
+  this.path = d3_geo.geoPath().projection(this.projection);
+  this.svg = d3_selection.select(this.wrapper).append("svg").attr("width", this.width).attr("height", this.height);
 
-  // functions
-  this.draw = draw;
-  this.drawBoundary = drawBoundary;
-  this.drawSubunits = drawSubunits;
-  this.fitSize = fitSize;
-  this.resize = resize;
+  // data object
+  this.data = {
+    geo: [],
+    tab: []
+  };
+
+  // keys object
+  this.keys = {}
+
+  // data functions
+  this.dataGeo = dataGeo;
 
   return this;
 }
