@@ -51,6 +51,7 @@
         // Exposes DOM elements for styling.
         var colors = ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"];
         map.subunits.transition().style("fill", (d, i) => colors[i % colors.length] );
+        map.subunits.on("click", d => { console.log(d); });
 
         // Makes it ridiculously easy to create resizable maps for responsive designs.
         window.onresize = () => map.resize();
