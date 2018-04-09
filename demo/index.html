@@ -17,27 +17,43 @@
   <body>
     <div id="map"></div>
 
+<!--     <script src="../lib/swiftmap-d3-bundler/d3.min.js"></script>
+    <script>
+
+    d3.select("body").append("h1")
+        .text("Hello, world!")
+        .style("text-align", "center")
+        .style("line-height", "320px")
+        .style("font-size", "100px")
+        .style("transform", "rotate(-180deg) scale(0.001, 0.001)")
+      .transition()
+        .duration(1500)
+        .style("transform", null);
+
+    </script> -->
+
     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
     <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 
     <script src="../dist/swiftmap.js"></script>
-    
     <script>
-      d3.json("india_state.json", function(error, data){
+      d3.json("india_state.json", (error, data) => {
+        // console.log(d3Transition)
 
         // Provides an insanely simple API for initializing and drawing maps.
-        var map = swiftmap.init("#map").dataGeo(data).draw();
-        console.log(map);
+        var map = swiftmap.init("#map")
+            .geometry(data, d => d.properties.ST_NM)
+            .draw();
 
         // Exposes DOM elements for styling.
         var colors = ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"];
-        map.subunits.style("fill", (d, i) => colors[i % colors.length] );
+        map.subunits.transition().style("fill", (d, i) => colors[i % colors.length] );
 
         // Makes it ridiculously easy to create resizable maps for responsive designs.
         window.onresize = () => map.resize();
-
       });
     </script>
   </body>
