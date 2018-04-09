@@ -7,10 +7,10 @@ import keepNumber from "./utils/keepNumber";
 // resizes the map
 export default function resize() {
   // size attributes
-  this.width = this.wrapper == "body" ? window.innerWidth :
-    +keepNumber(d3_selection.select(this.wrapper).style("width"));
-  this.height = this.wrapper == "body" ? window.innerHeight :
-    +keepNumber(d3_selection.select(this.wrapper).style("height"));
+  this.width = this.parent == "body" ? window.innerWidth :
+    +keepNumber(d3_selection.select(this.parent).style("width"));
+  this.height = this.parent == "body" ? window.innerHeight :
+    +keepNumber(d3_selection.select(this.parent).style("height"));
   this.svg.attr("width", this.width).attr("height", this.height);
   
   this.fitSize();

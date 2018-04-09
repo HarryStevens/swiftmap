@@ -6,7 +6,7 @@ A super simple API for making super simple maps. [See it in action](https://bl.o
 Provides an insanely simple API for initializing and drawing maps.
 
 ```js
-var map = swiftmap.init().dataGeo(TopoJSONObject).draw();
+var map = swiftmap.init().geometry(TopoJSONObject).draw();
 ```
 
 Exposes DOM elements as D3 selections for styling.
@@ -56,13 +56,13 @@ var swiftmap = require("swiftmap");
 
 ### Methods
 
-<a name="init" href="#init">#</a> swiftmap.<b>init</b>([<i>wrapper</i>])
+<a name="init" href="#init">#</a> swiftmap.<b>init</b>([<i>parent</i>])
 
-Initializes a <i>map</i>. If <i>wrapper</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the wrapper's selector. The <i>wrapper</i> must be specified as a string. If <i>wrapper</i> is not specified, `"body"` will be used as the wrapper.
+Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
 
-<a name="dataGeo" href="#dataGeo">#</a> <i>map</i>.<b>dataGeo</b>(<i>data</i>)
+<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>])
 
-Adds geospatial data the the <i>map</i>. The <i>data</i> must be a TopoJSON object. 
+Adds geospatial data the the <i>map</i>. The <i>data</i> must be a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map<i>.
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>()
 
@@ -78,7 +78,7 @@ Draws the map's subunits. For example, if your TopoJSON contains states, the sub
 
 <a name="fitSize" href="#fitSize">#</a> <i>map</i>.<b>fitSize</b>()
 
-Updates the projection so that the map's outer boundary fits its wrapper element.
+Updates the projection so that the map's outer boundary fits its parent element.
 
 <a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>()
 
@@ -105,9 +105,9 @@ map.subunits
 
 The D3 selection of the SVG element containing the map.
 
-<a name="wrapper" href="#wrapper">#</a> <i>map</i>.<b>wrapper</b>
+<a name="parent" href="#parent">#</a> <i>map</i>.<b>parent</b>
 
-A string of the map's wrapper element.
+A string of the map's parent element.
 
 <a name="path" href="#path">#</a> <i>map</i>.<b>path</b>()
 
