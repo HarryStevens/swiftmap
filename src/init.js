@@ -22,8 +22,6 @@ import keepNumber from "./utils/keepNumber";
 // Initializes a swiftmap
 export default function init(parent){
 
-  console.log(d3);
-
   // errors
   if (parent && typeof parent !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
 

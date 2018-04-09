@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.20. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.0.21. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -695,8 +695,6 @@
 
   var filterEvents = {};
 
-  var event = null;
-
   if (typeof document !== "undefined") {
     var element$1 = document.documentElement;
     if (!("onmouseenter" in element$1)) {
@@ -716,12 +714,9 @@
 
   function contextListener(listener, index, group) {
     return function(event1) {
-      var event0 = event; // Events can be reentrant (e.g., focus).
-      event = event1;
       try {
         listener.call(this, this.__data__, index, group);
       } finally {
-        event = event0;
       }
     };
   }
@@ -872,12 +867,6 @@
     return typeof selector === "string"
         ? new Selection([[document.querySelector(selector)]], [document.documentElement])
         : new Selection([[selector]], root);
-  }
-
-  function selectAll(selector) {
-    return typeof selector === "string"
-        ? new Selection([document.querySelectorAll(selector)], [document.documentElement])
-        : new Selection([selector == null ? [] : selector], root);
   }
 
   var noop = {value: function() {}};
@@ -4487,17 +4476,6 @@
 
     return reclip();
   }
-
-
-
-  var d3 = /*#__PURE__*/Object.freeze({
-    get event () { return event; },
-    selection: selection,
-    select: select,
-    selectAll: selectAll,
-    geoPath: index,
-    geoMercator: mercator
-  });
 
   function geometry(data, key){
   	// if no data is passed, then this is a getter function
@@ -8537,8 +8515,6 @@
 
   // Initializes a swiftmap
   function init$1(parent){
-
-    console.log(d3);
 
     // errors
     if (parent && typeof parent !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
