@@ -62,7 +62,7 @@ Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be 
 
 <a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>])
 
-Adds geospatial data the the <i>map</i>. The <i>data</i> must be a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map<i>.
+Adds geospatial data the the <i>map</i>. The <i>data</i> must be a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>.
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>()
 
@@ -94,7 +94,7 @@ The map's dimensions.
 <a name="boundary" href="#boundary">#</a> <i>map</i>.<b>boundary</b><br />
 <a name="subunits" href="#subunits">#</a> <i>map</i>.<b>subunits</b>
 
-D3 selections of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.<b>drawBoundary</b>(), <i>map</i>.<b>drawSubunits</b>(), or <i>map</i>.<b>draw</b>(), which makes both available.
+[D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.<b>drawBoundary</b>(), <i>map</i>.<b>drawSubunits</b>(), or <i>map</i>.<b>draw</b>(), which makes both available.
 
 ```js
 map.subunits
