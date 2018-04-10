@@ -123,6 +123,12 @@ Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as t
 
 ## <a name="contributing" href="#contributing">Contributing</a>
 
+```bash
+git clone https://github.com/HarryStevens/swiftmap # clone this repository
+cd swiftmap # navigate into the directory
+npm install # install node modules
+```
+
 swiftmap is compiled with [rollup](https://github.com/rollup/rollup). Each function can be found in the [`src` directory](https://github.com/HarryStevens/swiftmap/tree/master/lib).
 
 ```bash
@@ -130,3 +136,5 @@ npm run rollup # compile the library
 npm run minify # minify the library
 npm run build # compile and minify the library
 ```
+
+swiftmap also uses a custom version of D3.js, which can be found in [lib/swiftmap-d3-bundler](https://github.com/HarryStevens/swiftmap/tree/master/lib/swiftmap-d3-bundler). If you need to update the bundle, do `cd lib/swiftmap-d3-bundler`, where you can install additional dependencies and update the [`index.js`](https://github.com/HarryStevens/swiftmap/blob/master/lib/swiftmap-d3-bundler/index.js) file. You will also have to update the `globals` object and the `only` array in the `resolve()` function in [`rollup.config.js`](https://github.com/HarryStevens/swiftmap/blob/master/rollup.config.js).
