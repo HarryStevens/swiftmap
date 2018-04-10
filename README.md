@@ -1,9 +1,9 @@
 # swiftmap
-A super simple API for making super simple maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
+A simple API for making awesome maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
 ## <a name="features" href="#features">Features</a>
 
-Provides an insanely simple API for initializing and drawing maps.
+Provides a simple API for making maps.
 
 ```js
 var map = swiftmap.init().geometry(TopoJSONObject).draw();
@@ -62,7 +62,7 @@ Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be 
 
 <a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>])
 
-Adds geospatial data the the <i>map</i>. The <i>data</i> must be a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>.
+Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>.
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>()
 
