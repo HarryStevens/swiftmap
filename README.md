@@ -182,7 +182,7 @@ The <i>breaktype</i> will default to "q" if this method is not called.
 
 <a name="values" href="#values">#</a> <i>sequential</i>.<b>values</b>(function) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
-Allows the scheme to interact with the map's data. The <i>function</i> tells the scheme which value from each of the map's subunit should correspond to the scheme.
+Allows the scheme to interact with the map's data. The <i>function</i> tells the scheme which value from each of the map's subunits should correspond to the scheme.
 
 ## Contributing
 
