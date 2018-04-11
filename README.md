@@ -188,7 +188,7 @@ function(d){ return d; }
 
 When the scheme is passed to <i>map</i>.<b>fill</b>(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
 
-```
+```js
 var data = [
   {population: "15324", area: "124"},
   {population: "23540", area: "365"},
