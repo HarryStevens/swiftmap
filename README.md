@@ -66,15 +66,17 @@ Before drawing and styling a map, you must tell swiftmap where on the DOM to pla
 
 Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
 
-<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/geometry.js "Source")
+<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/geometry.js "Source")
 
-Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>.
+Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>. Swiftmap cannot draw a map without geospatial data.
 
-Swiftmap cannot draw a map unless without geospatial data.
+Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data.
 
-<a name="data" href="#data">#</a> <i>map</i>.<b>data</b>([<i>data</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/data.js "Source")
+<a name="data" href="#data">#</a> <i>map</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/data.js "Source")
 
 Adds tabular data to the <i>map</i>. The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>map</i>.
+
+Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data.
 
 <b>Initial attributes</b>
 
@@ -117,7 +119,7 @@ Draws the map's subunits. For example, if your TopoJSON contains states, the sub
 
 <a name="fill" href="#fill">#</a> <i>map</i>.<b>fill</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fill.js "Source")
 
-Fills the map's subunits based on a [<i>scheme</i>](#section-schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. The <i>duration</i> must be specified as a positive number corresponding to the length of the transition in milliseconds.
+Fills the map's subunits based on a [<i>scheme</i>](#section-schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. The <i>duration</i> must be specified as a positive number corresponding to the length of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
 <a name="fitSize" href="#fitSize">#</a> <i>map</i>.<b>fitSize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fitSize.js "Source")
 
@@ -147,6 +149,10 @@ Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as t
 
 Schemes provide an interface for mapping attributes of your data to visual attributes. Typically, you will use a scheme to create a thematic map, such as a choropleth map.
 
+<a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
+
+Sequential schemes are used to assign colors to discrete ranges in a series of values that progress from low to high.
+
 ```js
 var scheme = swiftmap.schemeSequential()
   .colors(["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"])
@@ -154,9 +160,7 @@ var scheme = swiftmap.schemeSequential()
   .values(d => +d.population / +d.area);
 ```
 
-<a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
-
-Sequential schemes are used to assign colors to discrete ranges in a series of values that progress from low to high.
+[See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
 <a name="colors" href="#colors">#</a> <i>sequential</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
