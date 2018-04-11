@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.1. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.2. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4483,32 +4483,21 @@
       return this.meta.tab;
     }
 
+    // if the key is not a function, set the key property of each datum matches its index
+    if (typeof key !== "function") {
+      console.warn("The key must be specified as a function. The key will default to (d, i) => i");
+      key = function(d, i){ return i; };
+    }
+
     // if data is passed, then this is a setter function
     this.meta.tab = data;
 
     // if a key is passed, add the key to the data
-    if (key){
-
-      // for loops are more efficient that forEach
-      var arr = this.meta.tab,
-        out = [];
-      for (var i = 0, n = arr.length; i < n; i++){
-        arr[i].key = key(arr[i]);
-        out.push(arr[i]);
-      }
-      this.meta.tab = out;
-
-    }
-
-    // without a key, just assign the index
-    else {
-
-      this.meta.tab.forEach(function(d, i){
-        d.key = i;
-        return d;
-      });
-
-    }
+    // otherwise, assign the index to the key property
+    this.meta.tab.forEach(function(d, i, arr){
+      d.key = key ? key(d, i, arr) : i;
+      return d;
+    });
     
     return this;
   }
@@ -4519,32 +4508,22 @@
       return this.meta.geo;
     }
 
+    // if the key is not a function, set the key property of each datum matches its index
+    if (typeof key !== "function") {
+      console.warn("The key must be specified as a function. The key will default to (d, i) => i");
+      key = function(d, i){ return i; };
+    }
+
     // if data is passed, then this is a setter function
     this.meta.geo = data;
 
     // if a key is passed, add the key to the data
-    if (key){
+    // otherwise, assign the index to the key property
+    this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries.forEach(function(d, i, arr){
+      d.properties.key = key ? key(d, i, arr) : i;
+      return d;
+    });
 
-      var arr = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries,
-        out = [];
-      for (var i = 0, n = arr.length; i < n; i++){
-        arr[i].properties.key = key(arr[i]);
-        out.push(arr[i]);
-      }
-      this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries = out;
-
-    }
-
-    // without a key, just assign the index
-    else {
-
-      this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries.forEach(function(d, i){
-        d.properties.key = i;
-        return d;
-      });
-      
-    }
-    
     return this;
   }
 

@@ -4,32 +4,21 @@ export default function data(data, key){
     return this.meta.tab;
   }
 
+  // if the key is not a function, set the key property of each datum matches its index
+  if (typeof key !== "function") {
+    console.warn("The key must be specified as a function. The key will default to (d, i) => i");
+    key = function(d, i){ return i; }
+  }
+
   // if data is passed, then this is a setter function
   this.meta.tab = data;
 
   // if a key is passed, add the key to the data
-  if (key){
-
-    // for loops are more efficient that forEach
-    var arr = this.meta.tab,
-      out = [];
-    for (var i = 0, n = arr.length; i < n; i++){
-      arr[i].key = key(arr[i]);
-      out.push(arr[i]);
-    }
-    this.meta.tab = out;
-
-  }
-
-  // without a key, just assign the index
-  else {
-
-    this.meta.tab.forEach(function(d, i){
-      d.key = i;
-      return d;
-    });
-
-  }
+  // otherwise, assign the index to the key property
+  this.meta.tab.forEach(function(d, i, arr){
+    d.key = key ? key(d, i, arr) : i;
+    return d;
+  });
   
   return this;
 }
