@@ -22,40 +22,43 @@ export default function init(parent){
   // errors
   if (parent && typeof parent !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
 
-  // parent
-  this.parent = parent ? parent : "body";
-  
-  // projection
-  this.projection = d3.geoMercator();
+  function Swiftmap(parent){
+    // parent
+    this.parent = parent ? parent : "body";
+    
+    // projection
+    this.projection = d3.geoMercator();
 
-  // size
-  this.width = this.parent == "body" ? window.innerWidth :
-    +keepNumber(d3.select(this.parent).style("width"));
-  this.height = this.parent == "body" ? window.innerHeight :
-    +keepNumber(d3.select(this.parent).style("height"));
+    // size
+    this.width = this.parent == "body" ? window.innerWidth :
+      +keepNumber(d3.select(this.parent).style("width"));
+    this.height = this.parent == "body" ? window.innerHeight :
+      +keepNumber(d3.select(this.parent).style("height"));
 
-  // derived attributes
-  this.path = d3.geoPath().projection(this.projection);
-  this.svg = d3.select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
+    // derived attributes
+    this.path = d3.geoPath().projection(this.projection);
+    this.svg = d3.select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
-  // meta object for storing data
-  this.meta = {
-    geo: [],
-    tab: []
-  };
+    // meta object for storing data
+    this.meta = {
+      geo: [],
+      tab: []
+    };
 
-  // init functions
-  this.data = data;
-  this.geometry = geometry;
+    // init functions
+    this.data = data;
+    this.geometry = geometry;
 
-  // draw functions
-  this.draw = draw;
-  this.drawBoundary = drawBoundary;
-  this.drawSubunits = drawSubunits;
-  this.fill = fill;
-  this.fitSize = fitSize;
-  this.resize = resize;
+    // draw functions
+    this.draw = draw;
+    this.drawBoundary = drawBoundary;
+    this.drawSubunits = drawSubunits;
+    this.fill = fill;
+    this.fitSize = fitSize;
+    this.resize = resize;
 
-  return this;
+  }
+
+  return (new Swiftmap(parent));
 
 }

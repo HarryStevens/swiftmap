@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.2. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.3. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4484,7 +4484,7 @@
     }
 
     // if the key is not a function, set the key property of each datum matches its index
-    if (typeof key !== "function") {
+    if (data && typeof key !== "function") {
       console.warn("The key must be specified as a function. The key will default to (d, i) => i");
       key = function(d, i){ return i; };
     }
@@ -4509,7 +4509,7 @@
     }
 
     // if the key is not a function, set the key property of each datum matches its index
-    if (typeof key !== "function") {
+    if (key && typeof key !== "function") {
       console.warn("The key must be specified as a function. The key will default to (d, i) => i");
       key = function(d, i){ return i; };
     }
@@ -7653,41 +7653,44 @@
     // errors
     if (parent && typeof parent !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
 
-    // parent
-    this.parent = parent ? parent : "body";
-    
-    // projection
-    this.projection = mercator();
+    function Swiftmap(parent){
+      // parent
+      this.parent = parent ? parent : "body";
+      
+      // projection
+      this.projection = mercator();
 
-    // size
-    this.width = this.parent == "body" ? window.innerWidth :
-      +keepNumber(select(this.parent).style("width"));
-    this.height = this.parent == "body" ? window.innerHeight :
-      +keepNumber(select(this.parent).style("height"));
+      // size
+      this.width = this.parent == "body" ? window.innerWidth :
+        +keepNumber(select(this.parent).style("width"));
+      this.height = this.parent == "body" ? window.innerHeight :
+        +keepNumber(select(this.parent).style("height"));
 
-    // derived attributes
-    this.path = index().projection(this.projection);
-    this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
+      // derived attributes
+      this.path = index().projection(this.projection);
+      this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
-    // meta object for storing data
-    this.meta = {
-      geo: [],
-      tab: []
-    };
+      // meta object for storing data
+      this.meta = {
+        geo: [],
+        tab: []
+      };
 
-    // init functions
-    this.data = data;
-    this.geometry = geometry;
+      // init functions
+      this.data = data;
+      this.geometry = geometry;
 
-    // draw functions
-    this.draw = draw;
-    this.drawBoundary = drawBoundary;
-    this.drawSubunits = drawSubunits;
-    this.fill = fill;
-    this.fitSize = fitSize$1;
-    this.resize = resize;
+      // draw functions
+      this.draw = draw;
+      this.drawBoundary = drawBoundary;
+      this.drawSubunits = drawSubunits;
+      this.fill = fill;
+      this.fitSize = fitSize$1;
+      this.resize = resize;
 
-    return this;
+    }
+
+    return (new Swiftmap(parent));
 
   }
 
