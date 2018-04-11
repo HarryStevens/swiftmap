@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.0.23. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.1. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4478,62 +4478,62 @@
   }
 
   function data(data, key){
-  	// if no data is passed, then this is a getter function
-  	if (!data) {
-  		return this.meta.tab;
-  	}
+    // if no data is passed, then this is a getter function
+    if (!data) {
+      return this.meta.tab;
+    }
 
-  	// if data is passed, then this is a setter function
-  	this.meta.tab = data;
+    // if data is passed, then this is a setter function
+    this.meta.tab = data;
 
-  	// if a key is passed, add the key to the data
-  	if (key){
+    // if a key is passed, add the key to the data
+    if (key){
 
-  		// for loops are more efficient that forEach
-  		var arr = this.meta.tab,
-  			out = [];
-  		for (var i = 0, n = arr.length; i < n; i++){
-  			arr[i].key = key(arr[i]);
-  			out.push(arr[i]);
-  		}
-  		this.meta.tab = out;
+      // for loops are more efficient that forEach
+      var arr = this.meta.tab,
+        out = [];
+      for (var i = 0, n = arr.length; i < n; i++){
+        arr[i].key = key(arr[i]);
+        out.push(arr[i]);
+      }
+      this.meta.tab = out;
 
-  	}
+    }
     
     return this;
   }
 
   function geometry(data, key){
-  	// if no data is passed, then this is a getter function
-  	if (!data) {
-  		return this.meta.geo;
-  	}
+    // if no data is passed, then this is a getter function
+    if (!data) {
+      return this.meta.geo;
+    }
 
-  	// if data is passed, then this is a setter function
-  	this.meta.geo = data;
+    // if data is passed, then this is a setter function
+    this.meta.geo = data;
 
-  	// if a key is passed, add the key to the data
-  	if (key){
+    // if a key is passed, add the key to the data
+    if (key){
 
-  		var arr = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries,
-  			out = [];
-  		for (var i = 0, n = arr.length; i < n; i++){
-  			arr[i].properties.key = key(arr[i]);
-  			out.push(arr[i]);
-  		}
-  		this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries = out;
+      var arr = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries,
+        out = [];
+      for (var i = 0, n = arr.length; i < n; i++){
+        arr[i].properties.key = key(arr[i]);
+        out.push(arr[i]);
+      }
+      this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries = out;
 
-  	}
+    }
     
     return this;
   }
 
   function draw(){
 
-  	// check for geospatial data
-  	if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
+    // check for geospatial data
+    if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
 
-  	// basic drawing
+    // basic drawing
     this.fitSize().drawSubunits().drawBoundary();
 
     return this;
@@ -4761,9 +4761,9 @@
 
   // draws an outer boundary
   function drawBoundary() {
-  	// check for geospatial data
-  	if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw a boundary.");
-  	
+    // check for geospatial data
+    if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw a boundary.");
+    
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     
     this.boundary = this.svg.append("path")
@@ -7618,7 +7618,7 @@
 
   // centers and zooms a projection
   function fitSize$1() {  
-  	// check for geospatial data
+    // check for geospatial data
     if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can fit the map in its parent.");
 
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
@@ -7692,68 +7692,68 @@
 
   }
 
-  function colors(array){
-  	if (!array) return this.meta.colors;
+  function colors(palette){
+    if (!palette) return this.meta.colors;
 
-  	this.meta.colors = array;
+    this.meta.colors = palette;
 
-  	return this;
+    return this;
   }
 
-  function mode(string){
-  	if (!string) return this.meta.mode;
+  function mode(breaktype){
+    if (!breaktype) return this.meta.mode;
 
-  	var available_modes = ["e", "q", "l", "k"];
+    var available_modes = ["e", "q", "l", "k"];
 
-  	if (typeof string !== "string") {
-  		console.warn("You must specify the scheme's mode as a string. The mode will default to 'e'.");
-  	} else if (available_modes.indexOf(string) == -1) {
-  		console.warn("You must specify the scheme's mode as either 'e', 'q', 'l', or 'k'. The mode will default to 'e'.");
-  	} else {
-  		this.meta.mode = string;
-  	}
-  	
-  	return this;
+    if (typeof breaktype !== "string") {
+      console.warn("You must specify the scheme's mode as a string. The mode will default to 'e'.");
+    } else if (available_modes.indexOf(breaktype) == -1) {
+      console.warn("You must specify the scheme's mode as either 'e', 'q', 'l', or 'k'. The mode will default to 'e'.");
+    } else {
+      this.meta.mode = breaktype;
+    }
+    
+    return this;
   }
 
   function values(mapper){
-  	// error
-  	if (!mapper) {
-  		console.warn("You must specify a mapper for scheme.values()");
-  	} 
+    // error
+    if (!mapper) {
+      console.warn("You must specify a mapper for scheme.values()");
+    } 
 
-  	// warning
-  	else if (typeof mapper !== "function") {
-  		console.warn("You must specify the scheme's values as a mapping function. The mapping function will default to function(d){ return d; }.");
-  	} 
+    // warning
+    else if (typeof mapper !== "function") {
+      console.warn("You must specify the scheme's values as a mapping function. The mapping function will default to function(d){ return d; }.");
+    } 
 
-  	// set the values mapper
-  	else {
-  		this.meta.values = mapper;	
-  	}
-  	
-  	return this;
+    // set the values mapper
+    else {
+      this.meta.values = mapper;  
+    }
+    
+    return this;
   }
 
   // scheme functions
 
   function schemeSequential(){
-  	
-  	function Scheme(){
-  		// data store
-  		this.meta = {
-  			colors: ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
-  			mode: "q",
-  			values: function(d){ return d; }
-  		};
+    
+    function Scheme(){
+      // data store
+      this.meta = {
+        colors: ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
+        mode: "q",
+        values: function(d){ return d; }
+      };
 
-  		// functions
-  		this.colors = colors;
-  		this.mode = mode;
-  		this.values = values;
-  	}
-  	
-  	return new Scheme;
+      // functions
+      this.colors = colors;
+      this.mode = mode;
+      this.values = values;
+    }
+    
+    return new Scheme;
   }
 
   exports.init = init$1;

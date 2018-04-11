@@ -1,7 +1,7 @@
-export default function colors(array){
-	if (!array) return this.meta.colors;
+export default function colors(palette){
+  if (!palette) return this.meta.colors;
 
-	this.meta.colors = array;
+  this.meta.colors = palette;
 
-	return this;
+  return this;
 }

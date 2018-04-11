@@ -1,9 +1,9 @@
 export default function draw(){
 
-	// check for geospatial data
-	if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
+  // check for geospatial data
+  if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
 
-	// basic drawing
+  // basic drawing
   this.fitSize().drawSubunits().drawBoundary();
 
   return this;
