@@ -7,7 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "minify": "uglifyjs dist/swiftmap.js --preamble \"$(preamble)\" -c -m -o dist/swiftmap.min.js",
     "rollup": "rm -rf dist && mkdir dist && rollup -c --banner \"$(preamble)\"",
-    "browserify": "browserify index.js -o dist/swiftmap.js --banner \"$(preamble)\"",
     "build": "npm run rollup && npm run minify"
   },
   "repository": {
@@ -32,18 +31,17 @@
   },
   "homepage": "https://github.com/HarryStevens/swiftmap#readme",
   "devDependencies": {
-    "d3-transition": "^1.1.1",
     "package-preamble": "^0.1.0",
     "rollup": "^0.57.1",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "topojson-client": "^3.0.0",
     "uglifyjs": "^2.4.11"
   },
   "dependencies": {
     "chroma-js": "^1.3.6",
     "d3-geo": "^1.10.0",
     "d3-selection": "^1.3.0",
-    "topojson": "^3.0.2"
+    "d3-transition": "^1.1.1",
+    "topojson-client": "^3.0.0"
   }
 }

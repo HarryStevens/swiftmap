@@ -1,16 +1,16 @@
 // modules
-import * as d3_selection from "d3-selection";
+import * as d3 from "../../lib/swiftmap-d3-bundler";
 
 // utility functions
-import keepNumber from "./utils/keepNumber";
+import keepNumber from "../utils/keepNumber";
 
 // resizes the map
 export default function resize() {
   // size attributes
   this.width = this.parent == "body" ? window.innerWidth :
-    +keepNumber(d3_selection.select(this.parent).style("width"));
+    +keepNumber(d3.select(this.parent).style("width"));
   this.height = this.parent == "body" ? window.innerHeight :
-    +keepNumber(d3_selection.select(this.parent).style("height"));
+    +keepNumber(d3.select(this.parent).style("height"));
   this.svg.attr("width", this.width).attr("height", this.height);
   
   this.fitSize();
