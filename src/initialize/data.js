@@ -20,6 +20,16 @@ export default function data(data, key){
     this.meta.tab = out;
 
   }
+
+  // without a key, just assign the index
+  else {
+
+    this.meta.tab.forEach(function(d, i){
+      d.key = i;
+      return d;
+    });
+
+  }
   
   return this;
 }

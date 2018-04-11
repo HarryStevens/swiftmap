@@ -19,6 +19,16 @@ export default function geometry(data, key){
     this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries = out;
 
   }
+
+  // without a key, just assign the index
+  else {
+
+    this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries.forEach(function(d, i){
+      d.properties.key = i;
+      return d;
+    });
+    
+  }
   
   return this;
 }

@@ -4499,6 +4499,16 @@
       this.meta.tab = out;
 
     }
+
+    // without a key, just assign the index
+    else {
+
+      this.meta.tab.forEach(function(d, i){
+        d.key = i;
+        return d;
+      });
+
+    }
     
     return this;
   }
@@ -4523,6 +4533,16 @@
       }
       this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries = out;
 
+    }
+
+    // without a key, just assign the index
+    else {
+
+      this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries.forEach(function(d, i){
+        d.properties.key = i;
+        return d;
+      });
+      
     }
     
     return this;
