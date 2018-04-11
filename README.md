@@ -176,7 +176,7 @@ If a <i>breaktype</i> is specified, the scheme will compute the class breaks bas
 - "q" specifies <b>quantile</b> breaks, where an equal number of data points is placed into each break.
 - "k" specifies <b>k-means</b> breaks, which use a [<i>k</i>-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) algorithm to group similar data points with each other.
 
-If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associate with the scheme.
+If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
 
 The <i>breaktype</i> will default to "q" if this method is not called.
 
