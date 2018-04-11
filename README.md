@@ -170,15 +170,13 @@ The <i>palette</i> will default to `["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8",
 
 <a name="mode" href="#mode">#</a> <i>sequential</i>.<b>mode</b>([breaktype]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/mode.js "Source")
 
-If a <i>breaktype</i> is specified, the scheme will compute the class breaks based on data. The <i>breaktype</i> must be specified as a string, either "e", "q", "l" or "k".
-- "e" specifies <b>equidistant</b> breaks, where each break spans an equal numeric range.
-- "l" specifies <b>logarithmic</b> breaks, which are just like equidistant breaks but on a logarithmic scale.
-- "q" specifies <b>quantile</b> breaks, where an equal number of data points is placed into each break.
-- "k" specifies <b>k-means</b> breaks, which use a [<i>k</i>-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) algorithm to group similar data points with each other.
+If a <i>breaktype</i> is specified, the scheme will compute the class breaks based on data. The <i>breaktype</i> must be specified as a string, either `"e"`, `"q"`, `"l"` or `"k"`.
+- `"e"` specifies <b>equidistant</b> breaks, where each break spans an equal numeric range.
+- `"l"` specifies <b>logarithmic</b> breaks, which are just like equidistant breaks but on a logarithmic scale.
+- `"q"` specifies <b>quantile</b> breaks, where an equal number of data points is placed into each break.
+- `"k"` specifies <b>k-means</b> breaks, which use a [<i>k</i>-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) algorithm to group similar data points with each other.
 
-If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
-
-The <i>breaktype</i> will default to "q" if this method is not called.
+The <i>breaktype</i> will default to `"q"` if this method is not called. If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
 
 <a name="values" href="#values">#</a> <i>sequential</i>.<b>values</b>(function) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
