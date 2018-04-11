@@ -103,7 +103,7 @@ The projection used to render the map. For now, only the Mercator projection is 
 
 ### Drawing a Map
 
-Once a <i>map</i> has been initialized, swiftmap provides several of methods for drawing.
+Once a <i>map</i> has been initialized, swiftmap provides several methods for drawing.
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/draw.js "Source")
 
