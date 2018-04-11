@@ -13,13 +13,13 @@ Exposes DOM elements as D3 selections for styling.
 
 ```js
 var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
-map.subunits.style("fill", (d, i) => colors[i % colors.length] );
+map.subunits.style("fill", function(d, i){ return colors[i % colors.length]; });
 ```
 
 Makes it easy to create resizable maps for responsive designs.
 
 ```js
-window.onresize = () => map.resize();
+window.onresize = function(){ map.resize(); }
 ```
 
 Allows for chaining functions.
@@ -138,7 +138,7 @@ Resizes the map. This method is useful if your map must respond to window resize
 
 ```js
 map.subunits
-    .style("stroke-width", (d, i) => (i / 4) + "px" )
+    .style("stroke-width", function(d, i){ return (i / 4) + "px"; })
 ```
 
 <b>Draw styles</b>
@@ -155,9 +155,9 @@ Sequential schemes are used to assign colors to discrete ranges in a series of v
 
 ```js
 var scheme = swiftmap.schemeSequential()
-  .colors(["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"])
+  .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"])
   .mode("q")
-  .values(d => +d.population / +d.area);
+  .values(function(d){ return d; });
 ```
 
 [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
@@ -178,9 +178,26 @@ If a <i>breaktype</i> is specified, the scheme will compute the class breaks bas
 
 The <i>breaktype</i> will default to `"q"` if this method is not called. If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
 
-<a name="values" href="#values">#</a> <i>sequential</i>.<b>values</b>(function) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="values" href="#values">#</a> <i>sequential</i>.<b>values</b>([function]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
-Allows the scheme to interact with the map's data. The <i>function</i> tells the scheme which value from each of the map's subunits should correspond to the scheme.
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. The <i>function</i> defaults to:
+
+```js
+function(d){ return d; }
+```
+
+When the scheme is passed to <i>map</i>.<b>fill</b>(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
+
+```
+var data = [
+  {population: "15324", area: "124"},
+  {population: "23540", area: "365"},
+  ...
+];
+
+var scheme = swiftmap.schemeSequential()
+  .values(function(d){ return +d.population / +d.area; });
+```
 
 ## Contributing
 
