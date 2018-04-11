@@ -1,22 +1,23 @@
-export default function geometry(data, key){
+export default function data(data, key){
 	// if no data is passed, then this is a getter function
 	if (!data) {
-		return this.data.geo;
+		return this.meta.tab;
 	}
 
 	// if data is passed, then this is a setter function
-	this.data.geo = data;
+	this.meta.tab = data;
 
 	// if a key is passed, add the key to the data
 	if (key){
 
-		var arr = this.data.geo.objects[Object.keys(this.data.geo.objects)[0]].geometries,
+		// for loops are more efficient that forEach
+		var arr = this.meta.tab,
 			out = [];
 		for (var i = 0, n = arr.length; i < n; i++){
-			arr[i].properties.key = key(arr[i]);
+			arr[i].key = key(arr[i]);
 			out.push(arr[i]);
 		}
-		this.data.geo.objects[Object.keys(this.data.geo.objects)[0]].geometries = out;
+		this.meta.tab = out;
 
 	}
   

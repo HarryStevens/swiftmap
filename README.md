@@ -1,7 +1,7 @@
 # swiftmap
 A simple API for making awesome maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
-## <a name="features" href="#features">Features</a>
+## Features
 
 Provides a simple API for making maps.
 
@@ -30,7 +30,7 @@ map.fitSize().drawBoundary();
 
 [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
-## <a name="installation" href="#installation">Installation</a>
+## Installation
 
 ### Web browser
 In vanilla, a `swiftmap` global is exported. You can use the CDN from unpkg.
@@ -52,54 +52,36 @@ npm install swiftmap --save
 var swiftmap = require("swiftmap");
 ```
 
-## <a name="api" href="#api">API</a>
+## API Reference
 
-### Methods
+- [Initializing a Map](#initializing-a-map)
+- [Drawing a Map](#drawing-a-map)
+- [Schemes](#schemes)
 
-<a name="init" href="#init">#</a> swiftmap.<b>init</b>([<i>parent</i>])
+### Initializing a Map
+
+Before drawing and styling a map, you must tell swiftmap where on the DOM to place the map, as well as the geospatial data to use for the map.
+
+<a name="init" href="#init">#</a> swiftmap.<b>init</b>([<i>parent</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/init.js "Source")
 
 Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
 
-<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>])
+<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/geometry.js "Source")
 
 Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>.
 
-<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>()
+Swiftmap cannot draw a map unless without geospatial data.
 
-Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fitSize</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
+<a name="data" href="#data">#</a> <i>map</i>.<b>data</b>([<i>data</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/data.js "Source")
 
-<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>()
+Adds tabular data to the <i>map</i>. The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>map</i>.
 
-Draws the map's outer boundary.
-
-<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>()
-
-Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
-
-<a name="fitSize" href="#fitSize">#</a> <i>map</i>.<b>fitSize</b>()
-
-Updates the projection so that the map's outer boundary fits its parent element.
-
-<a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>()
-
-Resizes the map. This method is useful if your map must respond to window resizes.
-
-### Attributes
+<b>Initial attributes</b>
 
 <a name="height" href="#height">#</a> <i>map</i>.<b>height</b><br />
 <a name="width" href="#width">#</a> <i>map</i>.<b>width</b>
 
 The map's dimensions.
-
-<a name="boundary" href="#boundary">#</a> <i>map</i>.<b>boundary</b><br />
-<a name="subunits" href="#subunits">#</a> <i>map</i>.<b>subunits</b>
-
-[D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.<b>drawBoundary</b>(), <i>map</i>.<b>drawSubunits</b>(), or <i>map</i>.<b>draw</b>(), which makes both available.
-
-```js
-map.subunits
-    .style("stroke-width", (d, i) => (i / 4) + "px" )
-```
 
 <a name="svg" href="#svg">#</a> <i>map</i>.<b>svg</b>
 
@@ -117,11 +99,88 @@ The GeoJSON path of the map. See [the documentation in d3-geo](https://github.co
 
 The projection used to render the map. For now, only the Mercator projection is supported. See [the documentation in d3-geo](https://github.com/d3/d3-geo#projections).
 
-### Styles
+### Drawing a Map
+
+Once a <i>map</i> has been initialized, swiftmap provides several of methods for drawing.
+
+<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/draw.js "Source")
+
+Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fitSize</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
+
+<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/drawBoundary.js "Source")
+
+Draws the map's outer boundary.
+
+<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/drawSubunits.js "Source")
+
+Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
+
+<a name="fill" href="#fill">#</a> <i>map</i>.<b>fill</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fill.js "Source")
+
+Fills the map's subunits based on a [<i>scheme</i>](#section-schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. The <i>duration</i> must be specified as a positive number corresponding to the length of the transition in milliseconds.
+
+<a name="fitSize" href="#fitSize">#</a> <i>map</i>.<b>fitSize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fitSize.js "Source")
+
+Updates the projection so that the map's outer boundary fits its parent element.
+
+<a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/resize.js "Source")
+
+Resizes the map. This method is useful if your map must respond to window resizes.
+
+<b>Draw attributes</b>
+
+<a name="boundary" href="#boundary">#</a> <i>map</i>.<b>boundary</b><br />
+<a name="subunits" href="#subunits">#</a> <i>map</i>.<b>subunits</b>
+
+[D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.<b>drawBoundary</b>(), <i>map</i>.<b>drawSubunits</b>(), or <i>map</i>.<b>draw</b>(), which makes both available.
+
+```js
+map.subunits
+    .style("stroke-width", (d, i) => (i / 4) + "px" )
+```
+
+<b>Draw styles</b>
 
 Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`.
 
-## <a name="contributing" href="#contributing">Contributing</a>
+### Schemes
+
+Schemes provide an interface for mapping attributes of your data to visual attributes. Typically, you will use a scheme to create a thematic map, such as a choropleth map.
+
+```js
+var scheme = swiftmap.schemeSequential()
+  .colors(["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"])
+  .mode("q")
+  .values(d => +d.population / +d.area);
+```
+
+<a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
+
+Sequential schemes are used to assign colors to discrete ranges in a series of values that progress from low to high.
+
+<a name="colors" href="#colors">#</a> <i>sequential</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
+
+If a <i>palette</i> is specified, the scheme will assign a series of values to each color in the <i>palette</i>. The <i>palette</i> must be specified as an array of strings. If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
+
+The <i>palette</i> will default to `["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]` if this method is not called.
+
+<a name="mode" href="#mode">#</a> <i>sequential</i>.<b>mode</b>([breaktype]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/mode.js "Source")
+
+If a <i>breaktype</i> is specified, the scheme will compute the class breaks based on data. The <i>breaktype</i> must be specified as a string, either "e", "q", "l" or "k".
+- "e" specifies <b>equidistant</b> breaks, where each break spans an equal numeric range.
+- "l" specifies <b>logarithmic</b> breaks, which are just like equidistant breaks but on a logarithmic scale.
+- "q" specifies <b>quantile</b> breaks, where an equal number of data points is placed into each break.
+- "k" specifies <b>k-means</b> breaks, which use a [<i>k</i>-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) algorithm to group similar data points with each other.
+
+If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associate with the scheme.
+
+The <i>breaktype</i> will default to "q" if this method is not called.
+
+<a name="values" href="#values">#</a> <i>sequential</i>.<b>values</b>(function) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+
+Allows the scheme to interact with the map's data. The <i>function</i> tells the scheme which value from each subunit corresponds to the scheme.
+
+## Contributing
 
 ```bash
 git clone https://github.com/HarryStevens/swiftmap # clone this repository
