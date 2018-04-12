@@ -150,7 +150,7 @@ Resizes the map. This method is useful if your map must respond to window resize
 
 ```js
 map.subunits
-    .style("stroke-width", (d, i) => (i / 4) + "px")
+    .style("stroke-width", (d, i) => (i / 4) + "px");
 ```
 
 <b>Draw styles</b>
