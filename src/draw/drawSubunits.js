@@ -5,7 +5,10 @@ import * as topojson from "topojson-client";
 // draws subunits
 export default function drawSubunits() {
   // check for geospatial data
-  if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw subunits.");
+  if (this.meta.geo.length == 0) {
+    console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw subunits.");
+    return;
+  }
 
   var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
   

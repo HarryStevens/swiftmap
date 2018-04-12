@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+      }
+      #map {
+        width: 100%;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+    <script src="https://d3js.org/d3-request.v1.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+
+    <script src="../dist/swiftmap.js"></script>
+
+    <script>
+      var map = swiftmap.init("#map");
+
+      // Create color schemes.
+      var scheme = swiftmap.schemeCategorical()
+        .values(d => d.Party)
+        .colors({
+          "TDP": "#4daf4a",
+          "TRS": "#e41a1c",
+          "YSRCP": "#984ea3",
+          "BJP": "#ff7f00",
+          "INC": "#377eb8"
+        })
+        .colorOther("#000");
+
+      d3.queue()
+        .defer(d3.json, "andhrapradesh-pre2014_AC.json") // geospatial data
+        .defer(d3.csv, "andhrapradesh-2014-results.csv") // tabular data
+        .await(ready);
+
+      function ready(error, geo, tab){
+
+        // Filter the tabular data to get just the winners from the non-bye election.
+        tab = tab.filter(function(d){ return d.Poll_No == "0" && d.Position == "1"; })
+
+        // Join geospatial and tabular data to your map.
+        // Then draw the map and fill it based on your color scheme.
+        map
+          .geometry(geo, function(d){ return d.properties.AC_NO; })
+          .data(tab, function(d){ return d.Constituency_No; })
+          .draw()
+          .fill(scheme, 1000);
+
+        window.onresize = () => map.resize();
+
+      }
+      
+    </script>
+  </body>
+</html>

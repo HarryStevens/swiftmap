@@ -5,7 +5,7 @@ export default function data(data, key){
   }
 
   // if the key is not a function, set the key property of each datum matches its index
-  if (data && typeof key !== "function") {
+  if (key && (Object.prototype.toString.call(key) !== "[object Function]" || typeof key !== "function")) {
     console.warn("The key must be specified as a function. The key will default to (d, i) => i");
     key = function(d, i){ return i; }
   }

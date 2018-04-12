@@ -5,7 +5,7 @@ import values from "./values";
 
 export default function schemeSequential(){
   
-  function Scheme(){
+  function SchemeSequential(){
     // data store
     this.meta = {
       colors: ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
@@ -19,5 +19,5 @@ export default function schemeSequential(){
     this.values = values;
   }
   
-  return new Scheme;
+  return new SchemeSequential;
 }

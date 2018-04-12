@@ -57,6 +57,8 @@ var swiftmap = require("swiftmap");
 - [Initializing a Map](#initializing-a-map)
 - [Drawing a Map](#drawing-a-map)
 - [Schemes](#schemes)
+	- [Categorical Schemes](#schemeCategorical)
+	- [Sequential Schemes](#schemeSequential)
 
 ### Initializing a Map
 
@@ -149,6 +151,52 @@ Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as t
 
 Schemes provide an interface for mapping attributes of your data to visual attributes. Typically, you will use a scheme to create a thematic map, such as a choropleth map.
 
+<a name="schemeCategorical" href="#schemeCategorical">#</a> swiftmap.<b>schemeCategorical</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeCategorical.js "Source")
+
+Categorical schemes are used to assign colors to non-numerical categories of data, such as political parties in an election.
+
+```js
+var scheme = swiftmap.schemeCategorical()
+  .colors({
+    "Republican": "tomato",
+    "Democratic": "steelblue"
+  })
+  .colorOther("yellow")
+  .values(d => d.party);
+```
+
+<a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
+
+If a <i>palette</i> is specified, it must be specified as an object where each property is one of the scheme's categories, and each value is the color associated with that category.
+
+```js
+scheme.colors({
+  "Republican": "tomato",
+  "Democratic": "steelblue"
+});
+```
+
+If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
+
+<a name="colorOther" href="#colorOther">#</a> <i>categorical</i>.<b>colorOther</b>([color]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colorOther.js "Source")
+
+If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.<b>colors</b>(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the current color, which defaults to `"#ccc"`.
+
+<a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>([function]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. When the scheme is passed to <i>map</i>.<b>fill</b>(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
+
+```js
+var data = [
+  {party: "Democratic", state: "California"},
+  {party: "Republican", state: "Texas"},
+  ...
+];
+
+var scheme = swiftmap.schemeCategorical()
+  .values(d => d.party);
+```
+
 <a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
 
 Sequential schemes are used to assign colors to discrete ranges in a series of values that progress from low to high.
@@ -162,7 +210,7 @@ var scheme = swiftmap.schemeSequential()
 
 [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-<a name="colors" href="#colors">#</a> <i>sequential</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
+<a name="colors-sequential" href="#colors-sequential">#</a> <i>sequential</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
 If a <i>palette</i> is specified, the scheme will assign a series of values to each color in the <i>palette</i>. The <i>palette</i> must be specified as an array of strings. If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
 
@@ -178,7 +226,7 @@ If a <i>breaktype</i> is specified, the scheme will compute the class breaks bas
 
 The <i>breaktype</i> will default to `"q"` if this method is not called. If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
 
-<a name="values" href="#values">#</a> <i>sequential</i>.<b>values</b>([function]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="values-sequential" href="#values-sequential">#</a> <i>sequential</i>.<b>values</b>([function]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
 Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. The <i>function</i> defaults to:
 

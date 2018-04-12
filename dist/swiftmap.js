@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.3. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.4. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4484,7 +4484,7 @@
     }
 
     // if the key is not a function, set the key property of each datum matches its index
-    if (data && typeof key !== "function") {
+    if (key && (Object.prototype.toString.call(key) !== "[object Function]" || typeof key !== "function")) {
       console.warn("The key must be specified as a function. The key will default to (d, i) => i");
       key = function(d, i){ return i; };
     }
@@ -4509,7 +4509,7 @@
     }
 
     // if the key is not a function, set the key property of each datum matches its index
-    if (key && typeof key !== "function") {
+    if (key && (Object.prototype.toString.call(key) !== "[object Function]" || typeof key !== "function")) {
       console.warn("The key must be specified as a function. The key will default to (d, i) => i");
       key = function(d, i){ return i; };
     }
@@ -4530,7 +4530,10 @@
   function draw(){
 
     // check for geospatial data
-    if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
+    if (this.meta.geo.length == 0) {
+    	console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
+    	return;
+    }
 
     // basic drawing
     this.fitSize().drawSubunits().drawBoundary();
@@ -4761,7 +4764,10 @@
   // draws an outer boundary
   function drawBoundary() {
     // check for geospatial data
-    if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw a boundary.");
+    if (this.meta.geo.length == 0) {
+      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw a boundary.");
+      return;
+    }
     
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     
@@ -4780,7 +4786,10 @@
   // draws subunits
   function drawSubunits() {
     // check for geospatial data
-    if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can draw subunits.");
+    if (this.meta.geo.length == 0) {
+      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw subunits.");
+      return;
+    }
 
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     
@@ -7555,13 +7564,16 @@
 
     // errors
     if (this.meta.geo.length == 0){
-      throw new Error("Your map does not have any geospatial data associated with it. Before calling fill() on your map, you must first add geospatial data with geometry()."); 
+      console.error("Your map does not have any geospatial data associated with it. Before calling fill() on your map, you must first add geospatial data with geometry()."); 
+      return;
     }
     if (this.meta.tab.length == 0){
-      throw new Error("Your map does not have any tabular data associated with it. Before calling fill() on your map, you must first add data with data()."); 
+      console.error("Your map does not have any tabular data associated with it. Before calling fill() on your map, you must first add data with data()."); 
+      return;
     }
     if (!this.subunits) {
-      throw new Error("Your map does not have subunits to fill. Before calling fill() on your map, you must first call either drawSubunits() or draw().");
+      console.error("Your map does not have subunits to fill. Before calling fill() on your map, you must first call either drawSubunits() or draw().");
+      return;
     }
 
     // warnings
@@ -7587,29 +7599,49 @@
     this.subunits.transition().duration(duration).style("fill", fillSubunits);
 
     function fillSubunits(d){
+
       // get the match and calculate the value
       var match = tab
         .filter(function(row){
           return row.key == d.properties.key;
         })
-        .map(function(row){
-          return scheme.meta.values(row);
-        });
+        .map(scheme.meta.values);
 
       // don't color if there is no match
       if (match.length == 0){
         return;
       }
 
-      // calculate the correct color
-      var color;
-      buckets.forEach(function(bucket, bucket_index){
-        if (match[0] >= bucket && match[0] <= buckets[bucket_index + 1]) {
-          color = scheme.meta.colors[bucket_index];
-        }
-      });
+      // if the scheme is sequential
+      if (scheme.constructor.name == "SchemeSequential") {
 
-      return color;
+        // calculate the correct color
+        var color;
+        buckets.forEach(function(bucket, bucket_index){
+          if (match[0] >= bucket && match[0] <= buckets[bucket_index + 1]){
+            color = scheme.meta.colors[bucket_index];
+          }
+        });
+
+        return color;
+
+      }
+
+      // if the scheme is categorical
+      else if (scheme.constructor.name == "SchemeCategorical"){
+        
+        // calculate the correct color
+        var color;
+        Object.keys(scheme.meta.colors).forEach(function(bucket){
+          if (match[0] == bucket){
+            color = scheme.meta.colors[bucket];
+          }
+        });
+
+        return color || scheme.meta.colorOther;
+
+      }
+
     }
 
     return this;
@@ -7618,7 +7650,13 @@
   // centers and zooms a projection
   function fitSize$1() {  
     // check for geospatial data
-    if (this.meta.geo.length == 0) throw Error("You must pass TopoJSON data through swiftmap.geometry() before you can fit the map in its parent.");
+    if (this.meta.geo.length == 0) {
+    	console.error("You must pass TopoJSON data through swiftmap.geometry() before you can fit the map in its parent.");
+    	return;
+    }
+
+    // update this property so we know whether this geospatial data has been fit to the parent
+    this.meta.fitSize = true;
 
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     this.projection.fitSize([this.width, this.height], feature(this.meta.geo, data_object));
@@ -7636,7 +7674,7 @@
       +keepNumber(select(this.parent).style("height"));
     this.svg.attr("width", this.width).attr("height", this.height);
     
-    this.fitSize();
+    if (this.meta.fitSize) this.fitSize();
 
     this.svg.selectAll("path").attr("d", this.path);
     var projection = this.projection;
@@ -7651,11 +7689,13 @@
   function init$1(parent){
 
     // errors
-    if (parent && typeof parent !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
+    if (parent && (typeof parent !== "string" || parent instanceof String)) {
+      throw TypeError("The argument passed to swiftmap.init() must be a string.");
+    }
 
     function Swiftmap(parent){
       // parent
-      this.parent = parent ? parent : "body";
+      this.parent = parent || "body";
       
       // projection
       this.projection = mercator();
@@ -7673,7 +7713,8 @@
       // meta object for storing data
       this.meta = {
         geo: [],
-        tab: []
+        tab: [],
+        fitSize: false
       };
 
       // init functions
@@ -7697,6 +7738,14 @@
   function colors(palette){
     if (!palette) return this.meta.colors;
 
+    // type errors
+    if (this.constructor.name == "SchemeSequential" && !Array.isArray(palette)) {
+    	throw new TypeError("In schemeSequential.colors(palette), the palette must be specified as an array.");
+    }
+    if (this.constructor.name == "SchemeCategorical" && (typeof palette !== "object" || Array.isArray(palette))) {
+    	throw new TypeError("In schemeCategorical.colors(palette), the palette must be specified as an object.");
+    }
+
     this.meta.colors = palette;
 
     return this;
@@ -7707,7 +7756,7 @@
 
     var available_modes = ["e", "q", "l", "k"];
 
-    if (typeof breaktype !== "string") {
+    if (typeof breaktype !== "string" || breaktype instanceof String) {
       console.warn("You must specify the scheme's mode as a string. The mode will default to 'e'.");
     } else if (available_modes.indexOf(breaktype) == -1) {
       console.warn("You must specify the scheme's mode as either 'e', 'q', 'l', or 'k'. The mode will default to 'e'.");
@@ -7722,12 +7771,12 @@
     // error
     if (!mapper) {
       console.warn("You must specify a mapper for scheme.values()");
-    } 
+    }
 
     // warning
-    else if (typeof mapper !== "function") {
+    else if (Object.prototype.toString.call(mapper) !== "[object Function]" || typeof mapper !== "function") {
       console.warn("You must specify the scheme's values as a mapping function. The mapping function will default to function(d){ return d; }.");
-    } 
+    }
 
     // set the values mapper
     else {
@@ -7741,7 +7790,7 @@
 
   function schemeSequential(){
     
-    function Scheme(){
+    function SchemeSequential(){
       // data store
       this.meta = {
         colors: ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
@@ -7755,11 +7804,41 @@
       this.values = values;
     }
     
-    return new Scheme;
+    return new SchemeSequential;
+  }
+
+  function colorOther(color){
+    if (!color) return this.meta.colorOther;
+
+    this.meta.colorOther = color;
+
+    return this;
+  }
+
+  // scheme functions
+
+  function schemeCategorical(){
+    
+    function SchemeCategorical(){
+      // data store
+      this.meta = {
+        colors: {},
+        values: function(d){ return d; },
+        colorOther: "#ccc"
+      };
+
+      // functions
+      this.colors = colors;
+      this.colorOther = colorOther;
+      this.values = values;
+    }
+    
+    return new SchemeCategorical;
   }
 
   exports.init = init$1;
   exports.schemeSequential = schemeSequential;
+  exports.schemeCategorical = schemeCategorical;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

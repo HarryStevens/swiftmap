@@ -20,11 +20,13 @@ import keepNumber from "../utils/keepNumber";
 export default function init(parent){
 
   // errors
-  if (parent && typeof parent !== "string") throw TypeError("The argument passed to swiftmap.init() must be a string.");
+  if (parent && (typeof parent !== "string" || parent instanceof String)) {
+    throw TypeError("The argument passed to swiftmap.init() must be a string.");
+  }
 
   function Swiftmap(parent){
     // parent
-    this.parent = parent ? parent : "body";
+    this.parent = parent || "body";
     
     // projection
     this.projection = d3.geoMercator();
@@ -42,7 +44,8 @@ export default function init(parent){
     // meta object for storing data
     this.meta = {
       geo: [],
-      tab: []
+      tab: [],
+      fitSize: false
     };
 
     // init functions
