@@ -34,7 +34,7 @@ map.fitSize().drawBoundary();
 var scheme = swiftmap.schemeSequential()
   .values(d => d.population)
   .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]);
-  
+
 map.fill(scheme);
 ```
 
@@ -159,7 +159,7 @@ Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as t
 
 ### Schemes
 
-Schemes provide an interface for mapping attributes of your data to visual attributes. Typically, you will use a scheme to create a thematic map, such as a choropleth map.
+Schemes provide an interface for mapping values of your data to a color palette. Typically, you will use a scheme to create a thematic map, such as a choropleth map.
 
 <a name="schemeCategorical" href="#schemeCategorical">#</a> swiftmap.<b>schemeCategorical</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeCategorical.js "Source")
 
