@@ -5,7 +5,7 @@ export default function values(mapper){
   }
 
   // warning
-  else if (Object.prototype.toString.call(mapper) !== "[object Function]" || typeof mapper !== "function") {
+  else if (typeof mapper !== "function") {
     console.warn("You must specify the scheme's values as a mapping function. The mapping function will default to function(d){ return d; }.");
   }
 

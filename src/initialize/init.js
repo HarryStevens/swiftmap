@@ -20,7 +20,7 @@ import keepNumber from "../utils/keepNumber";
 export default function init(parent){
 
   // errors
-  if (parent && (typeof parent !== "string" || parent instanceof String)) {
+  if (parent && typeof parent !== "string") {
     throw TypeError("The argument passed to swiftmap.init() must be a string.");
   }
 
