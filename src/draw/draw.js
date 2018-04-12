@@ -7,7 +7,7 @@ export default function draw(){
   }
 
   // basic drawing
-  this.fitSize().drawSubunits().drawBoundary();
+  this.fit().drawSubunits().drawBoundary();
 
   return this;
 

@@ -10,7 +10,7 @@ import draw from "../draw/draw";
 import drawBoundary from "../draw/drawBoundary";
 import drawSubunits from "../draw/drawSubunits";
 import fill from "../draw/fill";
-import fitSize from "../draw/fitSize";
+import fit from "../draw/fit";
 import resize from "../draw/resize";
 
 // utility functions
@@ -45,7 +45,7 @@ export default function init(parent){
     this.meta = {
       geo: [],
       tab: [],
-      fitSize: false
+      fit: false
     };
 
     // init functions
@@ -57,7 +57,7 @@ export default function init(parent){
     this.drawBoundary = drawBoundary;
     this.drawSubunits = drawSubunits;
     this.fill = fill;
-    this.fitSize = fitSize;
+    this.fit = fit;
     this.resize = resize;
 
   }

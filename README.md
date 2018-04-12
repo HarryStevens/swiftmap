@@ -25,7 +25,7 @@ window.onresize = () => map.resize();
 * Allows for chaining functions.
 
 ```js
-map.fitSize().drawBoundary();
+map.fit().drawBoundary();
 ```
 
 * Uses simple abstractions for creating color schemes.
@@ -119,7 +119,7 @@ Once a <i>map</i> has been initialized, swiftmap provides several methods for dr
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/draw.js "Source")
 
-Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fitSize</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
+Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fit</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
 
 <a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/drawBoundary.js "Source")
 
@@ -133,7 +133,7 @@ Draws the map's subunits. For example, if your TopoJSON contains states, the sub
 
 Fills the map's subunits based on a [<i>scheme</i>](#schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. An optional <i>duration</i> may be specified as a positive number corresponding to the time of the transition in milliseconds from the previous fill to the current fill. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-<a name="fitSize" href="#fitSize">#</a> <i>map</i>.<b>fitSize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fitSize.js "Source")
+<a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fit.js "Source")
 
 Updates the projection so that the map's outer boundary fits its parent element.
 
@@ -209,13 +209,10 @@ var data = [
   ...
 ];
 
-var scheme = swiftmap.schemeCategorical()
-  .values(d => d.party);
+scheme.values(d => d.party);
 
-swiftmap.init()
-  .geometry(TopoJSON, d => d.state)
+map
   .data(data, d => d.state)
-  .draw()
   .fill(scheme);
 ```
 
@@ -265,13 +262,10 @@ var data = [
   ...
 ];
 
-var scheme = swiftmap.schemeSequential()
-  .values(d => +d.population / +d.area);
+scheme.values(d => +d.population / +d.area);
 
-swiftmap.init()
-  .geometry(TopoJSON, d => d.county)
+map
   .data(data, d => d.county)
-  .draw()
   .fill(scheme);
 ```
 

@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.6. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.7. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4484,7 +4484,7 @@
     }
 
     // if the key is not a function, set the key property of each datum matches its index
-    if (key && (Object.prototype.toString.call(key) !== "[object Function]" || typeof key !== "function")) {
+    if (key && typeof key !== "function") {
       console.warn("The key must be specified as a function. The key will default to (d, i) => i");
       key = function(d, i){ return i; };
     }
@@ -4509,7 +4509,7 @@
     }
 
     // if the key is not a function, set the key property of each datum matches its index
-    if (key && (Object.prototype.toString.call(key) !== "[object Function]" || typeof key !== "function")) {
+    if (key && typeof key !== "function") {
       console.warn("The key must be specified as a function. The key will default to (d, i) => i");
       key = function(d, i){ return i; };
     }
@@ -4531,12 +4531,12 @@
 
     // check for geospatial data
     if (this.meta.geo.length == 0) {
-    	console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
-    	return;
+      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
+      return;
     }
 
     // basic drawing
-    this.fitSize().drawSubunits().drawBoundary();
+    this.fit().drawSubunits().drawBoundary();
 
     return this;
 
@@ -7648,7 +7648,7 @@
   }
 
   // centers and zooms a projection
-  function fitSize$1() {  
+  function fit$1() {  
     // check for geospatial data
     if (this.meta.geo.length == 0) {
     	console.error("You must pass TopoJSON data through swiftmap.geometry() before you can fit the map in its parent.");
@@ -7656,7 +7656,7 @@
     }
 
     // update this property so we know whether this geospatial data has been fit to the parent
-    this.meta.fitSize = true;
+    this.meta.fit = true;
 
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     this.projection.fitSize([this.width, this.height], feature(this.meta.geo, data_object));
@@ -7674,7 +7674,7 @@
       +keepNumber(select(this.parent).style("height"));
     this.svg.attr("width", this.width).attr("height", this.height);
     
-    if (this.meta.fitSize) this.fitSize();
+    if (this.meta.fit) this.fit();
 
     this.svg.selectAll("path").attr("d", this.path);
     var projection = this.projection;
@@ -7689,7 +7689,7 @@
   function init$1(parent){
 
     // errors
-    if (parent && (typeof parent !== "string" || parent instanceof String)) {
+    if (parent && typeof parent !== "string") {
       throw TypeError("The argument passed to swiftmap.init() must be a string.");
     }
 
@@ -7714,7 +7714,7 @@
       this.meta = {
         geo: [],
         tab: [],
-        fitSize: false
+        fit: false
       };
 
       // init functions
@@ -7726,7 +7726,7 @@
       this.drawBoundary = drawBoundary;
       this.drawSubunits = drawSubunits;
       this.fill = fill;
-      this.fitSize = fitSize$1;
+      this.fit = fit$1;
       this.resize = resize;
 
     }
@@ -7756,7 +7756,7 @@
 
     var available_modes = ["e", "q", "l", "k"];
 
-    if (typeof breaktype !== "string" || breaktype instanceof String) {
+    if (typeof breaktype !== "string") {
       console.warn("You must specify the scheme's mode as a string. The mode will default to 'e'.");
     } else if (available_modes.indexOf(breaktype) == -1) {
       console.warn("You must specify the scheme's mode as either 'e', 'q', 'l', or 'k'. The mode will default to 'e'.");
@@ -7774,7 +7774,7 @@
     }
 
     // warning
-    else if (Object.prototype.toString.call(mapper) !== "[object Function]" || typeof mapper !== "function") {
+    else if (typeof mapper !== "function") {
       console.warn("You must specify the scheme's values as a mapping function. The mapping function will default to function(d){ return d; }.");
     }
 
@@ -7810,7 +7810,12 @@
   function colorOther(color){
     if (!color) return this.meta.colorOther;
 
-    this.meta.colorOther = color;
+    // type checking
+    if (typeof color !== "string"){
+    	console.warn("The argument passed to scheme.colorOther() must be a string. The color will not be updated, and defaults to '#ccc'.");
+    } else {
+    	this.meta.colorOther = color;
+    }
 
     return this;
   }
