@@ -165,6 +165,8 @@ var scheme = swiftmap.schemeCategorical()
   .values(d => d.party);
 ```
 
+[See it in action](https://bl.ocks.org/HarryStevens/bc32fe303275b00a2aeea96328a3b143).
+
 <a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
 If a <i>palette</i> is specified, it must be specified as an object where each property is one of the scheme's categories, and each value is the color associated with that category.
