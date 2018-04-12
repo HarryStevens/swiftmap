@@ -80,7 +80,7 @@ Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be 
 
 <a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/geometry.js "Source")
 
-Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>. Swiftmap cannot draw a map without geospatial data.
+Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>. swiftmap cannot draw a map without geospatial data.
 
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
