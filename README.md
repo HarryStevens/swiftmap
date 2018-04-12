@@ -211,6 +211,12 @@ var data = [
 
 var scheme = swiftmap.schemeCategorical()
   .values(d => d.party);
+
+swiftmap.init()
+  .geometry(TopoJSON, d => d.state)
+  .data(data, d => d.state)
+  .draw()
+  .fill(scheme);
 ```
 
 <a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
@@ -254,13 +260,19 @@ When the scheme is passed to <i>map</i>.<b>fill</b>(), the <i>function</i> will 
 
 ```js
 var data = [
-  {population: "15324", area: "124"},
-  {population: "23540", area: "365"},
+  {population: "15324", area: "124", county: "Foo"},
+  {population: "23540", area: "365", county: "Bar"},
   ...
 ];
 
 var scheme = swiftmap.schemeSequential()
   .values(d => +d.population / +d.area);
+
+swiftmap.init()
+  .geometry(TopoJSON, d => d.county)
+  .data(data, d => d.county)
+  .draw()
+  .fill(scheme);
 ```
 
 ## Contributing
