@@ -3,29 +3,39 @@ A simple API for making awesome maps. [See it in action](https://bl.ocks.org/har
 
 ## Features
 
-Provides a simple API for making maps.
+* Provides a simple API for making maps.
 
 ```js
 var map = swiftmap.init().geometry(TopoJSONObject).draw();
 ```
 
-Exposes DOM elements as D3 selections for styling.
+* Exposes DOM elements as D3 selections for styling.
 
 ```js
 var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
 map.subunits.style("fill", (d, i) => colors[i % colors.length]);
 ```
 
-Makes it easy to create resizable maps for responsive designs.
+* Makes it easy to create resizable maps for responsive designs.
 
 ```js
 window.onresize = () => map.resize();
 ```
 
-Allows for chaining functions.
+* Allows for chaining functions.
 
 ```js
 map.fitSize().drawBoundary();
+```
+
+* Uses simple abstractions for creating color schemes.
+
+```js
+var scheme = swiftmap.schemeSequential()
+  .values(d => d.population)
+  .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]);
+  
+map.fill(scheme);
 ```
 
 [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
