@@ -4,8 +4,8 @@ import * as topojson from "topojson-client";
 export default function fit() {  
   // check for geospatial data
   if (this.meta.geo.length == 0) {
-  	console.error("You must pass TopoJSON data through swiftmap.geometry() before you can fit the map in its parent.")
-  	return;
+    console.error("You must pass TopoJSON data through swiftmap.geometry() before you can fit the map in its parent.")
+    return;
   }
 
   // update this property so we know whether this geospatial data has been fit to the parent
