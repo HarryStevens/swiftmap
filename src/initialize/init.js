@@ -4,6 +4,7 @@ import * as d3 from "../../lib/swiftmap-d3-bundler";
 // init functions
 import data from "./data";
 import geometry from "./geometry";
+import projection from "./projection";
 
 // draw functions
 import draw from "../draw/draw";
@@ -25,11 +26,19 @@ export default function init(parent){
   }
 
   function Swiftmap(parent){
+    // meta object for storing data
+    this.meta = {
+      geo: [],
+      tab: [],
+      fit: false,
+      projection: {
+        function: d3.geoMercator(),
+        name: "mercator"
+      },
+    };
+
     // parent
     this.parent = parent || "body";
-    
-    // projection
-    this.projection = d3.geoMercator();
 
     // size
     this.width = this.parent == "body" ? window.innerWidth :
@@ -38,19 +47,13 @@ export default function init(parent){
       +keepNumber(d3.select(this.parent).style("height"));
 
     // derived attributes
-    this.path = d3.geoPath().projection(this.projection);
+    this.path = d3.geoPath().projection(this.meta.projection.function);
     this.svg = d3.select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
-
-    // meta object for storing data
-    this.meta = {
-      geo: [],
-      tab: [],
-      fit: false
-    };
 
     // init functions
     this.data = data;
     this.geometry = geometry;
+    this.projection = projection;
 
     // draw functions
     this.draw = draw;

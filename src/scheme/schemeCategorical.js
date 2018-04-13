@@ -9,8 +9,8 @@ export default function schemeCategorical(){
     // data store
     this.meta = {
       colors: {},
-      values: function(d){ return d; },
-      colorOther: "#ccc"
+      colorOther: "#ccc",
+      values: function(d){ return d; }
     }
 
     // functions

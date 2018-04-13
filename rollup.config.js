@@ -16,13 +16,12 @@ export default {
       "d3-interpolate": "d3",
       "d3-selection": "d3",
       "d3-timer": "d3",
-      "d3-transition": "d3",
-      "topojson-client": "topojson"
+      "d3-transition": "d3"
     }
   },
   plugins: [
     resolve({
-    	only: ["d3-array", "d3-color", "d3-dispatch", "d3-ease", "d3-geo", "d3-interpolate", "d3-selection", "d3-timer", "d3-transition", "topojson-client"]
+    	only: ["d3-array", "d3-color", "d3-dispatch", "d3-ease", "d3-geo", "d3-interpolate", "d3-selection", "d3-timer", "d3-transition"]
     }),
     commonjs({
     	include: "node_modules/**"

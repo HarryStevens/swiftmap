@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.8. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.9. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2632,6 +2632,7 @@
   var exp = Math.exp;
   var log$1 = Math.log;
   var sin = Math.sin;
+  var sign = Math.sign || function(x) { return x > 0 ? 1 : x < 0 ? -1 : 0; };
   var sqrt = Math.sqrt;
   var tan = Math.tan;
 
@@ -4428,6 +4429,175 @@
     };
   }
 
+  function conicProjection(projectAt) {
+    var phi0 = 0,
+        phi1 = pi$1 / 3,
+        m = projectionMutator(projectAt),
+        p = m(phi0, phi1);
+
+    p.parallels = function(_) {
+      return arguments.length ? m(phi0 = _[0] * radians, phi1 = _[1] * radians) : [phi0 * degrees$1, phi1 * degrees$1];
+    };
+
+    return p;
+  }
+
+  function cylindricalEqualAreaRaw(phi0) {
+    var cosPhi0 = cos(phi0);
+
+    function forward(lambda, phi) {
+      return [lambda * cosPhi0, sin(phi) / cosPhi0];
+    }
+
+    forward.invert = function(x, y) {
+      return [x / cosPhi0, asin(y * cosPhi0)];
+    };
+
+    return forward;
+  }
+
+  function conicEqualAreaRaw(y0, y1) {
+    var sy0 = sin(y0), n = (sy0 + sin(y1)) / 2;
+
+    // Are the parallels symmetrical around the Equator?
+    if (abs(n) < epsilon) return cylindricalEqualAreaRaw(y0);
+
+    var c = 1 + sy0 * (2 * n - sy0), r0 = sqrt(c) / n;
+
+    function project(x, y) {
+      var r = sqrt(c - 2 * n * sin(y)) / n;
+      return [r * sin(x *= n), r0 - r * cos(x)];
+    }
+
+    project.invert = function(x, y) {
+      var r0y = r0 - y;
+      return [atan2(x, abs(r0y)) / n * sign(r0y), asin((c - (x * x + r0y * r0y) * n * n) / (2 * n))];
+    };
+
+    return project;
+  }
+
+  function conicEqualArea() {
+    return conicProjection(conicEqualAreaRaw)
+        .scale(155.424)
+        .center([0, 33.6442]);
+  }
+
+  function albers() {
+    return conicEqualArea()
+        .parallels([29.5, 45.5])
+        .scale(1070)
+        .translate([480, 250])
+        .rotate([96, 0])
+        .center([-0.6, 38.7]);
+  }
+
+  // The projections must have mutually exclusive clip regions on the sphere,
+  // as this will avoid emitting interleaving lines and polygons.
+  function multiplex(streams) {
+    var n = streams.length;
+    return {
+      point: function(x, y) { var i = -1; while (++i < n) streams[i].point(x, y); },
+      sphere: function() { var i = -1; while (++i < n) streams[i].sphere(); },
+      lineStart: function() { var i = -1; while (++i < n) streams[i].lineStart(); },
+      lineEnd: function() { var i = -1; while (++i < n) streams[i].lineEnd(); },
+      polygonStart: function() { var i = -1; while (++i < n) streams[i].polygonStart(); },
+      polygonEnd: function() { var i = -1; while (++i < n) streams[i].polygonEnd(); }
+    };
+  }
+
+  // A composite projection for the United States, configured by default for
+  // 960×500. The projection also works quite well at 960×600 if you change the
+  // scale to 1285 and adjust the translate accordingly. The set of standard
+  // parallels for each region comes from USGS, which is published here:
+  // http://egsc.usgs.gov/isb/pubs/MapProjections/projections.html#albers
+  function albersUsa() {
+    var cache,
+        cacheStream,
+        lower48 = albers(), lower48Point,
+        alaska = conicEqualArea().rotate([154, 0]).center([-2, 58.5]).parallels([55, 65]), alaskaPoint, // EPSG:3338
+        hawaii = conicEqualArea().rotate([157, 0]).center([-3, 19.9]).parallels([8, 18]), hawaiiPoint, // ESRI:102007
+        point, pointStream = {point: function(x, y) { point = [x, y]; }};
+
+    function albersUsa(coordinates) {
+      var x = coordinates[0], y = coordinates[1];
+      return point = null, (lower48Point.point(x, y), point)
+          || (alaskaPoint.point(x, y), point)
+          || (hawaiiPoint.point(x, y), point);
+    }
+
+    albersUsa.invert = function(coordinates) {
+      var k = lower48.scale(),
+          t = lower48.translate(),
+          x = (coordinates[0] - t[0]) / k,
+          y = (coordinates[1] - t[1]) / k;
+      return (y >= 0.120 && y < 0.234 && x >= -0.425 && x < -0.214 ? alaska
+          : y >= 0.166 && y < 0.234 && x >= -0.214 && x < -0.115 ? hawaii
+          : lower48).invert(coordinates);
+    };
+
+    albersUsa.stream = function(stream) {
+      return cache && cacheStream === stream ? cache : cache = multiplex([lower48.stream(cacheStream = stream), alaska.stream(stream), hawaii.stream(stream)]);
+    };
+
+    albersUsa.precision = function(_) {
+      if (!arguments.length) return lower48.precision();
+      lower48.precision(_), alaska.precision(_), hawaii.precision(_);
+      return reset();
+    };
+
+    albersUsa.scale = function(_) {
+      if (!arguments.length) return lower48.scale();
+      lower48.scale(_), alaska.scale(_ * 0.35), hawaii.scale(_);
+      return albersUsa.translate(lower48.translate());
+    };
+
+    albersUsa.translate = function(_) {
+      if (!arguments.length) return lower48.translate();
+      var k = lower48.scale(), x = +_[0], y = +_[1];
+
+      lower48Point = lower48
+          .translate(_)
+          .clipExtent([[x - 0.455 * k, y - 0.238 * k], [x + 0.455 * k, y + 0.238 * k]])
+          .stream(pointStream);
+
+      alaskaPoint = alaska
+          .translate([x - 0.307 * k, y + 0.201 * k])
+          .clipExtent([[x - 0.425 * k + epsilon, y + 0.120 * k + epsilon], [x - 0.214 * k - epsilon, y + 0.234 * k - epsilon]])
+          .stream(pointStream);
+
+      hawaiiPoint = hawaii
+          .translate([x - 0.205 * k, y + 0.212 * k])
+          .clipExtent([[x - 0.214 * k + epsilon, y + 0.166 * k + epsilon], [x - 0.115 * k - epsilon, y + 0.234 * k - epsilon]])
+          .stream(pointStream);
+
+      return reset();
+    };
+
+    albersUsa.fitExtent = function(extent, object) {
+      return fitExtent(albersUsa, extent, object);
+    };
+
+    albersUsa.fitSize = function(size, object) {
+      return fitSize(albersUsa, size, object);
+    };
+
+    albersUsa.fitWidth = function(width, object) {
+      return fitWidth(albersUsa, width, object);
+    };
+
+    albersUsa.fitHeight = function(height, object) {
+      return fitHeight(albersUsa, height, object);
+    };
+
+    function reset() {
+      cache = cacheStream = null;
+      return albersUsa;
+    }
+
+    return albersUsa.scale(1070);
+  }
+
   function mercatorRaw(lambda, phi) {
     return [lambda, log$1(tan((halfPi$1 + phi) / 2))];
   }
@@ -4475,6 +4645,17 @@
     }
 
     return reclip();
+  }
+
+  function equirectangularRaw(lambda, phi) {
+    return [lambda, phi];
+  }
+
+  equirectangularRaw.invert = equirectangularRaw;
+
+  function equirectangular() {
+    return projection(equirectangularRaw)
+        .scale(152.63);
   }
 
   function data(data, key){
@@ -4527,6 +4708,35 @@
     return this;
   }
 
+  // modules
+
+  function geometry$1(projectionName){
+    // if no data is passed, then this is a getter function
+    if (!projectionName) {
+      return this.meta.projection.function;
+    }
+
+    var available_projections = ["mercator", "albersUsa", "equirectangular"];
+
+    // if the key is not a function, set the key property of each datum matches its index
+    if (typeof projectionName !== "string") {
+      console.warn("The projectionName must be specified as a string. The projectionName will default to 'mercator'.");
+    }
+    if (available_projections.indexOf(projectionName) == -1){
+      console.warn("You must pass either 'mercator', 'albersUsa', or 'equirectangular' as the projectionName. The projectionName will default to 'mercator'.");
+    }
+
+    // if data is passed, then this is a setter function
+    this.meta.projection.name = projectionName;
+    this.meta.projection.function =
+      projectionName == "mercator" ? mercator() :
+      projectionName == "albersUsa" ? albersUsa() :
+      equirectangular();
+    this.path.projection(this.meta.projection.function);
+
+    return this;
+  }
+
   function draw(){
 
     // check for geospatial data
@@ -4540,6 +4750,11 @@
 
     return this;
 
+  }
+
+  function reverse(array, n) {
+    var t, j = array.length, i = j - n;
+    while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
   }
 
   function identity$4(x) {
@@ -4562,11 +4777,6 @@
       while (j < n) output[j] = input[j], ++j;
       return output;
     };
-  }
-
-  function reverse(array, n) {
-    var t, j = array.length, i = j - n;
-    while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
   }
 
   function feature(topology, o) {
@@ -5086,7 +5296,7 @@
     this.meta.fit = true;
 
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
-    this.projection.fitSize([this.width, this.height], feature(this.meta.geo, data_object));
+    this.meta.projection.function.fitSize([this.width, this.height], feature(this.meta.geo, data_object));
     return this;
   }
 
@@ -5121,11 +5331,19 @@
     }
 
     function Swiftmap(parent){
+      // meta object for storing data
+      this.meta = {
+        geo: [],
+        tab: [],
+        fit: false,
+        projection: {
+          function: mercator(),
+          name: "mercator"
+        },
+      };
+
       // parent
       this.parent = parent || "body";
-      
-      // projection
-      this.projection = mercator();
 
       // size
       this.width = this.parent == "body" ? window.innerWidth :
@@ -5134,19 +5352,13 @@
         +keepNumber(select(this.parent).style("height"));
 
       // derived attributes
-      this.path = index().projection(this.projection);
+      this.path = index().projection(this.meta.projection.function);
       this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
-
-      // meta object for storing data
-      this.meta = {
-        geo: [],
-        tab: [],
-        fit: false
-      };
 
       // init functions
       this.data = data;
       this.geometry = geometry;
+      this.projection = geometry$1;
 
       // draw functions
       this.draw = draw;
@@ -5255,8 +5467,8 @@
       // data store
       this.meta = {
         colors: {},
-        values: function(d){ return d; },
-        colorOther: "#ccc"
+        colorOther: "#ccc",
+        values: function(d){ return d; }
       };
 
       // functions

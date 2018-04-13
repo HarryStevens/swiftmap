@@ -90,6 +90,15 @@ Adds tabular data to the <i>map</i>. The <i>data</i> must be specified as a JSON
 
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
+<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([projectionName]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/projection.js "Source")
+
+If <i>projectionName</i> is specified, sets the map's projection. The <i>projectionName</i> must be specified as a string, and can be one of three options: 
+- `"mercator"`, for the [Mercator projection](https://en.wikipedia.org/wiki/Mercator_projection)
+- `"equirectangular"`, for the [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection)
+- `"albersUsa"`, for the Albers USA projection, which is a composite of three [Albers' equal-area conic projections](https://en.wikipedia.org/wiki/Albers_projection).
+
+If <i>projectionName</i> is not specified, returns the current projection associated with the map. For more information, see the [documentation in d3-geo](https://github.com/d3/d3-geo#projections).
+
 <b>Initial attributes</b>
 
 <a name="height" href="#height">#</a> <i>map</i>.<b>height</b><br />
@@ -107,11 +116,7 @@ A string of the map's parent element.
 
 <a name="path" href="#path">#</a> <i>map</i>.<b>path</b>()
 
-The GeoJSON path of the map. See [the documentation in d3-geo](https://github.com/d3/d3-geo#_path).
-
-<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>()
-
-The projection used to render the map. For now, only the Mercator projection is supported. See [the documentation in d3-geo](https://github.com/d3/d3-geo#projections).
+The geographic path generator of the map. For more information, see [the documentation in d3-geo](https://github.com/d3/d3-geo#_path).
 
 ### Drawing a Map
 

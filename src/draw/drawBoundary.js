@@ -1,4 +1,4 @@
-import * as topojson from "topojson-client";
+import mesh from "../../lib/swiftmap-topojson-bundler/mesh";
 
 // draws an outer boundary
 export default function drawBoundary() {
@@ -11,7 +11,7 @@ export default function drawBoundary() {
   var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
   
   this.boundary = this.svg.append("path")
-    .datum(topojson.mesh(this.meta.geo, data_object, function(a, b) { return a === b; }))
+    .datum(mesh(this.meta.geo, data_object, function(a, b) { return a === b; }))
     .attr("d", this.path)
     .attr("class", "boundary")
     .attr("stroke", "#000")
