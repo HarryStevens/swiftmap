@@ -1,5 +1,5 @@
 // modules
-import * as chroma from "chroma-js";
+import limits from "../../lib/swiftmap-chroma-bundler/limits";
 
 // utility functions
 import keepNumber from "../utils/keepNumber";
@@ -31,7 +31,7 @@ export default function fill(scheme, duration){
     geo = this.meta.geo;
 
   // calculate the numerical buckets
-  var buckets = chroma.default.limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
+  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
   
   // set the duration
   if (!duration) duration = 0;
