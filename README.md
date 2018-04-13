@@ -114,10 +114,6 @@ The D3 selection of the SVG element containing the map.
 
 A string of the map's parent element.
 
-<a name="path" href="#path">#</a> <i>map</i>.<b>path</b>()
-
-The geographic path generator of the map. For more information, see [the documentation in d3-geo](https://github.com/d3/d3-geo#_path).
-
 ### Drawing a Map
 
 Once a <i>map</i> has been initialized, swiftmap provides several methods for drawing.
