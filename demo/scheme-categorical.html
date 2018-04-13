@@ -37,12 +37,15 @@
         })
         .colorOther("#000");
 
+      console.log(scheme);
+
       d3.queue()
         .defer(d3.json, "andhrapradesh-pre2014_AC.json") // geospatial data
         .defer(d3.csv, "andhrapradesh-2014-results.csv") // tabular data
+        .defer(d3.json, "india_state.json")
         .await(ready);
 
-      function ready(error, geo, tab){
+      function ready(error, geo, tab, india){
 
         // Filter the tabular data to get just the winners from the non-bye election.
         tab = tab.filter(function(d){ return d.Poll_No == "0" && d.Position == "1"; })
