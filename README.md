@@ -61,8 +61,8 @@ var swiftmap = require("swiftmap");
 
 - [Maps](#maps)
 - [Schemes](#schemes)
-	- [Categorical Schemes](#schemeCategorical)
-	- [Sequential Schemes](#schemeSequential)
+	- [Categorical](#schemeCategorical)
+	- [Sequential](#schemeSequential)
 
 ### Maps
 
