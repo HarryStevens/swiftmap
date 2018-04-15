@@ -203,8 +203,7 @@ scheme
   .data(data, d => d.state)
   .values(d => d.party);
 
-map
-  .fill(scheme);
+map.fill(scheme);
 ```
 
 <a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
@@ -261,8 +260,7 @@ scheme
   .data(data, d => d.county)
   .values(d => +d.population / +d.area);
 
-map
-  .fill(scheme);
+map.fill(scheme);
 ```
 
 ## Contributing
