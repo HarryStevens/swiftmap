@@ -88,7 +88,7 @@ If <i>projectionName</i> is not specified, returns the current projection associ
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
 
-Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fit</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
+Draws a map. This is a convenience method equivalent to <i>map</i>.fit().drawSubunits().drawBoundary().
 
 <a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
 
@@ -128,7 +128,7 @@ A string of the map's parent element.
 <a name="boundary" href="#boundary">#</a> <i>map</i>.<b>boundary</b><br />
 <a name="subunits" href="#subunits">#</a> <i>map</i>.<b>subunits</b>
 
-[D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.<b>drawBoundary</b>(), <i>map</i>.<b>drawSubunits</b>(), or <i>map</i>.<b>draw</b>(), which makes both available.
+[D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
 
 ```js
 map.subunits
@@ -167,7 +167,7 @@ var scheme = swiftmap.schemeCategorical()
 
 Adds tabular data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>. The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>scheme</i>.
 
-Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.<b>fill</b>(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
+Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.fill(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
 <a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
@@ -184,11 +184,11 @@ If <i>palette</i> is not specified, returns the current color palette associated
 
 <a name="colorOther" href="#colorOther">#</a> <i>categorical</i>.<b>colorOther</b>([color]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colorOther.js "Source")
 
-If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.<b>colors</b>(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the current color, which defaults to `"#ccc"`.
+If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.colors(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the current color, which defaults to `"#ccc"`.
 
 <a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>([function]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
-Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. When the scheme is passed to <i>map</i>.<b>fill</b>(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. When the scheme is passed to <i>map</i>.fill(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
 
 ```js
 var data = [
@@ -245,7 +245,7 @@ Sets the values accessor to the specified <i>function</i>, allowing the scheme t
 d => d
 ```
 
-When the scheme is passed to <i>map</i>.<b>fill</b>(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
+When the scheme is passed to <i>map</i>.fill(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
 
 ```js
 var data = [
