@@ -219,7 +219,7 @@ var scheme = swiftmap.schemeSequential()
 
 <a name="data-categorical" href="#data-categorical">#</a> <i>sequential</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
-See [<i>categorical</i>.<b>data</b>()](#colors-categorical).
+See [<i>categorical</i>.<b>data</b>()](#data-categorical).
 
 <a name="colors-sequential" href="#colors-sequential">#</a> <i>sequential</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
