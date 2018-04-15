@@ -26,6 +26,7 @@ window.onresize = () => map.resize();
 
 ```js
 var scheme = swiftmap.schemeSequential()
+  .data(JSON, d => d.subunit)
   .values(d => d.population)
   .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]);
 
@@ -153,6 +154,7 @@ Categorical schemes are used to assign colors to non-numerical categories of dat
 
 ```js
 var scheme = swiftmap.schemeCategorical()
+  .data(JSON, d => d.state)
   .colors({
     "Republican": "tomato",
     "Democratic": "steelblue"
@@ -197,10 +199,11 @@ var data = [
   ...
 ];
 
-scheme.values(d => d.party);
+scheme
+  .data(data, d => d.state)
+  .values(d => d.party);
 
 map
-  .data(data, d => d.state)
   .fill(scheme);
 ```
 
@@ -254,10 +257,11 @@ var data = [
   ...
 ];
 
-scheme.values(d => +d.population / +d.area);
+scheme
+  .data(data, d => d.county)
+  .values(d => +d.population / +d.area);
 
 map
-  .data(data, d => d.county)
   .fill(scheme);
 ```
 
