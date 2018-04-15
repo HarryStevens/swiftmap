@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.9. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.11. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4658,31 +4658,6 @@
         .scale(152.63);
   }
 
-  function data(data, key){
-    // if no data is passed, then this is a getter function
-    if (!data) {
-      return this.meta.tab;
-    }
-
-    // if the key is not a function, set the key property of each datum matches its index
-    if (key && typeof key !== "function") {
-      console.warn("The key must be specified as a function. The key will default to (d, i) => i");
-      key = function(d, i){ return i; };
-    }
-
-    // if data is passed, then this is a setter function
-    this.meta.tab = data;
-
-    // if a key is passed, add the key to the data
-    // otherwise, assign the index to the key property
-    this.meta.tab.forEach(function(d, i, arr){
-      d.key = key ? key(d, i, arr) : i;
-      return d;
-    });
-    
-    return this;
-  }
-
   function geometry(data, key){
     // if no data is passed, then this is a getter function
     if (!data) {
@@ -5200,27 +5175,25 @@
   function fill(scheme, duration){
 
     // errors
-    if (this.meta.geo.length == 0){
-      console.error("Your map does not have any geospatial data associated with it. Before calling fill() on your map, you must first add geospatial data with geometry()."); 
+    if (!scheme){
+      console.error("You have not provided a color scheme to map.fill(), so your subunits will not be filled");
       return;
     }
-    if (this.meta.tab.length == 0){
-      console.error("Your map does not have any tabular data associated with it. Before calling fill() on your map, you must first add data with data()."); 
+    if (this.meta.geo.length == 0){
+      console.error("Your map does not have any geospatial data associated with it. Before calling map.fill(), you must first add geospatial data with map.geometry()."); 
+      return;
+    }
+    if (scheme.meta.tab.length == 0){
+      console.error("Your scheme does not have any tabular data associated with it. Before calling map.fill(), you must first add data with scheme.data()."); 
       return;
     }
     if (!this.subunits) {
-      console.error("Your map does not have subunits to fill. Before calling fill() on your map, you must first call either drawSubunits() or draw().");
-      return;
-    }
-
-    // warnings
-    if (!scheme){
-      console.warn("You have not provided a color scheme to fill(), so your subunits will not be filled");
+      console.error("Your map does not have subunits to fill. Before calling map.fill(), you must first call either map.drawSubunits() or map.draw().");
       return;
     }
     
     // put data in variables outside of the scope of the subunits fill
-    var tab = this.meta.tab,
+    var tab = scheme.meta.tab,
       geo = this.meta.geo;
 
     // calculate the numerical buckets
@@ -5323,18 +5296,17 @@
   // modules
 
   // Initializes a swiftmap
-  function init$1(parent){
+  function map$1(parent){
 
     // errors
     if (parent && typeof parent !== "string") {
-      throw TypeError("The argument passed to swiftmap.init() must be a string.");
+      throw TypeError("The argument passed to swiftmap.map() must be a string.");
     }
 
     function Swiftmap(parent){
       // meta object for storing data
       this.meta = {
         geo: [],
-        tab: [],
         fit: false,
         projection: {
           function: mercator(),
@@ -5356,7 +5328,6 @@
       this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
       // init functions
-      this.data = data;
       this.geometry = geometry;
       this.projection = geometry$1;
 
@@ -5387,6 +5358,31 @@
 
     this.meta.colors = palette;
 
+    return this;
+  }
+
+  function data(data, key){
+    // if no data is passed, then this is a getter function
+    if (!data) {
+      return this.meta.tab;
+    }
+
+    // if the key is not a function, set the key property of each datum matches its index
+    if (key && typeof key !== "function") {
+      console.warn("The key must be specified as a function. The key will default to (d, i) => i");
+      key = function(d, i){ return i; };
+    }
+
+    // if data is passed, then this is a setter function
+    this.meta.tab = data;
+
+    // if a key is passed, add the key to the data
+    // otherwise, assign the index to the key property
+    this.meta.tab.forEach(function(d, i, arr){
+      d.key = key ? key(d, i, arr) : i;
+      return d;
+    });
+    
     return this;
   }
 
@@ -5432,6 +5428,7 @@
     function SchemeSequential(){
       // data store
       this.meta = {
+        tab: [],
         colors: ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
         mode: "q",
         values: function(d){ return d; }
@@ -5439,6 +5436,7 @@
 
       // functions
       this.colors = colors;
+      this.data = data;
       this.mode = mode;
       this.values = values;
     }
@@ -5466,6 +5464,7 @@
     function SchemeCategorical(){
       // data store
       this.meta = {
+        tab: [],
         colors: {},
         colorOther: "#ccc",
         values: function(d){ return d; }
@@ -5474,13 +5473,14 @@
       // functions
       this.colors = colors;
       this.colorOther = colorOther;
+      this.data = data;
       this.values = values;
     }
     
     return new SchemeCategorical;
   }
 
-  exports.init = init$1;
+  exports.map = map$1;
   exports.schemeSequential = schemeSequential;
   exports.schemeCategorical = schemeCategorical;
 

@@ -19,7 +19,6 @@
     <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
-
     <script src="https://unpkg.com/jeezy@1.12.17/lib/jeezy.js"></script>
 
     <script src="../dist/swiftmap.js"></script>
@@ -41,13 +40,14 @@
       function ready(error, geo, tab){
         
         // Get a list of unique states whose population is greater than 10 million.
-        var states = tab.filter(d => +d.population > 10000000).map(d => d.state);
+        var states = tab.filter(d => +d.population > 1e7).map(d => d.state);
 
         // Initialize the map.
-        var map = swiftmap.init("#map").geometry(geo, d => d.properties.ST_NM).draw();
+        var map = swiftmap.map("#map").geometry(geo, d => d.properties.ST_NM).draw();
 
-        // Add data and fill it.
-        map.data(tab, d => d.state).fill(scheme);
+        // Add data to the scheme, and fill the map.
+        scheme.data(tab, d => d.state)
+        map.fill(scheme);
 
         // Change the map's scheme and fill every second.
         setInterval(function(){

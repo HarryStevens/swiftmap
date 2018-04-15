@@ -2,34 +2,32 @@
 import * as d3 from "../../lib/swiftmap-d3-bundler";
 
 // init functions
-import data from "./data";
 import geometry from "./geometry";
 import projection from "./projection";
 
 // draw functions
-import draw from "../draw/draw";
-import drawBoundary from "../draw/drawBoundary";
-import drawSubunits from "../draw/drawSubunits";
-import fill from "../draw/fill";
-import fit from "../draw/fit";
-import resize from "../draw/resize";
+import draw from "../map/draw";
+import drawBoundary from "../map/drawBoundary";
+import drawSubunits from "../map/drawSubunits";
+import fill from "../map/fill";
+import fit from "../map/fit";
+import resize from "../map/resize";
 
 // utility functions
 import keepNumber from "../utils/keepNumber";
 
 // Initializes a swiftmap
-export default function init(parent){
+export default function map(parent){
 
   // errors
   if (parent && typeof parent !== "string") {
-    throw TypeError("The argument passed to swiftmap.init() must be a string.");
+    throw TypeError("The argument passed to swiftmap.map() must be a string.");
   }
 
   function Swiftmap(parent){
     // meta object for storing data
     this.meta = {
       geo: [],
-      tab: [],
       fit: false,
       projection: {
         function: d3.geoMercator(),
@@ -51,7 +49,6 @@ export default function init(parent){
     this.svg = d3.select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
     // init functions
-    this.data = data;
     this.geometry = geometry;
     this.projection = projection;
 

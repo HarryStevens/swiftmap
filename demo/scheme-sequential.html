@@ -22,12 +22,13 @@
 
     <script src="../dist/swiftmap.js"></script>
     <script>
-      var map = swiftmap.init("#map");
 
-      // Create color schemes
+      // Create the map.
+      var map = swiftmap.map("#map");
+
+      // Create a sequential color scheme.
       var scheme = swiftmap.schemeSequential()
         .colors(["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"])
-        .mode("q")
         .values(function(d){ return +d.growth_2001_2011.replace("%", ""); });
 
       d3.queue()
@@ -37,21 +38,23 @@
 
       function ready(error, geo, tab){
 
-        // Join geospatial and tabular data to your map.
+        // Add data to the scheme.
+        scheme.data(tab, function(d){ return d.state; });
+
+        // Add geospatial data to your map.
         // Then draw the map and fill it based on your color scheme.
         map
           .geometry(geo, function(d){ return d.properties.ST_NM; })
-          .data(tab, function(d){ return d.state; })
           .draw()
           .fill(scheme);
 
-        // You can change easily update the scheme to change the map's styling.
+        // You can easily update the scheme to change the map's styling.
         setTimeout(function(){
 
           // Update the scheme...
           scheme.colors(["#b35806", "#f1a340", "#fee0b6", "#f7f7f7", "#d8daeb", "#998ec3", "#542788"])
 
-          // ...and refill the map.
+          // ...and refill the map with a five-second transition.
           map.fill(scheme, 5000);
 
         }, 2000);

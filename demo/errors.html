@@ -20,14 +20,12 @@
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 
-    <script src="../dist/swiftmap.js"></script>
+    <script src="../dist/swiftmap.min.js"></script>
 
     <script>
-
-      // Create the map.
       var map = swiftmap.map("#map");
 
-      // Create a categorical color scheme.
+      // Create color schemes.
       var scheme = swiftmap.schemeCategorical()
         .values(d => d.Party)
         .colors({
@@ -50,10 +48,9 @@
         // Filter the tabular data to get just the winners from the non-bye election.
         tab = tab.filter(function(d){ return d.Poll_No == "0" && d.Position == "1"; })
 
-        // Add data to the scheme.
         scheme.data(tab, function(d){ return d.Constituency_No; });
 
-        // Join geospatial data to your map.
+        // Join geospatial and tabular data to your map.
         // Then draw the map and fill it based on your color scheme.
         map
           .geometry(geo, function(d){ return d.properties.AC_NO; })

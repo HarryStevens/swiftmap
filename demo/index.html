@@ -25,19 +25,24 @@
     <script src="../dist/swiftmap.js"></script>
     <script>
 
+      var map = swiftmap.map("#map");
+
       d3.json("india_state.json", (error, data) => {
         
         // Provides an insanely simple API for initializing and drawing maps.
-        var map = swiftmap.init("#map").geometry(data).projection("equirectangular").draw();
+        map.geometry(data).draw();
 
         // Exposes DOM elements as D3 selections for styling.
         var colors = ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"];
-        map.subunits.transition().style("fill", function(d, i){ return colors[i % colors.length]; });
+        map.subunits
+          .transition().duration(2000)
+          .style("fill", (d, i) => colors[i % colors.length] );        
 
         // Makes it easy to create resizable maps for responsive designs.
         window.onresize = function(){ map.resize(); }
 
       });
+      
     </script>
   </body>
 </html>

@@ -6,7 +6,7 @@ A simple API for making awesome maps. [See it in action](https://bl.ocks.org/har
 * Provides a simple API for making maps.
 
 ```js
-var map = swiftmap.init().geometry(TopoJSONObject).draw();
+var map = swiftmap.map().geometry(TopoJSONObject).draw();
 ```
 
 * Exposes DOM elements as D3 selections for styling.
@@ -20,12 +20,6 @@ map.subunits.style("fill", (d, i) => colors[i % colors.length]);
 
 ```js
 window.onresize = () => map.resize();
-```
-
-* Allows for chaining functions.
-
-```js
-map.fit().drawBoundary();
 ```
 
 * Uses simple abstractions for creating color schemes.
@@ -64,33 +58,26 @@ var swiftmap = require("swiftmap");
 
 ## API Reference
 
-- [Initializing a Map](#initializing-a-map)
-- [Drawing a Map](#drawing-a-map)
+- [Maps](#maps)
 - [Schemes](#schemes)
 	- [Categorical Schemes](#schemeCategorical)
 	- [Sequential Schemes](#schemeSequential)
 
-### Initializing a Map
+### Maps
 
 Before drawing and styling a map, you must tell swiftmap where on the DOM to place the map, as well as the geospatial data to use for the map.
 
-<a name="init" href="#init">#</a> swiftmap.<b>init</b>([<i>parent</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/init.js "Source")
+<a name="map" href="#map">#</a> swiftmap.<b>map</b>([<i>parent</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/map.js "Source")
 
 Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
 
-<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/geometry.js "Source")
+<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/geometry.js "Source")
 
 Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>. swiftmap cannot draw a map without geospatial data.
 
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
-<a name="data" href="#data">#</a> <i>map</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/data.js "Source")
-
-Adds tabular data to the <i>map</i>. The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>map</i>.
-
-Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
-
-<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([projectionName]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/init/projection.js "Source")
+<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([projectionName]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/projection.js "Source")
 
 If <i>projectionName</i> is specified, sets the map's projection. The <i>projectionName</i> must be specified as a string, and can be one of three options: 
 - `"mercator"`, for the [Mercator projection](https://en.wikipedia.org/wiki/Mercator_projection)
@@ -99,7 +86,31 @@ If <i>projectionName</i> is specified, sets the map's projection. The <i>project
 
 If <i>projectionName</i> is not specified, returns the current projection associated with the map. For more information, see the [documentation in d3-geo](https://github.com/d3/d3-geo#projections).
 
-<b>Initial attributes</b>
+<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
+
+Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fit</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
+
+<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
+
+Draws the map's outer boundary.
+
+<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawSubunits.js "Source")
+
+Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
+
+<a name="fill" href="#fill">#</a> <i>map</i>.<b>fill</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
+
+Fills the map's subunits based on a [<i>scheme</i>](#schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. An optional <i>duration</i> may be specified as a positive number corresponding to the time of the transition in milliseconds from the previous fill to the current fill. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
+
+<a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
+
+Updates the projection so that the map's outer boundary fits its parent element.
+
+<a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/resize.js "Source")
+
+Resizes the map. This method is useful if your map must respond to window resizes.
+
+<b>Map attributes</b>
 
 <a name="height" href="#height">#</a> <i>map</i>.<b>height</b><br />
 <a name="width" href="#width">#</a> <i>map</i>.<b>width</b>
@@ -114,36 +125,6 @@ The D3 selection of the SVG element containing the map.
 
 A string of the map's parent element.
 
-### Drawing a Map
-
-Once a <i>map</i> has been initialized, swiftmap provides several methods for drawing.
-
-<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/draw.js "Source")
-
-Draws a map. This is a convenience method equivalent to <i>map</i>.<b>fit</b>().<b>drawSubunits</b>().<b>drawBoundary</b>().
-
-<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/drawBoundary.js "Source")
-
-Draws the map's outer boundary.
-
-<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/drawSubunits.js "Source")
-
-Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
-
-<a name="fill" href="#fill">#</a> <i>map</i>.<b>fill</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fill.js "Source")
-
-Fills the map's subunits based on a [<i>scheme</i>](#schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. An optional <i>duration</i> may be specified as a positive number corresponding to the time of the transition in milliseconds from the previous fill to the current fill. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
-
-<a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/fit.js "Source")
-
-Updates the projection so that the map's outer boundary fits its parent element.
-
-<a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/draw/resize.js "Source")
-
-Resizes the map. This method is useful if your map must respond to window resizes.
-
-<b>Draw attributes</b>
-
 <a name="boundary" href="#boundary">#</a> <i>map</i>.<b>boundary</b><br />
 <a name="subunits" href="#subunits">#</a> <i>map</i>.<b>subunits</b>
 
@@ -154,7 +135,7 @@ map.subunits
     .style("stroke-width", (d, i) => (i / 4) + "px");
 ```
 
-<b>Draw styles</b>
+<b>Map styles</b>
 
 Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`.
 
@@ -181,6 +162,12 @@ var scheme = swiftmap.schemeCategorical()
 ```
 
 [See it in action](https://bl.ocks.org/HarryStevens/bc32fe303275b00a2aeea96328a3b143).
+
+<a name="data-categorical" href="#data-categorical">#</a> <i>categorical</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
+
+Adds tabular data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>. The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>scheme</i>.
+
+Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.<b>fill</b>(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
 <a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
@@ -229,6 +216,10 @@ var scheme = swiftmap.schemeSequential()
 ```
 
 [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
+
+<a name="data-categorical" href="#data-categorical">#</a> <i>sequential</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
+
+See [<i>categorical</i>.<b>data</b>()](#colors-categorical).
 
 <a name="colors-sequential" href="#colors-sequential">#</a> <i>sequential</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
