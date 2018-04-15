@@ -77,7 +77,7 @@ Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a T
 
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
-<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([projectionName]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/projection.js "Source")
+<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([<i>projectionName</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/projection.js "Source")
 
 If <i>projectionName</i> is specified, sets the map's projection. The <i>projectionName</i> must be specified as a string, and can be one of three options: 
 - `"mercator"`, for the [Mercator projection](https://en.wikipedia.org/wiki/Mercator_projection)
@@ -169,7 +169,7 @@ Adds tabular data to the <i>scheme</i>, where each datum corresponds to each sub
 
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.fill(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
-<a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
+<a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([<i>palette</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
 If a <i>palette</i> is specified, it must be specified as an object where each property is one of the scheme's categories, and each value is the color associated with that category.
 
@@ -182,11 +182,11 @@ scheme.colors({
 
 If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
 
-<a name="colorOther" href="#colorOther">#</a> <i>categorical</i>.<b>colorOther</b>([color]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colorOther.js "Source")
+<a name="colorOther" href="#colorOther">#</a> <i>categorical</i>.<b>colorOther</b>([<i>color</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colorOther.js "Source")
 
 If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.colors(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the current color, which defaults to `"#ccc"`.
 
-<a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>([function]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
 Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. When the scheme is passed to <i>map</i>.fill(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
 
@@ -221,13 +221,13 @@ var scheme = swiftmap.schemeSequential()
 
 See [<i>categorical</i>.<b>data</b>()](#data-categorical).
 
-<a name="colors-sequential" href="#colors-sequential">#</a> <i>sequential</i>.<b>colors</b>([palette]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
+<a name="colors-sequential" href="#colors-sequential">#</a> <i>sequential</i>.<b>colors</b>([<i>palette</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
 If a <i>palette</i> is specified, the scheme will assign a series of values to each color in the <i>palette</i>. The <i>palette</i> must be specified as an array of strings. If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
 
 The <i>palette</i> will default to `["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]` if this method is not called.
 
-<a name="mode" href="#mode">#</a> <i>sequential</i>.<b>mode</b>([breaktype]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/mode.js "Source")
+<a name="mode" href="#mode">#</a> <i>sequential</i>.<b>mode</b>([<i>breaktype</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/mode.js "Source")
 
 If a <i>breaktype</i> is specified, the scheme will compute the class breaks based on data. The <i>breaktype</i> must be specified as a string, either `"e"`, `"q"`, `"l"` or `"k"`.
 - `"e"` specifies <b>equidistant</b> breaks, where each break spans an equal numeric range.
@@ -237,7 +237,7 @@ If a <i>breaktype</i> is specified, the scheme will compute the class breaks bas
 
 The <i>breaktype</i> will default to `"q"` if this method is not called. If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
 
-<a name="values-sequential" href="#values-sequential">#</a> <i>sequential</i>.<b>values</b>([function]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="values-sequential" href="#values-sequential">#</a> <i>sequential</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
 Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. The <i>function</i> defaults to:
 
