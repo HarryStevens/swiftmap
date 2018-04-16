@@ -6,15 +6,7 @@
         margin: 0;
         font-family: "Helvetica Neue", sans-serif;
       }
-      #map {
-        width: 100%;
-        height: 100vh;
-      }
-      #map .bubble {
-        fill: steelblue;
-        stroke: steelblue;
-        stroke-width: 2px;
-      }
+
       #select-wrapper {
         position: absolute;
         padding: 5px;
@@ -22,6 +14,17 @@
       }
       #select-wrapper .select-title {
         font-size: .8em;
+      }
+
+      #map {
+        width: 100%;
+        height: 100vh;
+      }
+      /* Swiftmap exposes the .bubble class */
+      #map .bubble {
+        fill: steelblue;
+        stroke: steelblue;
+        stroke-width: 2px;
       }
     </style>
   </head>
@@ -42,18 +45,20 @@
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 
-    <script src="../dist/swiftmap.js"></script>
+    <script src="../dist/swiftmap.min.js"></script>
 
     <script>
+
       // Create the map.
       var map = swiftmap.map("#map");
 
-      // Each metric has its own value function.
+      // In this example, each metric has its own value function,
+      // which will be passed to scheme.values() when the dropdown changes.
       var f = {
         growth: d => +d.growth_2001_2011.replace("%", ""),
         density: d => +d.population / +d.area,
         population: d => +d.population
-      }
+      };
 
       // Create the bubble schemes.
       var scheme = swiftmap.schemeBubble()
@@ -78,17 +83,18 @@
           .drawBubbles(scheme);
 
         // When the dropdown changes...
-        document.getElementById("select").onchange = (sel) => {
+        var sel = document.getElementById("select");
+        sel.onchange = () => {
 
           // ...update the scheme with the appropriate value function...
-          scheme.values(f[sel.srcElement.value]);
+          scheme.values(f[sel.value]);
 
           // ...and redraw the bubbles, with a 750ms transition.
           map.drawBubbles(scheme, 750);
 
         }
 
-        // It's easy to resize a swiftmap.
+        // It's easy to resize a Swiftmap.
         window.onresize = () => map.resize();
 
       }

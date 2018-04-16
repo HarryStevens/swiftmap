@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.11. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.12. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4966,6 +4966,94 @@
     return this;
   }
 
+  // Returns the maximum value of an array.
+  function max$1(arr){
+    return arr.reduce(function(a, b) {
+      return Math.max(a, b);
+  	});
+  }
+
+  // Returns the minimum value of an array.
+  function min$1(arr){
+    return arr.reduce(function(a, b) {
+      return Math.min(a, b);
+  	});
+  }
+
+  // Returns ths minimum and maximum values of an array as the array [min, max].
+  // Depencencies: max, min
+  function extent$2(arr){
+    return [min$1(arr), max$1(arr)];
+  }
+
+  // modules
+
+  // draws an outer boundary
+  function drawBubbles(scheme, duration) {
+    // check for geospatial data
+    if (this.meta.geo.length == 0) {
+      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw bubbles.");
+      return;
+    }
+
+    // set this to true for resizing operations
+    this.meta.bubbles = true;
+    
+    // store some data in variables
+    var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
+    var path = this.path;
+
+    this.bubbles = this.svg.selectAll(".bubble")
+        .data(feature(this.meta.geo, data_object).features, function(d){ return d.properties.key; });
+
+    this.bubbles.transition().duration(duration)
+        .attr("cx", function(d){ return path.centroid(d)[0]; })
+        .attr("cy", function(d){ return path.centroid(d)[1]; });
+
+    if (scheme){
+      this.bubbles.transition().duration(duration)
+          .attr("r", radius);
+    }
+
+    this.bubbles.enter().append("circle")
+        .attr("fill-opacity", .75)
+        .attr("stroke", "#000")
+        .attr("cx", function(d){ return path.centroid(d)[0]; })
+        .attr("cy", function(d){ return path.centroid(d)[1]; })
+        .attr("class", "bubble")
+      .transition().duration(duration)
+        .attr("r", radius);
+
+    function radius(d){
+      // get the matching datum
+      var match = scheme.meta.tab
+        .filter(function(row){
+          return row.key == d.properties.key;
+        })
+        .map(scheme.meta.values);
+
+      // if no match, no bubble
+      if (match.length == 0) return 0;
+
+      return scale(match[0]);    
+    }
+
+      // create a scale to calculate the appropriate radius
+    function scale(datum){
+      var scheme_domain_extent = extent$2(scheme.meta.tab.map(scheme.meta.values));
+      var scheme_range_extent = scheme.meta.radiusRange;
+
+      // where does the datum fall in the extent?
+      var diff_from_bottom = datum - scheme_domain_extent[0];
+      var diff_pct = diff_from_bottom / (scheme_domain_extent[1] - scheme_domain_extent[0]);
+
+      var pct_in_range = (scheme_range_extent[1] - scheme_range_extent[0]) * diff_pct;
+      return scheme_range_extent[0] + pct_in_range;
+    }
+
+    return this;
+  }
+
   // modules
 
   // draws subunits
@@ -4979,7 +5067,7 @@
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     
     this.subunits = this.svg.selectAll(".subunit")
-        .data(feature(this.meta.geo, data_object).features, function(d, i){ return i; })
+        .data(feature(this.meta.geo, data_object).features)
       .enter().append("path")
         .attr("class", "subunit")
         .attr("d", this.path)
@@ -5286,9 +5374,14 @@
     
     if (this.meta.fit) this.fit();
 
-    this.svg.selectAll("path").attr("d", this.path);
     var projection = this.projection;
+    var path = this.path;
+
+    this.svg.selectAll("path").attr("d", path);
     this.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+
+    // need to reposition bubbles
+    if (this.meta.bubbles) this.drawBubbles();
            
     return this;
   }
@@ -5308,6 +5401,7 @@
       this.meta = {
         geo: [],
         fit: false,
+        bubbles: false,
         projection: {
           function: mercator(),
           name: "mercator"
@@ -5334,6 +5428,7 @@
       // draw functions
       this.draw = draw;
       this.drawBoundary = drawBoundary;
+      this.drawBubbles = drawBubbles;
       this.drawSubunits = drawSubunits;
       this.fill = fill;
       this.fit = fit$1;
@@ -5480,9 +5575,50 @@
     return new SchemeCategorical;
   }
 
+  function radiusRange(domain){
+    if (!domain) return this.meta.radiusRange;
+
+    // type errors
+    if (!Array.isArray(domain)) {
+      console.error("In schemeBubble.area(domain), the domain must be specified as an array.");
+      return;
+    }
+
+    if (domain.length !== 2) {
+      console.warn("In schemeBubble.area(domain), the domain array must have two items representing the minimum and maximum bubble areas, in pixels. The domain will be transformed to take the first and last values.");
+      this.meta.radiusRange = [domain[0], domain[domain.length - 1]];
+    } else {
+      this.meta.radiusRange = domain;
+    }
+
+    return this;
+  }
+
+  // scheme functions
+
+  function schemeBubble(){
+    
+    function SchemeBubble(){
+      // data store
+      this.meta = {
+        radiusRange: [2, 20],
+        tab: [],
+        values: function(d){ return d; }
+      };
+
+      // functions
+      this.data = data;
+      this.radiusRange = radiusRange;
+      this.values = values;
+    }
+    
+    return new SchemeBubble;
+  }
+
   exports.map = map$1;
   exports.schemeSequential = schemeSequential;
   exports.schemeCategorical = schemeCategorical;
+  exports.schemeBubble = schemeBubble;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

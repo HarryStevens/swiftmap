@@ -1,5 +1,4 @@
 // modules
-import * as d3 from "../../lib/swiftmap-d3-bundler";
 import feature from "../../lib/swiftmap-topojson-bundler/feature";
 
 // draws subunits
@@ -13,7 +12,7 @@ export default function drawSubunits() {
   var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
   
   this.subunits = this.svg.selectAll(".subunit")
-      .data(feature(this.meta.geo, data_object).features, function(d, i){ return i; })
+      .data(feature(this.meta.geo, data_object).features)
     .enter().append("path")
       .attr("class", "subunit")
       .attr("d", this.path)

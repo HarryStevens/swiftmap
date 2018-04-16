@@ -15,9 +15,14 @@ export default function resize() {
   
   if (this.meta.fit) this.fit();
 
-  this.svg.selectAll("path").attr("d", this.path);
   var projection = this.projection;
+  var path = this.path;
+
+  this.svg.selectAll("path").attr("d", path);
   this.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+
+  // need to reposition bubbles
+  if (this.meta.bubbles) this.drawBubbles();
          
   return this;
 }

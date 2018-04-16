@@ -63,6 +63,7 @@ var swiftmap = require("swiftmap");
 - [Schemes](#schemes)
 	- [Categorical](#schemeCategorical)
 	- [Sequential](#schemeSequential)
+  - [Bubble](#schemeBubble)
 
 ### Maps
 
@@ -103,6 +104,10 @@ Draws the map's subunits. For example, if your TopoJSON contains states, the sub
 
 Fills the map's subunits based on a [<i>scheme</i>](#schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
+<a name="drawBubbles" href="#drawBubbles">#</a> <i>map</i>.<b>drawBubbles</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
+
+Draws bubbles on the centroids of the map's subunits based on a bubble [<i>scheme</i>](#schemeBubbles). An optional <i>duration</i> may be specified to enable an animated transition from each bubble's current radius to its new radius. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
+
 <a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
 
 Updates the projection so that the map's outer boundary fits its parent element.
@@ -131,6 +136,9 @@ A string of the map's parent element.
 
 [D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
 
+<a name="bubbles" href="#bubbles">#</a> <i>map</i>.<b>bubbles</b>
+[D3 selection](https://github.com/d3/d3-selection) of the map's bubbles after invoking <i>map</i>.drawBubbles().
+
 ```js
 map.subunits
     .style("stroke-width", (d, i) => (i / 4) + "px");
@@ -138,14 +146,18 @@ map.subunits
 
 <b>Map styles</b>
 
-Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`.
+Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`. If you create a bubble map, the bubbles are exposed as the class `bubble`.
 
 ### Schemes
 
-Schemes provide an interface for mapping values of your data to a color palette. Typically, you will use a scheme to create a thematic map, such as a choropleth map. Schemes can be added to a map like so:
+Schemes provide an interface for mapping values of your data to visual attributes, such as a choropleth map's color palette or the radii of circles in a bubble map. Schemes can be added to a map like so:
 
 ```js
+// Use a scheme to fill a choropleth map...
 map.fill(scheme);
+
+// ...or to draw a bubble map.
+map.drawBubble(scheme);
 ```
 
 <a name="schemeCategorical" href="#schemeCategorical">#</a> swiftmap.<b>schemeCategorical</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeCategorical.js "Source")
@@ -212,14 +224,15 @@ Sequential schemes are used to assign colors to discrete ranges in a series of v
 
 ```js
 var scheme = swiftmap.schemeSequential()
+  .data(JSON)
   .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"])
   .mode("q")
-  .values(d => d);
+  .values(d => d.value);
 ```
 
 [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-<a name="data-categorical" href="#data-categorical">#</a> <i>sequential</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
+<a name="data-sequential" href="#data-sequential">#</a> <i>sequential</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
 See [<i>categorical</i>.<b>data</b>()](#data-categorical).
 
@@ -261,6 +274,49 @@ scheme
   .values(d => +d.population / +d.area);
 
 map.fill(scheme);
+```
+
+<a name="schemeBubble" href="#schemeBubble">#</a> swiftmap.<b>schemeBubble</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeBubble.js "Source")
+
+Bubble schemes are used to map values of data to corresponding circles' radii.
+
+```js
+var scheme = swiftmap.schemeBubble()
+  .data(JSON)
+  .radiusRange([2, 20])
+  .values(d => d.value);
+```
+
+<a name="data-bubble" href="#data-bubble">#</a> <i>bubble</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
+
+See [<i>categorical</i>.<b>data</b>()](#data-categorical).
+
+<a name="radiusRange" href="#radiusRange">#</a> <i>bubble</i>.<b>radiusRange</b>([<i>range</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/radiusRange.js "Source")
+
+If a <i>range</i> is specified, sets the minimum and maximum values of the bubbles' radii. If a <i>range</i> is not specified, returns the current range, which defaults to `[2, 20]`.
+
+<a name="values-bubble" href="#values-bubble">#</a> <i>bubble</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. The <i>function</i> defaults to:
+
+```js
+d => d
+```
+
+When the scheme is passed to <i>map</i>.drawBubbles(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want the size of the bubbles to to be based on each subunit's population density:
+
+```js
+var data = [
+  {population: "15324", area: "124", county: "Foo"},
+  {population: "23540", area: "365", county: "Bar"},
+  ...
+];
+
+scheme
+  .data(data, d => d.county)
+  .values(d => +d.population / +d.area);
+
+map.drawBubbles(scheme);
 ```
 
 ## Contributing
