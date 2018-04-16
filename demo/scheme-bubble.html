@@ -80,7 +80,7 @@
         map
           .geometry(geo, d => d.properties.ST_NM)
           .draw()
-          .drawBubbles(scheme);
+          .drawScheme(scheme);
 
         // When the dropdown changes...
         var sel = document.getElementById("select");
@@ -90,7 +90,7 @@
           scheme.values(f[sel.value]);
 
           // ...and redraw the bubbles, with a 750ms transition.
-          map.drawBubbles(scheme, 750);
+          map.drawScheme(scheme, 750);
 
         }
 

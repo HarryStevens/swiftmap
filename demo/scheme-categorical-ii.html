@@ -47,7 +47,7 @@
 
         // Add data to the scheme, and fill the map.
         scheme.data(tab, d => d.state)
-        map.fill(scheme);
+        map.drawScheme(scheme);
 
         // Change the map's scheme and fill every second.
         setInterval(function(){
@@ -58,7 +58,7 @@
           scheme.colors(obj);
 
           // Refill the map, with a half-second transition between fills.
-          map.fill(scheme, 500);
+          map.drawScheme(scheme, 500);
 
         }, 1000);
 

@@ -30,7 +30,7 @@ var scheme = swiftmap.schemeSequential()
   .values(d => d.population)
   .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]);
 
-map.fill(scheme);
+map.drawScheme(scheme);
 ```
 
 [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
@@ -100,13 +100,13 @@ Draws the map's outer boundary.
 
 Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
 
-<a name="fill" href="#fill">#</a> <i>map</i>.<b>fill</b>(<i>scheme</i>[, <i>duration</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
+<a name="drawScheme" href="#drawScheme">#</a> <i>map</i>.<b>drawScheme</b>(<i>scheme</i>[, <i>duration</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawScheme.js "Source")
 
-Fills the map's subunits based on a [<i>scheme</i>](#schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
+If the <i>scheme</i> is either [categorical](#schemeCategorical) or [sequential](#schemeSequential), fills the map's subunits to create a choropleth map based on the scheme. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-<a name="drawBubbles" href="#drawBubbles">#</a> <i>map</i>.<b>drawBubbles</b>(<i>scheme</i>[, <i>duration</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBubbles.js "Source")
+If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's subunits based the scheme. An optional <i>duration</i> may be specified to enable an animated transition from each bubble's current radius to its new radius. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
 
-Draws bubbles on the centroids of the map's subunits based on a bubble [<i>scheme</i>](#schemeBubbles). An optional <i>duration</i> may be specified to enable an animated transition from each bubble's current radius to its new radius. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
+An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
 
 <a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
 
@@ -137,7 +137,7 @@ A string of the map's parent element.
 [D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
 
 <a name="bubbles" href="#bubbles">#</a> <i>map</i>.<b>bubbles</b>
-[D3 selection](https://github.com/d3/d3-selection) of the map's bubbles after invoking <i>map</i>.drawBubbles().
+[D3 selection](https://github.com/d3/d3-selection) of the map's bubbles after invoking <i>map</i>.drawScheme().
 
 ```js
 map.subunits
@@ -153,11 +153,8 @@ Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as t
 Schemes provide an interface for mapping values of your data to visual attributes, such as a choropleth map's color palette or the radii of circles in a bubble map. Schemes can be added to a map like so:
 
 ```js
-// Use a scheme to fill a choropleth map...
-map.fill(scheme);
-
-// ...or to draw a bubble map.
-map.drawBubble(scheme);
+// Use a scheme to fill a choropleth map, or to draw a bubble map.
+map.drawScheme(scheme);
 ```
 
 <a name="schemeCategorical" href="#schemeCategorical">#</a> swiftmap.<b>schemeCategorical</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeCategorical.js "Source")
@@ -181,7 +178,7 @@ var scheme = swiftmap.schemeCategorical()
 
 Adds tabular data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>. The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>scheme</i>.
 
-Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.fill(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
+Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.drawScheme(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
 <a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([<i>palette</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
@@ -202,7 +199,7 @@ If a <i>color</i> is specified, assigns a color to those subunits whose category
 
 <a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
-Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. When the scheme is passed to <i>map</i>.fill(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
 
 ```js
 var data = [
@@ -215,7 +212,7 @@ scheme
   .data(data, d => d.state)
   .values(d => d.party);
 
-map.fill(scheme);
+map.drawScheme(scheme);
 ```
 
 <a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
@@ -260,7 +257,7 @@ Sets the values accessor to the specified <i>function</i>, allowing the scheme t
 d => d
 ```
 
-When the scheme is passed to <i>map</i>.fill(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
+When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
 
 ```js
 var data = [
@@ -273,7 +270,7 @@ scheme
   .data(data, d => d.county)
   .values(d => +d.population / +d.area);
 
-map.fill(scheme);
+map.drawScheme(scheme);
 ```
 
 <a name="schemeBubble" href="#schemeBubble">#</a> swiftmap.<b>schemeBubble</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeBubble.js "Source")
@@ -299,27 +296,7 @@ If a <i>range</i> is specified, sets the minimum and maximum values of the bubbl
 
 <a name="values-bubble" href="#values-bubble">#</a> <i>bubble</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
-Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. The <i>function</i> defaults to:
-
-```js
-d => d
-```
-
-When the scheme is passed to <i>map</i>.drawBubbles(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want the size of the bubbles to to be based on each subunit's population density:
-
-```js
-var data = [
-  {population: "15324", area: "124", county: "Foo"},
-  {population: "23540", area: "365", county: "Bar"},
-  ...
-];
-
-scheme
-  .data(data, d => d.county)
-  .values(d => +d.population / +d.area);
-
-map.drawBubbles(scheme);
-```
+See [<i>sequential</i>.values()](#values-sequential).
 
 ## Contributing
 

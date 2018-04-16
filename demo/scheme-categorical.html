@@ -58,7 +58,7 @@
         map
           .geometry(geo, function(d){ return d.properties.AC_NO; })
           .draw()
-          .fill(scheme, 1000);
+          .drawScheme(scheme, 1000);
 
         window.onresize = () => map.resize();
 

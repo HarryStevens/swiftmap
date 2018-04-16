@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.12. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.14. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4966,94 +4966,6 @@
     return this;
   }
 
-  // Returns the maximum value of an array.
-  function max$1(arr){
-    return arr.reduce(function(a, b) {
-      return Math.max(a, b);
-  	});
-  }
-
-  // Returns the minimum value of an array.
-  function min$1(arr){
-    return arr.reduce(function(a, b) {
-      return Math.min(a, b);
-  	});
-  }
-
-  // Returns ths minimum and maximum values of an array as the array [min, max].
-  // Depencencies: max, min
-  function extent$2(arr){
-    return [min$1(arr), max$1(arr)];
-  }
-
-  // modules
-
-  // draws an outer boundary
-  function drawBubbles(scheme, duration) {
-    // check for geospatial data
-    if (this.meta.geo.length == 0) {
-      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw bubbles.");
-      return;
-    }
-
-    // set this to true for resizing operations
-    this.meta.bubbles = true;
-    
-    // store some data in variables
-    var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
-    var path = this.path;
-
-    this.bubbles = this.svg.selectAll(".bubble")
-        .data(feature(this.meta.geo, data_object).features, function(d){ return d.properties.key; });
-
-    this.bubbles.transition().duration(duration)
-        .attr("cx", function(d){ return path.centroid(d)[0]; })
-        .attr("cy", function(d){ return path.centroid(d)[1]; });
-
-    if (scheme){
-      this.bubbles.transition().duration(duration)
-          .attr("r", radius);
-    }
-
-    this.bubbles.enter().append("circle")
-        .attr("fill-opacity", .75)
-        .attr("stroke", "#000")
-        .attr("cx", function(d){ return path.centroid(d)[0]; })
-        .attr("cy", function(d){ return path.centroid(d)[1]; })
-        .attr("class", "bubble")
-      .transition().duration(duration)
-        .attr("r", radius);
-
-    function radius(d){
-      // get the matching datum
-      var match = scheme.meta.tab
-        .filter(function(row){
-          return row.key == d.properties.key;
-        })
-        .map(scheme.meta.values);
-
-      // if no match, no bubble
-      if (match.length == 0) return 0;
-
-      return scale(match[0]);    
-    }
-
-      // create a scale to calculate the appropriate radius
-    function scale(datum){
-      var scheme_domain_extent = extent$2(scheme.meta.tab.map(scheme.meta.values));
-      var scheme_range_extent = scheme.meta.radiusRange;
-
-      // where does the datum fall in the extent?
-      var diff_from_bottom = datum - scheme_domain_extent[0];
-      var diff_pct = diff_from_bottom / (scheme_domain_extent[1] - scheme_domain_extent[0]);
-
-      var pct_in_range = (scheme_range_extent[1] - scheme_range_extent[0]) * diff_pct;
-      return scheme_range_extent[0] + pct_in_range;
-    }
-
-    return this;
-  }
-
   // modules
 
   // draws subunits
@@ -5254,95 +5166,199 @@
     return limits;
   }
 
+  // Returns the maximum value of an array.
+  function max$1(arr){
+    return arr.reduce(function(a, b) {
+      return Math.max(a, b);
+  	});
+  }
+
+  // Returns the minimum value of an array.
+  function min$1(arr){
+    return arr.reduce(function(a, b) {
+      return Math.min(a, b);
+  	});
+  }
+
+  // Returns ths minimum and maximum values of an array as the array [min, max].
+  // Depencencies: max, min
+  function extent$2(arr){
+    return [min$1(arr), max$1(arr)];
+  }
+
   function keepNumber(x){
     return x.replace(/[^\d.-]/g, "");
   }
 
   // modules
 
-  function fill(scheme, duration){
+  function drawScheme(scheme, duration){
 
-    // errors
-    if (!scheme){
-      console.error("You have not provided a color scheme to map.fill(), so your subunits will not be filled");
-      return;
-    }
-    if (this.meta.geo.length == 0){
-      console.error("Your map does not have any geospatial data associated with it. Before calling map.fill(), you must first add geospatial data with map.geometry()."); 
-      return;
-    }
-    if (scheme.meta.tab.length == 0){
-      console.error("Your scheme does not have any tabular data associated with it. Before calling map.fill(), you must first add data with scheme.data()."); 
-      return;
-    }
-    if (!this.subunits) {
-      console.error("Your map does not have subunits to fill. Before calling map.fill(), you must first call either map.drawSubunits() or map.draw().");
-      return;
-    }
-    
-    // put data in variables outside of the scope of the subunits fill
-    var tab = scheme.meta.tab,
-      geo = this.meta.geo;
+  	if (scheme.constructor.name == "SchemeCategorical" || scheme.constructor.name == "SchemeSequential"){
+  		fill(scheme, duration, this);
+  	} 
 
-    // calculate the numerical buckets
-    var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
-    
-    // set the duration
-    if (!duration) duration = 0;
-    if (typeof duration !== "number" || duration < 0) {
-      console.warn("You must specify the duration as a positive number. The duration will be set to 0.");
-      duration = 0;
-    }
+  	else if (scheme.constructor.name == "SchemeBubble") {
+  		drawBubbles(scheme, duration, this);
+  	}
 
-    this.subunits.transition().duration(duration).style("fill", fillSubunits);
+  	else {
+  		console.error("You must pass a valid scheme to map.drawScheme().");
+  		return;
+  	}
 
-    function fillSubunits(d){
+  	function drawBubbles(scheme, duration, swiftmap) {
+  	  // check for geospatial data
+  	  if (swiftmap.meta.geo.length == 0) {
+  	    console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw bubbles.");
+  	    return;
+  	  }
 
-      // get the match and calculate the value
-      var match = tab
-        .filter(function(row){
-          return row.key == d.properties.key;
-        })
-        .map(scheme.meta.values);
+  	  // set this to true for resizing operations
+  	  swiftmap.meta.bubbles = true;
+  	  
+  	  // store some data in variables
+  	  var data_object = swiftmap.meta.geo.objects[Object.keys(swiftmap.meta.geo.objects)[0]];
+  	  var path = swiftmap.path;
 
-      // don't color if there is no match
-      if (match.length == 0){
-        return;
-      }
+  	  swiftmap.bubbles = swiftmap.svg.selectAll(".bubble")
+  	      .data(feature(swiftmap.meta.geo, data_object).features, function(d){ return d.properties.key; });
 
-      // if the scheme is sequential
-      if (scheme.constructor.name == "SchemeSequential") {
+  	  swiftmap.bubbles.transition().duration(duration)
+  	      .attr("cx", function(d){ return path.centroid(d)[0]; })
+  	      .attr("cy", function(d){ return path.centroid(d)[1]; });
 
-        // calculate the correct color
-        var color;
-        buckets.forEach(function(bucket, bucket_index){
-          if (match[0] >= bucket && match[0] <= buckets[bucket_index + 1]){
-            color = scheme.meta.colors[bucket_index];
-          }
-        });
+  	  if (!scheme.skipRadius){
+  	    swiftmap.bubbles.transition().duration(duration)
+  	        .attr("r", radius);
+  	  }
 
-        return color;
+  	  swiftmap.bubbles.enter().append("circle")
+  	      .attr("fill-opacity", .75)
+  	      .attr("stroke", "#000")
+  	      .attr("cx", function(d){ return path.centroid(d)[0]; })
+  	      .attr("cy", function(d){ return path.centroid(d)[1]; })
+  	      .attr("class", "bubble")
+  	    .transition().duration(duration)
+  	      .attr("r", radius);
 
-      }
+  	  function radius(d){
+  	    // get the matching datum
+  	    var match = scheme.meta.tab
+  	      .filter(function(row){
+  	        return row.key == d.properties.key;
+  	      })
+  	      .map(scheme.meta.values);
 
-      // if the scheme is categorical
-      else if (scheme.constructor.name == "SchemeCategorical"){
-        
-        // calculate the correct color
-        var color;
-        Object.keys(scheme.meta.colors).forEach(function(bucket){
-          if (match[0] == bucket){
-            color = scheme.meta.colors[bucket];
-          }
-        });
+  	    // if no match, no bubble
+  	    if (match.length == 0) return 0;
 
-        return color || scheme.meta.colorOther;
+  	    return scale(match[0]);    
+  	  }
 
-      }
+  	    // create a scale to calculate the appropriate radius
+  	  function scale(datum){
+  	    var scheme_domain_extent = extent$2(scheme.meta.tab.map(scheme.meta.values));
+  	    var scheme_range_extent = scheme.meta.radiusRange;
 
-    }
+  	    // where does the datum fall in the extent?
+  	    var diff_from_bottom = datum - scheme_domain_extent[0];
+  	    var diff_pct = diff_from_bottom / (scheme_domain_extent[1] - scheme_domain_extent[0]);
 
-    return this;
+  	    var pct_in_range = (scheme_range_extent[1] - scheme_range_extent[0]) * diff_pct;
+  	    return scheme_range_extent[0] + pct_in_range;
+  	  }
+
+  	  return swiftmap;
+
+  	}
+
+  	function fill(scheme, duration, swiftmap){
+
+  	  // errors
+  	  if (!scheme){
+  	    console.error("You have not provided a color scheme to map.fill(), so your subunits will not be filled");
+  	    return;
+  	  }
+  	  if (swiftmap.meta.geo.length == 0){
+  	    console.error("Your map does not have any geospatial data associated with it. Before calling map.fill(), you must first add geospatial data with map.geometry()."); 
+  	    return;
+  	  }
+  	  if (scheme.meta.tab.length == 0){
+  	    console.error("Your scheme does not have any tabular data associated with it. Before calling map.fill(), you must first add data with scheme.data()."); 
+  	    return;
+  	  }
+  	  if (!swiftmap.subunits) {
+  	    console.error("Your map does not have subunits to fill. Before calling map.fill(), you must first call either map.drawSubunits() or map.draw().");
+  	    return;
+  	  }
+  	  
+  	  // put data in variables outside of the scope of the subunits fill
+  	  var tab = scheme.meta.tab,
+  	    geo = swiftmap.meta.geo;
+
+  	  // calculate the numerical buckets
+  	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
+  	  
+  	  // set the duration
+  	  if (!duration) duration = 0;
+  	  if (typeof duration !== "number" || duration < 0) {
+  	    console.warn("You must specify the duration as a positive number. The duration will be set to 0.");
+  	    duration = 0;
+  	  }
+
+  	  swiftmap.subunits.transition().duration(duration).style("fill", fillSubunits);
+
+  	  function fillSubunits(d){
+
+  	    // get the match and calculate the value
+  	    var match = tab
+  	      .filter(function(row){
+  	        return row.key == d.properties.key;
+  	      })
+  	      .map(scheme.meta.values);
+
+  	    // don't color if there is no match
+  	    if (match.length == 0){
+  	      return;
+  	    }
+
+  	    // if the scheme is sequential
+  	    if (scheme.constructor.name == "SchemeSequential") {
+
+  	      // calculate the correct color
+  	      var color;
+  	      buckets.forEach(function(bucket, bucket_index){
+  	        if (match[0] >= bucket && match[0] <= buckets[bucket_index + 1]){
+  	          color = scheme.meta.colors[bucket_index];
+  	        }
+  	      });
+
+  	      return color;
+
+  	    }
+
+  	    // if the scheme is categorical
+  	    else if (scheme.constructor.name == "SchemeCategorical"){
+  	      
+  	      // calculate the correct color
+  	      var color;
+  	      Object.keys(scheme.meta.colors).forEach(function(bucket){
+  	        if (match[0] == bucket){
+  	          color = scheme.meta.colors[bucket];
+  	        }
+  	      });
+
+  	      return color || scheme.meta.colorOther;
+
+  	    }
+
+  	  }
+
+  	  return swiftmap;
+
+  	}
+
   }
 
   // centers and zooms a projection
@@ -5381,7 +5397,7 @@
     this.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
 
     // need to reposition bubbles
-    if (this.meta.bubbles) this.drawBubbles();
+    if (this.meta.bubbles) this.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true});
            
     return this;
   }
@@ -5428,9 +5444,8 @@
       // draw functions
       this.draw = draw;
       this.drawBoundary = drawBoundary;
-      this.drawBubbles = drawBubbles;
       this.drawSubunits = drawSubunits;
-      this.fill = fill;
+      this.drawScheme = drawScheme;
       this.fit = fit$1;
       this.resize = resize;
 

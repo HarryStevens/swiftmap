@@ -6,13 +6,12 @@ import geometry from "./geometry";
 import projection from "./projection";
 
 // draw functions
-import draw from "../map/draw";
-import drawBoundary from "../map/drawBoundary";
-import drawBubbles from "../map/drawBubbles";
-import drawSubunits from "../map/drawSubunits";
-import fill from "../map/fill";
-import fit from "../map/fit";
-import resize from "../map/resize";
+import draw from "./draw";
+import drawBoundary from "./drawBoundary";
+import drawSubunits from "./drawSubunits";
+import drawScheme from "./drawScheme";
+import fit from "./fit";
+import resize from "./resize";
 
 // utility functions
 import keepNumber from "../utils/keepNumber";
@@ -57,9 +56,8 @@ export default function map(parent){
     // draw functions
     this.draw = draw;
     this.drawBoundary = drawBoundary;
-    this.drawBubbles = drawBubbles;
     this.drawSubunits = drawSubunits;
-    this.fill = fill;
+    this.drawScheme = drawScheme;
     this.fit = fit;
     this.resize = resize;
 

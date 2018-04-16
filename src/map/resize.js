@@ -22,7 +22,7 @@ export default function resize() {
   this.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
 
   // need to reposition bubbles
-  if (this.meta.bubbles) this.drawBubbles();
+  if (this.meta.bubbles) this.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true});
          
   return this;
 }

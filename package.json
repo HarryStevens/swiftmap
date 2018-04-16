@@ -5,7 +5,7 @@
   "main": "dist/swiftmap.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "minify": "uglifyjs dist/swiftmap.js --preamble \"$(preamble)\" -c keep_fnames=true -m reserved=['SchemeSequential','SchemeCategorical','Swiftmap'] -o dist/swiftmap.min.js",
+    "minify": "uglifyjs dist/swiftmap.js --preamble \"$(preamble)\" -c keep_fnames=true -m reserved=['SchemeSequential','SchemeCategorical','SchemeBubble','Swiftmap'] -o dist/swiftmap.min.js",
     "rollup": "rm -rf dist && mkdir dist && rollup -c --banner \"$(preamble)\"",
     "build": "npm run rollup && npm run minify"
   },

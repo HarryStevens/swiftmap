@@ -46,7 +46,7 @@
         map
           .geometry(geo, function(d){ return d.properties.ST_NM; })
           .draw()
-          .fill(scheme);
+          .drawScheme(scheme);
 
         // You can easily update the scheme to change the map's styling.
         setTimeout(function(){
@@ -55,7 +55,7 @@
           scheme.colors(["#b35806", "#f1a340", "#fee0b6", "#f7f7f7", "#d8daeb", "#998ec3", "#542788"])
 
           // ...and refill the map with a five-second transition.
-          map.fill(scheme, 5000);
+          map.drawScheme(scheme, 5000);
 
         }, 2000);
 
