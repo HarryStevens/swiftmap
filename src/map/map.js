@@ -30,6 +30,7 @@ export default function map(parent){
       geo: [],
       fit: false,
       bubbles: false,
+      boundary: false,
       projection: {
         function: d3.geoMercator(),
         name: "mercator"

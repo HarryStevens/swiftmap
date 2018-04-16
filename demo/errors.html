@@ -10,30 +10,20 @@
         width: 100%;
         height: 100vh;
       }
-      #map .bubble {
-        fill: steelblue;
-        stroke: steelblue;
-        stroke-width: 2px;
-      }
-      #select-wrapper {
+      #projection-wrapper {
         position: absolute;
         padding: 5px;
         background: rgba(255, 255, 255, .75);
-      }
-      #select-wrapper .select-title {
         font-size: .8em;
       }
     </style>
   </head>
   <body>
-    <div id="select-wrapper">
-      <div class="select-title">Select metric</div>
-      <select id="select">
-        <option value="growth">Growth</option>
-        <option value="density">Population density</option>
-        <option value="population">Population</option>
-      </select>
+    <div id="projection-wrapper">
+      <div>Current projection: <span id="curr-projection"></span></div>
+      <div><button id="button">Change projection</button></div>
     </div>
+    
     <div id="map"></div>
 
     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
@@ -45,47 +35,31 @@
     <script src="../dist/swiftmap.js"></script>
 
     <script>
+      var curr_projection_div = document.getElementById("curr-projection");
+      var curr_projection = "mercator";
+      curr_projection_div.innerHTML = curr_projection;
+
       // Create the map.
       var map = swiftmap.map("#map");
 
-      // Each metric has its own value function.
-      var f = {
-        growth: d => +d.growth_2001_2011.replace("%", ""),
-        density: d => +d.population / +d.area,
-        population: d => +d.population
-      }
-
-      // Create the bubble schemes.
-      var scheme = swiftmap.schemeBubble()
-        .values(f.growth)
-        .radiusRange([3, 30]);
-
       d3.queue()
         .defer(d3.json, "india_state.json") // geospatial data
-        .defer(d3.csv, "india_state_population.csv") // tabular data
         .await(ready);
 
       function ready(error, geo, tab){
-
-        // Add data to the scheme.
-        scheme.data(tab, d => d.state);
 
         // Add geospatial data to your map.
         // Then draw the map and bubbles.
         map
           .geometry(geo, d => d.properties.ST_NM)
           .draw()
-          .drawBubbles(scheme);
 
         // When the dropdown changes...
-        document.getElementById("select").onchange = (sel) => {
-
-          // ...update the scheme with the appropriate value function...
-          scheme.values(f[sel.srcElement.value]);
-
-          // ...and redraw the bubbles, with a 750ms transition.
-          map.drawBubbles(scheme, 750);
-
+        document.getElementById("button").onclick = (sel) => {
+          var new_projection = curr_projection == "mercator" ? "equirectangular" : "mercator";
+          map.projection(new_projection).draw();
+          curr_projection = new_projection;
+          curr_projection_div.innerHTML = curr_projection;
         }
 
         // It's easy to resize a swiftmap.

@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.14. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.15. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4956,12 +4956,20 @@
     
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     
-    this.boundary = this.svg.append("path")
-      .datum(mesh(this.meta.geo, data_object, function(a, b) { return a === b; }))
-      .attr("d", this.path)
-      .attr("class", "boundary")
-      .attr("stroke", "#000")
-      .attr("fill", "none");
+    // only append the first time
+    if (!this.meta.boundary){
+      this.boundary = this.svg.append("path")
+        .datum(mesh(this.meta.geo, data_object, function(a, b) { return a === b; }))
+        .attr("d", this.path)
+        .attr("class", "boundary")
+        .attr("stroke", "#000")
+        .attr("fill", "none");
+
+      // update the meta property so it doesn't append again
+      this.meta.boundary = true;
+    } else {
+      this.boundary.attr("d", this.path);
+    }
 
     return this;
   }
@@ -4979,13 +4987,15 @@
     var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
     
     this.subunits = this.svg.selectAll(".subunit")
-        .data(feature(this.meta.geo, data_object).features)
-      .enter().append("path")
+        .data(feature(this.meta.geo, data_object).features);
+    
+    this.subunits.enter().append("path")
         .attr("class", "subunit")
-        .attr("d", this.path)
         .attr("stroke", "#fff")
         .attr("stroke-width", "1px")
-        .attr("fill", "#ccc");
+        .attr("fill", "#ccc")
+      .merge(this.subunits)
+        .attr("d", this.path);
 
     return this;
   }
@@ -5418,6 +5428,7 @@
         geo: [],
         fit: false,
         bubbles: false,
+        boundary: false,
         projection: {
           function: mercator(),
           name: "mercator"

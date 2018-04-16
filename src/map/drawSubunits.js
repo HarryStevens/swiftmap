@@ -13,12 +13,14 @@ export default function drawSubunits() {
   
   this.subunits = this.svg.selectAll(".subunit")
       .data(feature(this.meta.geo, data_object).features)
-    .enter().append("path")
+  
+  this.subunits.enter().append("path")
       .attr("class", "subunit")
-      .attr("d", this.path)
       .attr("stroke", "#fff")
       .attr("stroke-width", "1px")
-      .attr("fill", "#ccc");
+      .attr("fill", "#ccc")
+    .merge(this.subunits)
+      .attr("d", this.path);
 
   return this;
 }

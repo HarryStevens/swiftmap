@@ -10,12 +10,20 @@ export default function drawBoundary() {
   
   var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
   
-  this.boundary = this.svg.append("path")
-    .datum(mesh(this.meta.geo, data_object, function(a, b) { return a === b; }))
-    .attr("d", this.path)
-    .attr("class", "boundary")
-    .attr("stroke", "#000")
-    .attr("fill", "none");
+  // only append the first time
+  if (!this.meta.boundary){
+    this.boundary = this.svg.append("path")
+      .datum(mesh(this.meta.geo, data_object, function(a, b) { return a === b; }))
+      .attr("d", this.path)
+      .attr("class", "boundary")
+      .attr("stroke", "#000")
+      .attr("fill", "none");
+
+    // update the meta property so it doesn't append again
+    this.meta.boundary = true;
+  } else {
+    this.boundary.attr("d", this.path);
+  }
 
   return this;
 }
