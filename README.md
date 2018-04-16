@@ -137,6 +137,7 @@ A string of the map's parent element.
 [D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
 
 <a name="bubbles" href="#bubbles">#</a> <i>map</i>.<b>bubbles</b>
+
 [D3 selection](https://github.com/d3/d3-selection) of the map's bubbles after invoking <i>map</i>.drawScheme().
 
 ```js
