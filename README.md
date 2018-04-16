@@ -100,11 +100,11 @@ Draws the map's outer boundary.
 
 Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
 
-<a name="fill" href="#fill">#</a> <i>map</i>.<b>fill</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
+<a name="fill" href="#fill">#</a> <i>map</i>.<b>fill</b>(<i>scheme</i>[, <i>duration</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
 
 Fills the map's subunits based on a [<i>scheme</i>](#schemes). An optional <i>duration</i> may be specified to enable an animated transition from the current fill to the new fill. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-<a name="drawBubbles" href="#drawBubbles">#</a> <i>map</i>.<b>drawBubbles</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
+<a name="drawBubbles" href="#drawBubbles">#</a> <i>map</i>.<b>drawBubbles</b>(<i>scheme</i>[, <i>duration</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
 
 Draws bubbles on the centroids of the map's subunits based on a bubble [<i>scheme</i>](#schemeBubbles). An optional <i>duration</i> may be specified to enable an animated transition from each bubble's current radius to its new radius. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
 
