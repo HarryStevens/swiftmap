@@ -106,7 +106,7 @@ Fills the map's subunits based on a [<i>scheme</i>](#schemes). An optional <i>du
 
 <a name="drawBubbles" href="#drawBubbles">#</a> <i>map</i>.<b>drawBubbles</b>(scheme[, duration]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fill.js "Source")
 
-Draws bubbles on the centroids of the map's subunits based on a bubble [<i>scheme</i>](#schemeBubbles). An optional <i>duration</i> may be specified to enable an animated transition from each bubble's current radius to its new radius. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
+Draws bubbles on the centroids of the map's subunits based on a bubble [<i>scheme</i>](#schemeBubbles). An optional <i>duration</i> may be specified to enable an animated transition from each bubble's current radius to its new radius. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
 
 <a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
 
@@ -234,7 +234,7 @@ var scheme = swiftmap.schemeSequential()
 
 <a name="data-sequential" href="#data-sequential">#</a> <i>sequential</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
-See [<i>categorical</i>.<b>data</b>()](#data-categorical).
+See [<i>categorical</i>.data()](#data-categorical).
 
 <a name="colors-sequential" href="#colors-sequential">#</a> <i>sequential</i>.<b>colors</b>([<i>palette</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
@@ -287,9 +287,11 @@ var scheme = swiftmap.schemeBubble()
   .values(d => d.value);
 ```
 
+[See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
+
 <a name="data-bubble" href="#data-bubble">#</a> <i>bubble</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
-See [<i>categorical</i>.<b>data</b>()](#data-categorical).
+See [<i>categorical</i>.data()](#data-categorical).
 
 <a name="radiusRange" href="#radiusRange">#</a> <i>bubble</i>.<b>radiusRange</b>([<i>range</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/radiusRange.js "Source")
 
