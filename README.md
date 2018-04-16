@@ -104,7 +104,7 @@ Draws the map's subunits. For example, if your TopoJSON contains states, the sub
 
 If the <i>scheme</i> is either [categorical](#schemeCategorical) or [sequential](#schemeSequential), fills the map's subunits to create a choropleth map based on the scheme. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's subunits based the scheme. An optional <i>duration</i> may be specified to enable an animated transition from each bubble's current radius to its new radius. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
+If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's subunits based the scheme. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
 
 An optional <i>duration</i> may be specified to enable an animated transition from the current style to the new style. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
 
