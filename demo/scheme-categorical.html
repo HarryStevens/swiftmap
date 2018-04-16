@@ -42,7 +42,6 @@
       d3.queue()
         .defer(d3.json, "andhrapradesh-pre2014_AC.json") // geospatial data
         .defer(d3.csv, "andhrapradesh-2014-results.csv") // tabular data
-        .defer(d3.json, "india_state.json")
         .await(ready);
 
       function ready(error, geo, tab, india){
