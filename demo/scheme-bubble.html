@@ -45,7 +45,7 @@
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 
-    <script src="../dist/swiftmap.min.js"></script>
+    <script src="../dist/swiftmap.js"></script>
 
     <script>
 
@@ -78,7 +78,7 @@
         // Add geospatial data to your map.
         // Then draw the map and bubbles.
         map
-          .geometry(geo, d => d.properties.ST_NM)
+          .polygons(geo, d => d.properties.ST_NM)
           .draw()
           .drawScheme(scheme);
 

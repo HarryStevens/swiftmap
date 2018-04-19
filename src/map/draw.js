@@ -1,8 +1,8 @@
-export default function draw(){
+export default function draw(cl){
 
   // check for geospatial data
-  if (this.meta.geo.length == 0) {
-    console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.")
+  if (this.meta.polygons.length == 0) {
+    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.")
     return;
   }
 

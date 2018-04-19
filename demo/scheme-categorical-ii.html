@@ -43,7 +43,7 @@
         var states = tab.filter(d => +d.population > 1e7).map(d => d.state);
 
         // Initialize the map.
-        var map = swiftmap.map("#map").geometry(geo, d => d.properties.ST_NM).draw();
+        var map = swiftmap.map("#map").polygons(geo, d => d.properties.ST_NM).draw();
 
         // Add data to the scheme, and fill the map.
         scheme.data(tab, d => d.state)

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Helvetica Neue", sans-serif;
+      }
+      #map {
+        width: 100%;
+        height: 100vh;
+      }
+      #map .subunit.subunit-india {
+        fill: #fff;
+        stroke: #eee;
+      }
+      #map .boundary.boundary-india {
+        stroke: #aaa;
+      }
+      #map .boundary.boundary-karnataka {
+        /*stroke-width: 2px;*/
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+    <script src="https://d3js.org/d3-request.v1.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+
+    <script src="https://unpkg.com/jeezy@1.12.17/lib/jeezy.js"></script>
+
+    <script src="../dist/swiftmap.js"></script>
+    <script>
+
+      var scheme = swiftmap.schemeCategorical()
+        .values(d => d.winner)
+        .colors({
+          "INC": "#a6cee3",
+          "BJP": "#fdbf6f",
+          "JD(S)": "#fb9a99"
+        });
+
+      d3.queue()
+        .defer(d3.json, "karnataka_geodata.json")
+        .defer(d3.json, "karnataka_data_2013.json")
+        .defer(d3.json, "karnataka_data_random.json")
+        .defer(d3.json, "india_state.json")
+        .await(ready);
+
+      function ready(error, karnataka, results2013, resultsRandom, india){
+        
+        scheme.data(parseResults(results2013), d => d.ac_no);
+
+        function parseResults(results){
+          return results.map(ac => {
+            ac.winner = ac.candidate_json[0].party;
+            ac.ac_no = ac.const_code;
+            return ac;
+          });
+        }
+
+        var map = swiftmap.map("#map")
+          .projection("equirectangular")
+          .polygons(india, null, "india")
+            .draw()
+          .polygons(karnataka, d => d.properties.ac_no, "karnataka")
+            .draw()
+            .drawScheme(scheme)
+          // .places(karnataka, null, "karnataka")
+
+        // Makes it easy to create resizable maps for responsive designs.
+        window.onresize = function(){ 
+          map.resize(); 
+        }
+      }      
+    </script>
+  </body>
+</html>

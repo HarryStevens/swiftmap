@@ -6,14 +6,21 @@ import limits from "../../lib/swiftmap-chroma-bundler/limits";
 import extent from "../utils/extent";
 import keepNumber from "../utils/keepNumber";
 
-export default function drawScheme(scheme, duration){
+export default function drawScheme(scheme, duration, layer){
+
+	// calculate the layer that needs to be drawn
+  if (layer && typeof layer !== "string") {
+    console.warn("You must specify that layer to fit as a string. Layer will default to " + this.meta.last_layer);
+    layer = this.meta.last_layer;
+  }
+  var fit_layer = layer || this.meta.last_layer;
 
 	if (scheme.constructor.name == "SchemeCategorical" || scheme.constructor.name == "SchemeSequential"){
-		fill(scheme, duration, this);
+		return fill(scheme, duration, this);
 	} 
 
 	else if (scheme.constructor.name == "SchemeBubble") {
-		drawBubbles(scheme, duration, this);
+		return drawBubbles(scheme, duration, this);
 	}
 
 	else {
@@ -21,33 +28,37 @@ export default function drawScheme(scheme, duration){
 		return;
 	}
 
+
 	function drawBubbles(scheme, duration, swiftmap) {
 	  // check for geospatial data
-	  if (swiftmap.meta.geo.length == 0) {
-	    console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw bubbles.");
+	  if (swiftmap.meta.polygons[0] && swiftmap.meta.polygons[0].length == 0) {
+
+	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a scheme.");
 	    return;
+
 	  }
 
 	  // set this to true for resizing operations
 	  swiftmap.meta.bubbles = true;
 	  
 	  // store some data in variables
-	  var data_object = swiftmap.meta.geo.objects[Object.keys(swiftmap.meta.geo.objects)[0]];
+	  var curr_polygons = swiftmap.meta.polygons[fit_layer];
+	  var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
 	  var path = swiftmap.path;
 
-	  swiftmap.bubbles = swiftmap.svg.selectAll(".bubble")
-	      .data(feature(swiftmap.meta.geo, data_object).features, function(d){ return d.properties.key; });
+	  swiftmap.layers[fit_layer].bubbles = swiftmap.svg.selectAll(".bubble")
+	      .data(feature(curr_polygons, data_object).features, function(d){ return d.properties.key; });
 
-	  swiftmap.bubbles.transition().duration(duration)
+	  swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
 	      .attr("cx", function(d){ return path.centroid(d)[0]; })
 	      .attr("cy", function(d){ return path.centroid(d)[1]; })
 
 	  if (!scheme.skipRadius){
-	    swiftmap.bubbles.transition().duration(duration)
+	    swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
 	        .attr("r", radius);
 	  }
 
-	  swiftmap.bubbles.enter().append("circle")
+	  swiftmap.layers[fit_layer].bubbles.enter().append("circle")
 	      .attr("fill-opacity", .75)
 	      .attr("stroke", "#000")
 	      .attr("cx", function(d){ return path.centroid(d)[0]; })
@@ -91,25 +102,28 @@ export default function drawScheme(scheme, duration){
 
 	  // errors
 	  if (!scheme){
-	    console.error("You have not provided a color scheme to map.fill(), so your subunits will not be filled");
+	    console.error("You have not provided a color scheme to map.drawScheme(), so your subunits will not be filled.");
 	    return;
 	  }
-	  if (swiftmap.meta.geo.length == 0){
-	    console.error("Your map does not have any geospatial data associated with it. Before calling map.fill(), you must first add geospatial data with map.geometry()."); 
+	  // check for geospatial data
+	  if (swiftmap.meta.polygons[0] && swiftmap.meta.polygons[0].length == 0) {
+	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a scheme.");
 	    return;
 	  }
 	  if (scheme.meta.tab.length == 0){
-	    console.error("Your scheme does not have any tabular data associated with it. Before calling map.fill(), you must first add data with scheme.data()."); 
+	    console.error("Your scheme does not have any tabular data associated with it. Before calling map.drawScheme(), you must first add data with scheme.data()."); 
 	    return;
 	  }
-	  if (!swiftmap.subunits) {
-	    console.error("Your map does not have subunits to fill. Before calling map.fill(), you must first call either map.drawSubunits() or map.draw().");
+
+
+	  if (swiftmap.meta.last_layer == "" && !swiftmap.layers[swiftmap.meta.layer_index].subunits) {
+	    console.error("Your map does not have subunits to fill. Before calling map.drawScheme(), you must first call either map.drawSubunits() or map.draw().");
 	    return;
 	  }
 	  
 	  // put data in variables outside of the scope of the subunits fill
 	  var tab = scheme.meta.tab,
-	    geo = swiftmap.meta.geo;
+	    geo = swiftmap.meta.polygons[fit_layer];
 
 	  // calculate the numerical buckets
 	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
@@ -121,7 +135,9 @@ export default function drawScheme(scheme, duration){
 	    duration = 0;
 	  }
 
-	  swiftmap.subunits.transition().duration(duration).style("fill", fillSubunits);
+	 	// fill the subunits
+	 	swiftmap.layers[fit_layer].subunits.transition().duration(duration).style("fill", fillSubunits);
+	  
 
 	  function fillSubunits(d){
 

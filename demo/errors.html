@@ -10,20 +10,20 @@
         width: 100%;
         height: 100vh;
       }
-      #projection-wrapper {
-        position: absolute;
-        padding: 5px;
-        background: rgba(255, 255, 255, .75);
-        font-size: .8em;
+      #map .subunit.subunit-india {
+        fill: #fff;
+        stroke: #eee;
+      }
+      #map .boundary.boundary-india {
+        stroke: #aaa;
+      }
+      #map .boundary.boundary-karnataka {
+        stroke-width: 2px;
       }
     </style>
   </head>
   <body>
-    <div id="projection-wrapper">
-      <div>Current projection: <span id="curr-projection"></span></div>
-      <div><button id="button">Change projection</button></div>
-    </div>
-    
+
     <div id="map"></div>
 
     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
@@ -35,38 +35,34 @@
     <script src="../dist/swiftmap.js"></script>
 
     <script>
-      var curr_projection_div = document.getElementById("curr-projection");
-      var curr_projection = "mercator";
-      curr_projection_div.innerHTML = curr_projection;
-
-      // Create the map.
       var map = swiftmap.map("#map");
+      var scheme = swiftmap.schemeBubble()
+        .values(d => d.candidate_json.length);     
 
       d3.queue()
-        .defer(d3.json, "india_state.json") // geospatial data
+        .defer(d3.json, "india_state.json")
+        .defer(d3.json, "karnataka_geodata.json")
+        .defer(d3.json, "karnataka_data_2013.json")
         .await(ready);
 
-      function ready(error, geo, tab){
+      function ready(err, india, karnataka, results2013){
 
-        // Add geospatial data to your map.
-        // Then draw the map and bubbles.
+        scheme.data(results2013, d => d.const_code);
+
         map
-          .geometry(geo, d => d.properties.ST_NM)
-          .draw()
+          .polygons(india, null, "india")
+            .drawSubunits()
+            .drawBoundary()
+          .polygons(karnataka, d => d.properties.ac_no, "karnataka")
+            .draw()
+            .drawScheme(scheme);
 
-        // When the dropdown changes...
-        document.getElementById("button").onclick = (sel) => {
-          var new_projection = curr_projection == "mercator" ? "equirectangular" : "mercator";
-          map.projection(new_projection).draw();
-          curr_projection = new_projection;
-          curr_projection_div.innerHTML = curr_projection;
-        }
-
-        // It's easy to resize a swiftmap.
         window.onresize = () => map.resize();
 
       }
-      
+        
+
+
     </script>
   </body>
 </html>

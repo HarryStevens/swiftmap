@@ -2,7 +2,7 @@
 import * as d3 from "../../lib/swiftmap-d3-bundler";
 
 // init functions
-import geometry from "./geometry";
+import polygons from "./polygons";
 import projection from "./projection";
 
 // draw functions
@@ -27,15 +27,20 @@ export default function map(parent){
   function Swiftmap(parent){
     // meta object for storing data
     this.meta = {
-      geo: [],
+      layer_index: -1,
+      last_layer: "",
+      polygons: {
+        0: []
+      },
       fit: false,
       bubbles: false,
-      boundary: false,
       projection: {
         function: d3.geoMercator(),
         name: "mercator"
       },
     };
+
+    this.layers = {};
 
     // parent
     this.parent = parent || "body";
@@ -51,7 +56,7 @@ export default function map(parent){
     this.svg = d3.select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
     // init functions
-    this.geometry = geometry;
+    this.polygons = polygons;
     this.projection = projection;
 
     // draw functions

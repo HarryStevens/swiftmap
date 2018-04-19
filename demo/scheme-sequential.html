@@ -44,7 +44,7 @@
         // Add geospatial data to your map.
         // Then draw the map and fill it based on your color scheme.
         map
-          .geometry(geo, function(d){ return d.properties.ST_NM; })
+          .polygons(geo, function(d){ return d.properties.ST_NM; })
           .draw()
           .drawScheme(scheme);
 

@@ -1,4 +1,4 @@
-# swiftmap
+# Swiftmap
 A simple API for making awesome maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
 ## Features
@@ -6,14 +6,14 @@ A simple API for making awesome maps. [See it in action](https://bl.ocks.org/har
 * Provides a simple API for making maps.
 
 ```js
-var map = swiftmap.map().geometry(TopoJSONObject).draw();
+var map = swiftmap.map().polygons(TopoJSONObject).draw();
 ```
 
 * Exposes DOM elements as D3 selections for styling.
 
 ```js
 var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
-map.subunits.style("fill", (d, i) => colors[i % colors.length]);
+map.layers[0].subunits.style("fill", (d, i) => colors[i % colors.length]);
 ```
 
 * Makes it easy to create resizable maps for responsive designs.
@@ -61,32 +61,68 @@ var swiftmap = require("swiftmap");
 
 - [Maps](#maps)
 - [Schemes](#schemes)
-	- [Categorical](#schemeCategorical)
-	- [Sequential](#schemeSequential)
+  - [Categorical](#schemeCategorical)
+  - [Sequential](#schemeSequential)
   - [Bubble](#schemeBubble)
 
 ### Maps
 
-Before drawing and styling a map, you must tell swiftmap where on the DOM to place the map, as well as the geospatial data to use for the map.
+Before drawing and styling a map, you must tell Swiftmap where on the DOM to place the map, as well as the geospatial data to use for the map.
+
+```js
+swiftmap.map("#map")
+  .polygons(TopoJSON, d => d.state_name, "states")
+    .draw()
+  .polygons(TopoJSON, d => d.county_name, "counties")
+    .draw();
+```
+
+```css
+#map .boundary {
+  stroke-width: 2px;
+}
+#map .boundary.boundary-states {
+  stroke-width: 3px;
+}
+#map .subunit {
+  fill: none;
+}
+#map .subunit.subunit-counties {
+  fill: blue;
+}
+```
 
 <a name="map" href="#map">#</a> swiftmap.<b>map</b>([<i>parent</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/map.js "Source")
 
-Initializes a <i>map</i>. If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
+Initializes a <i>map</i>.
 
-<a name="geometry" href="#geometry">#</a> <i>map</i>.<b>geometry</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/geometry.js "Source")
+<i>parent</i><br />
+If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
 
-Adds geospatial data to the <i>map</i>. The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current geospatial data associated with the <i>map</i>. swiftmap cannot draw a map without geospatial data.
+<a name="polygons" href="#polygons">#</a> <i>map</i>.<b>polygons</b>([<i>data</i>[, <i>key</i>, <i>layer</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/polygons.js "Source")
 
+Sets or gets a polygons layer.
+
+<i>data</i><br />
+The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current polygons associated with the layer.
+
+<i>key</i><br />
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
-<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([<i>projectionName</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/projection.js "Source")
+<i>layer</i><br />
+If a <i>layer</i> is passed, the geospatial data will be associated with with the name of the layer, which must be specified as a string. In the <i>layer</i> string, space characters will be converted to hyphens so that DOM elements produced by the layer's geospatial data can be referenced with CSS selectors.
 
-If <i>projectionName</i> is specified, sets the map's projection. The <i>projectionName</i> must be specified as a string, and can be one of three options: 
+<a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([<i>projection</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/projection.js "Source")
+
+Sets or gets a map's projection.
+
+<i>projection</i><br />
+If <i>projection</i> is specified, sets the map's projection. The <i>projection</i> must be specified as a string, and can be one of three options: 
 - `"mercator"`, for the [Mercator projection](https://en.wikipedia.org/wiki/Mercator_projection)
 - `"equirectangular"`, for the [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection)
 - `"albersUsa"`, for the Albers USA projection, which is a composite of three [Albers' equal-area conic projections](https://en.wikipedia.org/wiki/Albers_projection)
 
-If <i>projectionName</i> is not specified, returns the current projection associated with the map. For more information, see the [documentation in d3-geo](https://github.com/d3/d3-geo#projections).
+If <i>projection</i> is not specified, returns the current projection associated with the map. For more information, see the [documentation in d3-geo](https://github.com/d3/d3-geo#projections).
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
 
@@ -102,10 +138,14 @@ Draws the map's subunits. For example, if your TopoJSON contains states, the sub
 
 <a name="drawScheme" href="#drawScheme">#</a> <i>map</i>.<b>drawScheme</b>(<i>scheme</i>[, <i>duration</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawScheme.js "Source")
 
+Styles the map based on a scheme.
+
+<i>scheme</i><br />
 If the <i>scheme</i> is either [categorical](#schemeCategorical) or [sequential](#schemeSequential), fills the map's subunits to create a choropleth map based on the scheme. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
 If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's subunits based the scheme. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
 
+<i>duration</i><br />
 An optional <i>duration</i> may be specified to enable an animated transition from the current style to the new style. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
 
 <a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
@@ -154,7 +194,6 @@ Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as t
 Schemes provide an interface for mapping values of your data to visual attributes, such as a choropleth map's color palette or the radii of circles in a bubble map. Schemes can be added to a map like so:
 
 ```js
-// Use a scheme to fill a choropleth map, or to draw a bubble map.
 map.drawScheme(scheme);
 ```
 
@@ -177,12 +216,19 @@ var scheme = swiftmap.schemeCategorical()
 
 <a name="data-categorical" href="#data-categorical">#</a> <i>categorical</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
-Adds tabular data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>. The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>scheme</i>.
+Adds tabular data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>.
 
+<i>data</i><br />
+The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>scheme</i>.
+
+<i>key</i><br />
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.drawScheme(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
 <a name="colors-categorical" href="#colors-categorical">#</a> <i>categorical</i>.<b>colors</b>([<i>palette</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
+Specifies which colors should be associated with which values.
+
+<i>palette</i><br />
 If a <i>palette</i> is specified, it must be specified as an object where each property is one of the scheme's categories, and each value is the color associated with that category.
 
 ```js
@@ -196,11 +242,17 @@ If <i>palette</i> is not specified, returns the current color palette associated
 
 <a name="colorOther" href="#colorOther">#</a> <i>categorical</i>.<b>colorOther</b>([<i>color</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colorOther.js "Source")
 
+Sets or gets an alternative color in the scheme.
+
+<i>color</i><br />
 If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.colors(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the current color, which defaults to `"#ccc"`.
 
-<a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
-Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. 
+
+<i>function</i><br />
+When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
 
 ```js
 var data = [
@@ -236,12 +288,18 @@ See [<i>categorical</i>.data()](#data-categorical).
 
 <a name="colors-sequential" href="#colors-sequential">#</a> <i>sequential</i>.<b>colors</b>([<i>palette</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colors.js "Source")
 
+Specifies the series of colors to which values should be assigned.
+
+<i>palette</i><br />
 If a <i>palette</i> is specified, the scheme will assign a series of values to each color in the <i>palette</i>. The <i>palette</i> must be specified as an array of strings. If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
 
 The <i>palette</i> will default to `["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]` if this method is not called.
 
 <a name="mode" href="#mode">#</a> <i>sequential</i>.<b>mode</b>([<i>breaktype</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/mode.js "Source")
 
+Computes class breaks based on data.
+
+<i>breaktype</i><br />
 If a <i>breaktype</i> is specified, the scheme will compute the class breaks based on data. The <i>breaktype</i> must be specified as a string, either `"e"`, `"q"`, `"l"` or `"k"`.
 - `"e"` specifies <b>equidistant</b> breaks, where each break spans an equal numeric range.
 - `"l"` specifies <b>logarithmic</b> breaks, which are just like equidistant breaks but on a logarithmic scale.
@@ -250,9 +308,12 @@ If a <i>breaktype</i> is specified, the scheme will compute the class breaks bas
 
 The <i>breaktype</i> will default to `"q"` if this method is not called. If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
 
-<a name="values-sequential" href="#values-sequential">#</a> <i>sequential</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="values-sequential" href="#values-sequential">#</a> <i>sequential</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
-Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. The <i>function</i> defaults to:
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data.
+
+<i>function</i><br />
+The <i>function</i> defaults to:
 
 ```js
 d => d
@@ -293,9 +354,12 @@ See [<i>categorical</i>.data()](#data-categorical).
 
 <a name="radiusRange" href="#radiusRange">#</a> <i>bubble</i>.<b>radiusRange</b>([<i>range</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/radiusRange.js "Source")
 
+Sets or gets the minimum and maximum radii of the bubble scheme.
+
+<i>range</i><br />
 If a <i>range</i> is specified, sets the minimum and maximum values of the bubbles' radii. If a <i>range</i> is not specified, returns the current range, which defaults to `[2, 20]`.
 
-<a name="values-bubble" href="#values-bubble">#</a> <i>bubble</i>.<b>values</b>([<i>function</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="values-bubble" href="#values-bubble">#</a> <i>bubble</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
 See [<i>sequential</i>.values()](#values-sequential).
 
@@ -307,7 +371,7 @@ cd swiftmap # navigate into the directory
 npm install # install node modules
 ```
 
-swiftmap is compiled with [rollup](https://github.com/rollup/rollup). Each function can be found in the [`src` directory](https://github.com/HarryStevens/swiftmap/tree/master/lib).
+Swiftmap is compiled with [rollup](https://github.com/rollup/rollup). Each function can be found in the [`src` directory](https://github.com/HarryStevens/swiftmap/tree/master/lib).
 
 ```bash
 npm run rollup # compile the library
@@ -315,4 +379,4 @@ npm run minify # minify the library
 npm run build # compile and minify the library
 ```
 
-swiftmap also uses a custom version of D3.js, which can be found in [`lib/swiftmap-d3-bundler`](https://github.com/HarryStevens/swiftmap/tree/master/lib/swiftmap-d3-bundler). If you need to update the bundle, do `cd lib/swiftmap-d3-bundler`, where you can install additional dependencies and update the [`index.js`](https://github.com/HarryStevens/swiftmap/blob/master/lib/swiftmap-d3-bundler/index.js) file. You will also have to update the `globals` object and the `only` array in the `resolve()` function in [`rollup.config.js`](https://github.com/HarryStevens/swiftmap/blob/master/rollup.config.js).
+Swiftmap also uses a custom version of D3.js, which can be found in [`lib/swiftmap-d3-bundler`](https://github.com/HarryStevens/swiftmap/tree/master/lib/swiftmap-d3-bundler). If you need to update the bundle, do `cd lib/swiftmap-d3-bundler`, where you can install additional dependencies and update the [`index.js`](https://github.com/HarryStevens/swiftmap/blob/master/lib/swiftmap-d3-bundler/index.js) file. You will also have to update the `globals` object and the `only` array in the `resolve()` function in [`rollup.config.js`](https://github.com/HarryStevens/swiftmap/blob/master/rollup.config.js).

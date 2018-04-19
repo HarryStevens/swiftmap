@@ -4318,7 +4318,7 @@
     return transform$$1;
   }
 
-  function projection(project) {
+  function projection$1(project) {
     return projectionMutator(function() { return project; })();
   }
 
@@ -4612,7 +4612,7 @@
   }
 
   function mercatorProjection(project) {
-    var m = projection(project),
+    var m = projection$1(project),
         center = m.center,
         scale = m.scale,
         translate = m.translate,
@@ -4654,14 +4654,40 @@
   equirectangularRaw.invert = equirectangularRaw;
 
   function equirectangular() {
-    return projection(equirectangularRaw)
+    return projection$1(equirectangularRaw)
         .scale(152.63);
   }
 
-  function geometry(data, key){
+  // Transforms a string into a slug.
+  function toSlugCase(x) {
+    return x.toString()
+      .replace(/\s+/g, "-")           // Replace spaces with -
+      .replace(/[^\w\-]+/g, "")       // Remove all non-word chars
+      .replace(/\-\-+/g, "-")         // Replace multiple - with single -
+      .replace(/^-+/, "")             // Trim - from start of text
+      .replace(/-+$/, "");            // Trim - from end of text
+  }
+
+  function polygons(data, key, cl){
+
+    // update the layer index
+    ++this.meta.layer_index;
+
+    // if the class exists but is not a string, set it to null
+    if (!cl){
+      cl = null;
+    } else if (cl && typeof cl !== "string"){
+      console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + this.meta.layer_index + ".");
+      cl = null;
+    } else if (toSlugCase(cl) !== cl){
+      var slug = toSlugCase(cl);
+      console.warn("The CSS class of the polygon layer's name will be slugified to '" + slug + "'.");
+      cl = slug;
+    }
+
     // if no data is passed, then this is a getter function
     if (!data) {
-      return this.meta.geo;
+      return this.meta.polygons[this.meta.layer_index];
     }
 
     // if the key is not a function, set the key property of each datum matches its index
@@ -4671,11 +4697,26 @@
     }
 
     // if data is passed, then this is a setter function
-    this.meta.geo = data;
+
+    // if a class has been passed (and not nullified),
+    // then we remove the current index from the polygons
+    // also, that's the property we pull from the polygons
+    // otherwise, pull the index
+    var prop;
+    if (cl) {
+      delete this.meta.polygons[this.meta.layer_index];
+      prop = cl;
+    } else {
+      prop = this.meta.layer_index;
+    }
+
+    this.meta.last_layer = prop;
+    if (!this.layers[prop]) this.layers[prop] = {name: prop, boundary: false, subunits: false, scheme: false, fit: false};
+    this.meta.polygons[prop] = data;
 
     // if a key is passed, add the key to the data
     // otherwise, assign the index to the key property
-    this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]].geometries.forEach(function(d, i, arr){
+    this.meta.polygons[prop].objects[Object.keys(this.meta.polygons[prop].objects)[0]].geometries.forEach(function(d, i, arr){
       d.properties.key = key ? key(d, i, arr) : i;
       return d;
     });
@@ -4685,7 +4726,7 @@
 
   // modules
 
-  function geometry$1(projectionName){
+  function projection$2(projectionName){
     // if no data is passed, then this is a getter function
     if (!projectionName) {
       return this.meta.projection.function;
@@ -4712,11 +4753,11 @@
     return this;
   }
 
-  function draw(){
+  function draw(cl){
 
     // check for geospatial data
-    if (this.meta.geo.length == 0) {
-      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw the map.");
+    if (this.meta.polygons.length == 0) {
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
     }
 
@@ -4948,27 +4989,35 @@
 
   // draws an outer boundary
   function drawBoundary() {
+    
     // check for geospatial data
-    if (this.meta.geo.length == 0) {
-      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw a boundary.");
+    if (this.meta.polygons[0] && this.meta.polygons[0].length == 0) {
+
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a boundary.");
       return;
+
     }
     
-    var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
+    var curr_polygons = this.meta.polygons[this.meta.last_layer];
+    var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
     
     // only append the first time
-    if (!this.meta.boundary){
-      this.boundary = this.svg.append("path")
-        .datum(mesh(this.meta.geo, data_object, function(a, b) { return a === b; }))
+    if (!this.layers[this.meta.last_layer].boundary){
+      
+      this.layers[this.meta.last_layer].boundary = this.svg.append("path")
+        .datum(mesh(curr_polygons, data_object, function(a, b) { return a === b; }))
         .attr("d", this.path)
-        .attr("class", "boundary")
+        .attr("class", "boundary boundary-" + this.meta.last_layer)
         .attr("stroke", "#000")
         .attr("fill", "none");
 
-      // update the meta property so it doesn't append again
-      this.meta.boundary = true;
-    } else {
-      this.boundary.attr("d", this.path);
+    } 
+
+    // otherwise, update the path subsequently
+    else {
+
+      this[cl].boundary.attr("d", this.path);
+
     }
 
     return this;
@@ -4978,23 +5027,25 @@
 
   // draws subunits
   function drawSubunits() {
+    
     // check for geospatial data
-    if (this.meta.geo.length == 0) {
-      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw subunits.");
+    if (this.meta.polygons[0] && this.meta.polygons[0].length == 0) {
+
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw subunits.");
       return;
+
     }
 
-    var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
-    
-    this.subunits = this.svg.selectAll(".subunit")
-        .data(feature(this.meta.geo, data_object).features);
-    
-    this.subunits.enter().append("path")
-        .attr("class", "subunit")
+    var curr_polygons = this.meta.polygons[this.meta.last_layer];
+    var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
+
+    this.layers[this.meta.last_layer].subunits = this.svg.selectAll(".subunit.subunit-" + this.meta.last_layer)
+        .data(feature(curr_polygons, data_object).features, function(d){ return d.properties.key; })
+      .enter().append("path")
+        .attr("class", "subunit subunit-" + this.meta.last_layer)
         .attr("stroke", "#fff")
         .attr("stroke-width", "1px")
         .attr("fill", "#ccc")
-      .merge(this.subunits)
         .attr("d", this.path);
 
     return this;
@@ -5202,14 +5253,21 @@
 
   // modules
 
-  function drawScheme(scheme, duration){
+  function drawScheme(scheme, duration, layer){
+
+  	// calculate the layer that needs to be drawn
+    if (layer && typeof layer !== "string") {
+      console.warn("You must specify that layer to fit as a string. Layer will default to " + this.meta.last_layer);
+      layer = this.meta.last_layer;
+    }
+    var fit_layer = layer || this.meta.last_layer;
 
   	if (scheme.constructor.name == "SchemeCategorical" || scheme.constructor.name == "SchemeSequential"){
-  		fill(scheme, duration, this);
+  		return fill(scheme, duration, this);
   	} 
 
   	else if (scheme.constructor.name == "SchemeBubble") {
-  		drawBubbles(scheme, duration, this);
+  		return drawBubbles(scheme, duration, this);
   	}
 
   	else {
@@ -5217,33 +5275,37 @@
   		return;
   	}
 
+
   	function drawBubbles(scheme, duration, swiftmap) {
   	  // check for geospatial data
-  	  if (swiftmap.meta.geo.length == 0) {
-  	    console.error("You must pass TopoJSON data through swiftmap.geometry() before you can draw bubbles.");
+  	  if (swiftmap.meta.polygons[0] && swiftmap.meta.polygons[0].length == 0) {
+
+  	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a scheme.");
   	    return;
+
   	  }
 
   	  // set this to true for resizing operations
   	  swiftmap.meta.bubbles = true;
   	  
   	  // store some data in variables
-  	  var data_object = swiftmap.meta.geo.objects[Object.keys(swiftmap.meta.geo.objects)[0]];
+  	  var curr_polygons = swiftmap.meta.polygons[fit_layer];
+  	  var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
   	  var path = swiftmap.path;
 
-  	  swiftmap.bubbles = swiftmap.svg.selectAll(".bubble")
-  	      .data(feature(swiftmap.meta.geo, data_object).features, function(d){ return d.properties.key; });
+  	  swiftmap.layers[fit_layer].bubbles = swiftmap.svg.selectAll(".bubble")
+  	      .data(feature(curr_polygons, data_object).features, function(d){ return d.properties.key; });
 
-  	  swiftmap.bubbles.transition().duration(duration)
+  	  swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
   	      .attr("cx", function(d){ return path.centroid(d)[0]; })
   	      .attr("cy", function(d){ return path.centroid(d)[1]; });
 
   	  if (!scheme.skipRadius){
-  	    swiftmap.bubbles.transition().duration(duration)
+  	    swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
   	        .attr("r", radius);
   	  }
 
-  	  swiftmap.bubbles.enter().append("circle")
+  	  swiftmap.layers[fit_layer].bubbles.enter().append("circle")
   	      .attr("fill-opacity", .75)
   	      .attr("stroke", "#000")
   	      .attr("cx", function(d){ return path.centroid(d)[0]; })
@@ -5287,25 +5349,28 @@
 
   	  // errors
   	  if (!scheme){
-  	    console.error("You have not provided a color scheme to map.fill(), so your subunits will not be filled");
+  	    console.error("You have not provided a color scheme to map.drawScheme(), so your subunits will not be filled.");
   	    return;
   	  }
-  	  if (swiftmap.meta.geo.length == 0){
-  	    console.error("Your map does not have any geospatial data associated with it. Before calling map.fill(), you must first add geospatial data with map.geometry()."); 
+  	  // check for geospatial data
+  	  if (swiftmap.meta.polygons[0] && swiftmap.meta.polygons[0].length == 0) {
+  	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a scheme.");
   	    return;
   	  }
   	  if (scheme.meta.tab.length == 0){
-  	    console.error("Your scheme does not have any tabular data associated with it. Before calling map.fill(), you must first add data with scheme.data()."); 
+  	    console.error("Your scheme does not have any tabular data associated with it. Before calling map.drawScheme(), you must first add data with scheme.data()."); 
   	    return;
   	  }
-  	  if (!swiftmap.subunits) {
-  	    console.error("Your map does not have subunits to fill. Before calling map.fill(), you must first call either map.drawSubunits() or map.draw().");
+
+
+  	  if (swiftmap.meta.last_layer == "" && !swiftmap.layers[swiftmap.meta.layer_index].subunits) {
+  	    console.error("Your map does not have subunits to fill. Before calling map.drawScheme(), you must first call either map.drawSubunits() or map.draw().");
   	    return;
   	  }
   	  
   	  // put data in variables outside of the scope of the subunits fill
   	  var tab = scheme.meta.tab,
-  	    geo = swiftmap.meta.geo;
+  	    geo = swiftmap.meta.polygons[fit_layer];
 
   	  // calculate the numerical buckets
   	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
@@ -5317,7 +5382,9 @@
   	    duration = 0;
   	  }
 
-  	  swiftmap.subunits.transition().duration(duration).style("fill", fillSubunits);
+  	 	// fill the subunits
+  	 	swiftmap.layers[fit_layer].subunits.transition().duration(duration).style("fill", fillSubunits);
+  	  
 
   	  function fillSubunits(d){
 
@@ -5372,44 +5439,79 @@
   }
 
   // centers and zooms a projection
-  function fit$1() {  
+  function fit$1(layer) {  
+    
     // check for geospatial data
-    if (this.meta.geo.length == 0) {
-      console.error("You must pass TopoJSON data through swiftmap.geometry() before you can fit the map in its parent.");
+    if (this.meta.polygons[0] && this.meta.polygons[0].length == 0) {
+
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can fit the map to its container.");
       return;
+
     }
 
-    // update this property so we know whether this geospatial data has been fit to the parent
-    this.meta.fit = true;
+    // for scoping issues
+    var swiftmap = this;
 
-    var data_object = this.meta.geo.objects[Object.keys(this.meta.geo.objects)[0]];
-    this.meta.projection.function.fitSize([this.width, this.height], feature(this.meta.geo, data_object));
-    return this;
+    // type check the layer
+    if (layer && typeof layer !== "string") {
+      console.warn("You must specify that layer to fit as a string. Layer will default to " + swiftmap.meta.last_layer);
+      layer = swiftmap.meta.last_layer;
+    }
+
+    // the layer to fit
+    var fit_layer = layer || swiftmap.meta.last_layer;
+
+    // update this property so we know whether this geospatial data has been fit to the parent
+    var layers = Object.keys(swiftmap.layers);
+    layers.forEach(function(layer){
+      swiftmap.layers[layer].fit = false;  
+    });
+    swiftmap.layers[fit_layer].fit = true;
+
+    // set up the fit
+    var curr_polygons = swiftmap.meta.polygons[fit_layer];
+    var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
+    swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(curr_polygons, data_object));
+
+    // make sure all classes are updated
+    var path = swiftmap.path.projection(swiftmap.meta.projection.function);
+    
+    swiftmap.svg.selectAll("path").attr("d", path);
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.polygons.coordinates) + ")"; });
+
+    return swiftmap;
   }
 
   // modules
 
   // resizes the map
   function resize() {
+
+    // scoping issues
+    var swiftmap = this;
+
     // size attributes
-    this.width = this.parent == "body" ? window.innerWidth :
-      +keepNumber(select(this.parent).style("width"));
-    this.height = this.parent == "body" ? window.innerHeight :
-      +keepNumber(select(this.parent).style("height"));
-    this.svg.attr("width", this.width).attr("height", this.height);
+    swiftmap.width = swiftmap.parent == "body" ? window.innerWidth :
+      +keepNumber(select(swiftmap.parent).style("width"));
+    swiftmap.height = swiftmap.parent == "body" ? window.innerHeight :
+      +keepNumber(select(swiftmap.parent).style("height"));
+    swiftmap.svg.attr("width", swiftmap.width).attr("height", swiftmap.height);
     
-    if (this.meta.fit) this.fit();
+    // if any layer has been fit, fit to that layer
+    var layers = Object.keys(swiftmap.layers).map(function(d){ return swiftmap.layers[d]; });
+    var fit_layer = layers.filter(function(d){ return d.fit; })[0];
+    if (fit_layer) swiftmap.fit(fit_layer.name);
 
-    var projection = this.projection;
-    var path = this.path;
+    var projection = swiftmap.projection;
+    var path = swiftmap.path;
 
-    this.svg.selectAll("path").attr("d", path);
-    this.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+    swiftmap.svg.selectAll("path").attr("d", path);
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.polygons.coordinates) + ")"; });
 
     // need to reposition bubbles
-    if (this.meta.bubbles) this.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true});
+    if (swiftmap.meta.bubbles) swiftmap.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true}, 0, fit_layer ? fit_layer.name : null);
            
-    return this;
+    return swiftmap;
   }
 
   // modules
@@ -5425,15 +5527,20 @@
     function Swiftmap(parent){
       // meta object for storing data
       this.meta = {
-        geo: [],
+        layer_index: -1,
+        last_layer: "",
+        polygons: {
+          0: []
+        },
         fit: false,
         bubbles: false,
-        boundary: false,
         projection: {
           function: mercator(),
           name: "mercator"
         },
       };
+
+      this.layers = {};
 
       // parent
       this.parent = parent || "body";
@@ -5449,8 +5556,8 @@
       this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
       // init functions
-      this.geometry = geometry;
-      this.projection = geometry$1;
+      this.polygons = polygons;
+      this.projection = projection$2;
 
       // draw functions
       this.draw = draw;

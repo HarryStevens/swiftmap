@@ -1,7 +1,7 @@
 // modules
 import * as d3 from "../../lib/swiftmap-d3-bundler";
 
-export default function geometry(projectionName){
+export default function projection(projectionName){
   // if no data is passed, then this is a getter function
   if (!projectionName) {
     return this.meta.projection.function;

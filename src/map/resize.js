@@ -6,23 +6,30 @@ import keepNumber from "../utils/keepNumber";
 
 // resizes the map
 export default function resize() {
+
+  // scoping issues
+  var swiftmap = this;
+
   // size attributes
-  this.width = this.parent == "body" ? window.innerWidth :
-    +keepNumber(d3.select(this.parent).style("width"));
-  this.height = this.parent == "body" ? window.innerHeight :
-    +keepNumber(d3.select(this.parent).style("height"));
-  this.svg.attr("width", this.width).attr("height", this.height);
+  swiftmap.width = swiftmap.parent == "body" ? window.innerWidth :
+    +keepNumber(d3.select(swiftmap.parent).style("width"));
+  swiftmap.height = swiftmap.parent == "body" ? window.innerHeight :
+    +keepNumber(d3.select(swiftmap.parent).style("height"));
+  swiftmap.svg.attr("width", swiftmap.width).attr("height", swiftmap.height);
   
-  if (this.meta.fit) this.fit();
+  // if any layer has been fit, fit to that layer
+  var layers = Object.keys(swiftmap.layers).map(function(d){ return swiftmap.layers[d]; });
+  var fit_layer = layers.filter(function(d){ return d.fit; })[0];
+  if (fit_layer) swiftmap.fit(fit_layer.name);
 
-  var projection = this.projection;
-  var path = this.path;
+  var projection = swiftmap.projection;
+  var path = swiftmap.path;
 
-  this.svg.selectAll("path").attr("d", path);
-  this.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+  swiftmap.svg.selectAll("path").attr("d", path);
+  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.polygons.coordinates) + ")"; });
 
   // need to reposition bubbles
-  if (this.meta.bubbles) this.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true});
+  if (swiftmap.meta.bubbles) swiftmap.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true}, 0, fit_layer ? fit_layer.name : null);
          
-  return this;
+  return swiftmap;
 }
