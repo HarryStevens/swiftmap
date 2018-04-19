@@ -171,19 +171,18 @@ The D3 selection of the SVG element containing the map.
 
 A string of the map's parent element.
 
-<a name="boundary" href="#boundary">#</a> <i>map</i>.<b>boundary</b><br />
-<a name="subunits" href="#subunits">#</a> <i>map</i>.<b>subunits</b>
+<b>Layer attributes</b>
 
-[D3 selections](https://github.com/d3/d3-selection) of the map's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
+Each of the map's drawn layers will have D3 selections associated with them.
 
-<a name="bubbles" href="#bubbles">#</a> <i>map</i>.<b>bubbles</b>
+<a name="boundary" href="#boundary">#</a> <i>map</i>.layers.< layername >.<b>boundary</b><br />
+<a name="subunits" href="#subunits">#</a> <i>map</i>.layers.< layername >.<b>subunits</b>
+
+[D3 selections](https://github.com/d3/d3-selection) of the layers's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
+
+<a name="bubbles" href="#bubbles">#</a> <i>map</i>.layers.< layername >.<b>bubbles</b>
 
 [D3 selection](https://github.com/d3/d3-selection) of the map's bubbles after invoking <i>map</i>.drawScheme().
-
-```js
-map.subunits
-    .style("stroke-width", (d, i) => (i / 4) + "px");
-```
 
 <b>Map styles</b>
 
