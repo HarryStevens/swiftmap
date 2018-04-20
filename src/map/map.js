@@ -1,11 +1,8 @@
-// modules
 import * as d3 from "../../lib/swiftmap-d3-bundler";
 
-// init functions
 import polygons from "./polygons";
 import projection from "./projection";
 
-// draw functions
 import draw from "./draw";
 import drawBoundary from "./drawBoundary";
 import drawSubunits from "./drawSubunits";
@@ -13,7 +10,6 @@ import drawScheme from "./drawScheme";
 import fit from "./fit";
 import resize from "./resize";
 
-// utility functions
 import keepNumber from "../utils/keepNumber";
 
 // Initializes a swiftmap
@@ -29,9 +25,6 @@ export default function map(parent){
     this.meta = {
       layer_index: -1,
       last_layer: "",
-      polygons: {
-        0: []
-      },
       fit: false,
       bubbles: false,
       projection: {
@@ -40,6 +33,7 @@ export default function map(parent){
       },
     };
 
+    // a layers object to store the geospatial layers
     this.layers = {};
 
     // parent

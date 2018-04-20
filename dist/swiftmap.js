@@ -4668,60 +4668,110 @@
       .replace(/-+$/, "");            // Trim - from end of text
   }
 
-  function polygons(data, key, cl){
+  // tests whether geospatial json is topojson
+  function isTopoJson(json){
+  	return json.type == "Topology" && !!json.arcs && !!json.transform && !!json.objects;
+  }
 
-    // update the layer index
-    ++this.meta.layer_index;
+  // returns the mode from an array of numbers
+  function mode(arr){
+    return arr.sort(function(a, b){
+    	return arr.filter(function(v){ return v === a; }).length - arr.filter(function(v){ return v === b; }).length
+    }).pop();
+  }
 
-    // if the class exists but is not a string, set it to null
-    if (!cl){
-      cl = null;
-    } else if (cl && typeof cl !== "string"){
-      console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + this.meta.layer_index + ".");
-      cl = null;
-    } else if (toSlugCase(cl) !== cl){
-      var slug = toSlugCase(cl);
-      console.warn("The CSS class of the polygon layer's name will be slugified to '" + slug + "'.");
-      cl = slug;
-    }
+  // takes a topojson, and finds the first matching object that matches
+  // the type passed, which can be either "polygons" and "points"
+  function getTopoObjectOfType(json, type){
+
+  	var return_object;
+
+  	var objects = Object.keys(json.objects);
+
+  	// just return the first matching object
+  	for (var i = 0, l = objects.length; i < l; i++) {
+  		var obj = objects[i];
+  		var object = json.objects[obj];
+  		var most_frequent_type = mode(object.geometries.map(function(d){ return d.type; }));
+  		if (type == "polygons" && most_frequent_type.indexOf("Polygon") !== -1) {
+  			return_object = object;
+  			break;
+  		}
+
+  		else if (type == "points" && most_frequent_type == "Points") {
+  			return_object = object;
+  			break;
+  		}
+
+  	}
+  	
+  	return return_object;
+  }
+
+  function polygons(data, key, layer){
 
     // if no data is passed, then this is a getter function
     if (!data) {
-      return this.meta.polygons[this.meta.layer_index];
+      return this.layers[this.meta.last_layer];
+    } 
+
+    // otherwise, data was passed, so we add a layer
+    else {
+
+      // test if the data is even TopoJSON
+      if (!isTopoJson(data)){
+        console.error("The geospatial data passed to map.polygons() must be formatted as TopoJSON.");
+        return;
+      }
+
+      // update the layer index
+      this.meta.layer_index = Object.keys(this.layers).length;
+
+      // if the layer was not passed, set it to the layer index
+      if (!layer){
+        layer = this.meta.layer_index;
+      }
+
+      // if the layer was passed but is not a string, set it to the layer index
+      // but also warn the user
+      else if (layer && typeof layer !== "string"){
+        console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + this.meta.layer_index + ".");
+        layer = this.meta.layer_index;
+      }
+
+      // if the layer is passed but is not a slug, slugify it
+      else if (toSlugCase(layer) !== layer){
+        var slug = toSlugCase(layer);
+        console.warn("The CSS layer of the polygon layer's name will be slugified to '" + slug + "'.");
+        layer = slug;
+      }
+
+      // update the last layer tracker
+      this.meta.last_layer = layer;
+
+      // create the new layer
+      this.layers[layer] = {name: layer, type: "polygons", boundary: false, data: data, subunits: false, scheme: false, fit: false};
+
+      // get the polygons object from the topojson
+      this.layers[layer].object = getTopoObjectOfType(data, "polygons");
+
+      // if the key was passed but is not a function,
+      // set the key property of each datum to its index
+      if (key && typeof key !== "function") {
+        console.warn("The key must be specified as a function. The key will default to (d, i) => i");
+        key = function(d, i){ return i; };
+      }
+
+      // assign the key
+      this.layers[layer].object.geometries.forEach(function(d, i, arr){
+        d.properties.key = key ? key(d, i, arr) : i;
+        return d;
+      });
+
+      return this;
     }
 
-    // if the key is not a function, set the key property of each datum matches its index
-    if (key && typeof key !== "function") {
-      console.warn("The key must be specified as a function. The key will default to (d, i) => i");
-      key = function(d, i){ return i; };
-    }
-
-    // if data is passed, then this is a setter function
-
-    // if a class has been passed (and not nullified),
-    // then we remove the current index from the polygons
-    // also, that's the property we pull from the polygons
-    // otherwise, pull the index
-    var prop;
-    if (cl) {
-      delete this.meta.polygons[this.meta.layer_index];
-      prop = cl;
-    } else {
-      prop = this.meta.layer_index;
-    }
-
-    this.meta.last_layer = prop;
-    if (!this.layers[prop]) this.layers[prop] = {name: prop, boundary: false, subunits: false, scheme: false, fit: false};
-    this.meta.polygons[prop] = data;
-
-    // if a key is passed, add the key to the data
-    // otherwise, assign the index to the key property
-    this.meta.polygons[prop].objects[Object.keys(this.meta.polygons[prop].objects)[0]].geometries.forEach(function(d, i, arr){
-      d.properties.key = key ? key(d, i, arr) : i;
-      return d;
-    });
-
-    return this;
+    
   }
 
   // modules
@@ -4756,7 +4806,7 @@
   function draw(cl){
 
     // check for geospatial data
-    if (this.meta.polygons.length == 0) {
+    if (Object.keys(this.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
     }
@@ -4991,21 +5041,18 @@
   function drawBoundary() {
     
     // check for geospatial data
-    if (this.meta.polygons[0] && this.meta.polygons[0].length == 0) {
-
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a boundary.");
+    if (Object.keys(this.layers).length === 0) {
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
-
     }
     
-    var curr_polygons = this.meta.polygons[this.meta.last_layer];
-    var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
-    
+    var curr_layer = this.layers[this.meta.last_layer];
+
     // only append the first time
-    if (!this.layers[this.meta.last_layer].boundary){
+    if (!curr_layer.boundary){
       
       this.layers[this.meta.last_layer].boundary = this.svg.append("path")
-        .datum(mesh(curr_polygons, data_object, function(a, b) { return a === b; }))
+        .datum(mesh(curr_layer.data, curr_layer.object, function(a, b) { return a === b; }))
         .attr("d", this.path)
         .attr("class", "boundary boundary-" + this.meta.last_layer)
         .attr("stroke", "#000")
@@ -5016,7 +5063,7 @@
     // otherwise, update the path subsequently
     else {
 
-      this[cl].boundary.attr("d", this.path);
+      this.layers[this.meta.last_layer].boundary.attr("d", this.path);
 
     }
 
@@ -5029,18 +5076,15 @@
   function drawSubunits() {
     
     // check for geospatial data
-    if (this.meta.polygons[0] && this.meta.polygons[0].length == 0) {
-
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw subunits.");
+    if (Object.keys(this.layers).length === 0) {
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
-
     }
 
-    var curr_polygons = this.meta.polygons[this.meta.last_layer];
-    var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
+    var curr_layer = this.layers[this.meta.last_layer];
 
     this.layers[this.meta.last_layer].subunits = this.svg.selectAll(".subunit.subunit-" + this.meta.last_layer)
-        .data(feature(curr_polygons, data_object).features, function(d){ return d.properties.key; })
+        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.key; })
       .enter().append("path")
         .attr("class", "subunit subunit-" + this.meta.last_layer)
         .attr("stroke", "#fff")
@@ -5257,9 +5301,10 @@
 
   	// calculate the layer that needs to be drawn
     if (layer && typeof layer !== "string") {
-      console.warn("You must specify that layer to fit as a string. Layer will default to " + this.meta.last_layer);
+      console.warn("You must specify the layer to fit as a string. Layer will default to " + this.meta.last_layer);
       layer = this.meta.last_layer;
     }
+    
     var fit_layer = layer || this.meta.last_layer;
 
   	if (scheme.constructor.name == "SchemeCategorical" || scheme.constructor.name == "SchemeSequential"){
@@ -5278,23 +5323,20 @@
 
   	function drawBubbles(scheme, duration, swiftmap) {
   	  // check for geospatial data
-  	  if (swiftmap.meta.polygons[0] && swiftmap.meta.polygons[0].length == 0) {
-
-  	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a scheme.");
+  	  if (Object.keys(swiftmap.layers).length === 0) {
+  	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
   	    return;
-
   	  }
 
   	  // set this to true for resizing operations
   	  swiftmap.meta.bubbles = true;
   	  
   	  // store some data in variables
-  	  var curr_polygons = swiftmap.meta.polygons[fit_layer];
-  	  var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
+  	  var curr_layer = swiftmap.layers[fit_layer];
   	  var path = swiftmap.path;
 
   	  swiftmap.layers[fit_layer].bubbles = swiftmap.svg.selectAll(".bubble")
-  	      .data(feature(curr_polygons, data_object).features, function(d){ return d.properties.key; });
+  	      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.key; });
 
   	  swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
   	      .attr("cx", function(d){ return path.centroid(d)[0]; })
@@ -5347,30 +5389,30 @@
 
   	function fill(scheme, duration, swiftmap){
 
-  	  // errors
+  	  // check for a scheme
   	  if (!scheme){
   	    console.error("You have not provided a color scheme to map.drawScheme(), so your subunits will not be filled.");
   	    return;
   	  }
   	  // check for geospatial data
-  	  if (swiftmap.meta.polygons[0] && swiftmap.meta.polygons[0].length == 0) {
-  	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw a scheme.");
+  	  if (Object.keys(swiftmap.layers).length === 0) {
+  	    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
   	    return;
   	  }
+  	  // check for tabular data
   	  if (scheme.meta.tab.length == 0){
   	    console.error("Your scheme does not have any tabular data associated with it. Before calling map.drawScheme(), you must first add data with scheme.data()."); 
   	    return;
   	  }
-
-
-  	  if (swiftmap.meta.last_layer == "" && !swiftmap.layers[swiftmap.meta.layer_index].subunits) {
+  	  // check for subunits
+  	  if (!swiftmap.layers[swiftmap.meta.last_layer].subunits) {
   	    console.error("Your map does not have subunits to fill. Before calling map.drawScheme(), you must first call either map.drawSubunits() or map.draw().");
   	    return;
   	  }
   	  
   	  // put data in variables outside of the scope of the subunits fill
   	  var tab = scheme.meta.tab,
-  	    geo = swiftmap.meta.polygons[fit_layer];
+  	    geo = swiftmap.layers[fit_layer].data;
 
   	  // calculate the numerical buckets
   	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
@@ -5442,11 +5484,9 @@
   function fit$1(layer) {  
     
     // check for geospatial data
-    if (this.meta.polygons[0] && this.meta.polygons[0].length == 0) {
-
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can fit the map to its container.");
+    if (Object.keys(this.layers).length === 0) {
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
-
     }
 
     // for scoping issues
@@ -5454,7 +5494,7 @@
 
     // type check the layer
     if (layer && typeof layer !== "string") {
-      console.warn("You must specify that layer to fit as a string. Layer will default to " + swiftmap.meta.last_layer);
+      console.warn("You must specify the layer to fit as a string. Layer will default to " + swiftmap.meta.last_layer);
       layer = swiftmap.meta.last_layer;
     }
 
@@ -5469,9 +5509,8 @@
     swiftmap.layers[fit_layer].fit = true;
 
     // set up the fit
-    var curr_polygons = swiftmap.meta.polygons[fit_layer];
-    var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
-    swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(curr_polygons, data_object));
+    var curr_layer = swiftmap.layers[fit_layer];
+    swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(curr_layer.data, curr_layer.object));
 
     // make sure all classes are updated
     var path = swiftmap.path.projection(swiftmap.meta.projection.function);
@@ -5514,8 +5553,6 @@
     return swiftmap;
   }
 
-  // modules
-
   // Initializes a swiftmap
   function map$1(parent){
 
@@ -5529,9 +5566,6 @@
       this.meta = {
         layer_index: -1,
         last_layer: "",
-        polygons: {
-          0: []
-        },
         fit: false,
         bubbles: false,
         projection: {
@@ -5540,6 +5574,7 @@
         },
       };
 
+      // a layers object to store the geospatial layers
       this.layers = {};
 
       // parent
@@ -5614,7 +5649,7 @@
     return this;
   }
 
-  function mode(breaktype){
+  function mode$1(breaktype){
     if (!breaktype) return this.meta.mode;
 
     var available_modes = ["e", "q", "l", "k"];
@@ -5665,7 +5700,7 @@
       // functions
       this.colors = colors;
       this.data = data;
-      this.mode = mode;
+      this.mode = mode$1;
       this.values = values;
     }
     

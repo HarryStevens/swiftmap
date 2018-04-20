@@ -4,11 +4,9 @@ import feature from "../../lib/swiftmap-topojson-bundler/feature";
 export default function fit(layer) {  
   
   // check for geospatial data
-  if (this.meta.polygons[0] && this.meta.polygons[0].length == 0) {
-
-    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can fit the map to its container.");
+  if (Object.keys(this.layers).length === 0) {
+    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.")
     return;
-
   }
 
   // for scoping issues
@@ -16,7 +14,7 @@ export default function fit(layer) {
 
   // type check the layer
   if (layer && typeof layer !== "string") {
-    console.warn("You must specify that layer to fit as a string. Layer will default to " + swiftmap.meta.last_layer);
+    console.warn("You must specify the layer to fit as a string. Layer will default to " + swiftmap.meta.last_layer);
     layer = swiftmap.meta.last_layer;
   }
 
@@ -31,9 +29,8 @@ export default function fit(layer) {
   swiftmap.layers[fit_layer].fit = true;
 
   // set up the fit
-  var curr_polygons = swiftmap.meta.polygons[fit_layer]
-  var data_object = curr_polygons.objects[Object.keys(curr_polygons.objects)[0]];
-  swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(curr_polygons, data_object));
+  var curr_layer = swiftmap.layers[fit_layer];
+  swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(curr_layer.data, curr_layer.object));
 
   // make sure all classes are updated
   var path = swiftmap.path.projection(swiftmap.meta.projection.function);

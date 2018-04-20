@@ -1,57 +1,69 @@
 import toSlugCase from "../utils/toSlugCase";
+import isTopoJson from "../utils/isTopoJson";
+import getTopoObjectOfType from "../utils/getTopoObjectOfType";
 
-export default function polygons(data, key, cl){
-
-  // update the layer index
-  ++this.meta.layer_index;
-
-  // if the class exists but is not a string, set it to null
-  if (!cl){
-    cl = null;
-  } else if (cl && typeof cl !== "string"){
-    console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + this.meta.layer_index + ".")
-    cl = null;
-  } else if (toSlugCase(cl) !== cl){
-    var slug = toSlugCase(cl);
-    console.warn("The CSS class of the polygon layer's name will be slugified to '" + slug + "'.");
-    cl = slug;
-  }
+export default function polygons(data, key, layer){
 
   // if no data is passed, then this is a getter function
   if (!data) {
-    return this.meta.polygons[this.meta.layer_index];
+    return this.layers[this.meta.last_layer];
+  } 
+
+  // otherwise, data was passed, so we add a layer
+  else {
+
+    // test if the data is even TopoJSON
+    if (!isTopoJson(data)){
+      console.error("The geospatial data passed to map.polygons() must be formatted as TopoJSON.");
+      return;
+    }
+
+    // update the layer index
+    this.meta.layer_index = Object.keys(this.layers).length;
+
+    // if the layer was not passed, set it to the layer index
+    if (!layer){
+      layer = this.meta.layer_index;
+    }
+
+    // if the layer was passed but is not a string, set it to the layer index
+    // but also warn the user
+    else if (layer && typeof layer !== "string"){
+      console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + this.meta.layer_index + ".")
+      layer = this.meta.layer_index;
+    }
+
+    // if the layer is passed but is not a slug, slugify it
+    else if (toSlugCase(layer) !== layer){
+      var slug = toSlugCase(layer);
+      console.warn("The CSS layer of the polygon layer's name will be slugified to '" + slug + "'.");
+      layer = slug;
+    }
+
+    // update the last layer tracker
+    this.meta.last_layer = layer;
+
+    // create the new layer
+    this.layers[layer] = {name: layer, type: "polygons", boundary: false, data: data, subunits: false, scheme: false, fit: false};
+
+    // get the polygons object from the topojson
+    this.layers[layer].object = getTopoObjectOfType(data, "polygons");
+
+    // if the key was passed but is not a function,
+    // set the key property of each datum to its index
+    if (key && typeof key !== "function") {
+      console.warn("The key must be specified as a function. The key will default to (d, i) => i");
+      key = function(d, i){ return i; }
+    }
+
+    // assign the key
+    this.layers[layer].object.geometries.forEach(function(d, i, arr){
+      d.properties.key = key ? key(d, i, arr) : i;
+      return d;
+    });
+
+    return this;
   }
 
-  // if the key is not a function, set the key property of each datum matches its index
-  if (key && typeof key !== "function") {
-    console.warn("The key must be specified as a function. The key will default to (d, i) => i");
-    key = function(d, i){ return i; }
-  }
-
-  // if data is passed, then this is a setter function
-
-  // if a class has been passed (and not nullified),
-  // then we remove the current index from the polygons
-  // also, that's the property we pull from the polygons
-  // otherwise, pull the index
-  var prop;
-  if (cl) {
-    delete this.meta.polygons[this.meta.layer_index];
-    prop = cl;
-  } else {
-    prop = this.meta.layer_index;
-  }
-
-  this.meta.last_layer = prop;
-  if (!this.layers[prop]) this.layers[prop] = {name: prop, boundary: false, subunits: false, scheme: false, fit: false};
-  this.meta.polygons[prop] = data;
-
-  // if a key is passed, add the key to the data
-  // otherwise, assign the index to the key property
-  this.meta.polygons[prop].objects[Object.keys(this.meta.polygons[prop].objects)[0]].geometries.forEach(function(d, i, arr){
-    d.properties.key = key ? key(d, i, arr) : i;
-    return d;
-  });
-
-  return this;
+  
 }

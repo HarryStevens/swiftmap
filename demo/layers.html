@@ -12,13 +12,11 @@
       }
       #map .subunit.subunit-india {
         fill: #fff;
-        stroke: #eee;
+        stroke: #aaa;
+        stroke-dasharray: 5, 5;
       }
       #map .boundary.boundary-india {
         stroke: #aaa;
-      }
-      #map .boundary.boundary-karnataka {
-        /*stroke-width: 2px;*/
       }
     </style>
   </head>
@@ -64,7 +62,6 @@
         }
 
         var map = swiftmap.map("#map")
-          .projection("equirectangular")
           .polygons(india, null, "india")
             .draw()
           .polygons(karnataka, d => d.properties.ac_no, "karnataka")
