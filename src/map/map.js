@@ -25,7 +25,6 @@ export default function map(parent){
     this.meta = {
       layer_index: -1,
       last_layer: "",
-      fit: false,
       bubbles: false,
       projection: {
         function: d3.geoMercator(),
