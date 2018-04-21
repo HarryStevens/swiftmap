@@ -10,9 +10,9 @@ export default function drawPoints(radius, duration, layer) {
     return;
   }
   // type check the layer
-  if (layer && typeof layer !== "string"){
-    console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
-    layer = this.meta.last_layer;
+  if (layer && typeof layer !== "string" && typeof layer !== "number") {
+    console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+    layer = swiftmap.meta.last_layer;
   }
   // Determine which layer we are drawing on.
   var draw_layer = layer || this.meta.last_layer;

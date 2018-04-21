@@ -4,67 +4,109 @@
     <style>
       body {
         margin: 0;
-        font-family: "Helvetica Neue", sans-serif;
+        /*font-family: "Helvetica Neue", sans-serif;*/
       }
       #map {
         width: 100%;
         height: 100vh;
+        background: #1f78b4;
       }
       #map .subunit.subunit-india {
         fill: #fff;
-        stroke: #eee;
+        stroke: #ddd;
+        stroke-dasharray: 5, 5;
       }
       #map .boundary.boundary-india {
-        stroke: #aaa;
+        stroke: none;
       }
       #map .boundary.boundary-karnataka {
         stroke-width: 2px;
       }
+      #map .label.label-cities {
+        text-shadow: 1px 1px 1px #fcfcfc, 1px 1px 1px #eee, 0 -1px 0 #fff, -1px 0 0 #fff;
+      }
     </style>
   </head>
   <body>
-
     <div id="map"></div>
-
-<!--     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
-    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
-    <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
-    <script src="https://d3js.org/d3-request.v1.min.js"></script>
-    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
-
     <script src="d3.v4.min.js"></script>
-
     <script src="../dist/swiftmap.js"></script>
-
     <script>
+
       var map = swiftmap.map("#map");
-      var scheme = swiftmap.schemeBubble()
-        .values(d => d.candidate_json.length);     
+
+      var scheme = swiftmap.schemeCategorical()
+        .values(d => d.winner)
+        .colors({
+          "INC": "#b2df8a",
+        });
 
       d3.queue()
-        .defer(d3.json, "india_state.json")
         .defer(d3.json, "karnataka_geodata.json")
         .defer(d3.json, "karnataka_data_2013.json")
+        .defer(d3.json, "karnataka_data_random.json")
+        .defer(d3.json, "india_state.json")
         .await(ready);
 
-      function ready(err, india, karnataka, results2013){
+      function ready(error, karnataka, results2013, resultsRandom, india){
 
-        scheme.data(results2013, d => d.const_code);
+        // MASSIVE AND BIZARRE BUG: Update pattern not working for drawSubunits
+        
+        // Update the scheme's data.
+        scheme.data(parseResults(results2013), d => d.ac_no);
 
-        map
-          .polygons(india, null, "india")
-            .drawSubunits()
-            .drawBoundary()
+        // Add three layers.
+        map.polygons(india, null, "india")
+            .draw()
           .polygons(karnataka, d => d.properties.ac_no, "karnataka")
             .draw()
-            .drawScheme(scheme);
+            .drawScheme(scheme, 1000)
+          .points(karnataka, null, "cities")
+            .drawPoints()
+            .drawLabels(d => d.properties.name); // TODO: arguments: key, layer
 
+        setTimeout(() => {
+          
+          // Change the scheme's colors.
+          scheme.colors({
+            "INC": "#b2df8a",
+            "BJP": "#fdbf6f",
+            "JD(S)": "#fb9a99"
+          });
+
+          // Update the "karnataka" layer, even though it was not drawn most recently.
+          map.drawScheme(scheme, 1000, "karnataka");
+
+        }, 1000);
+
+        setTimeout(() => {
+
+          // Update the size of the points.
+          map.drawPoints(20, 1000, "cities");
+
+        }, 2000);
+
+        setTimeout(() => {
+
+          // Change the city labels.
+          map.drawLabels(() => "This is a city!", "cities");
+
+        }, 3000);
+
+
+        // Makes it easy to create resizable maps for responsive designs.
         window.onresize = () => map.resize();
 
       }
-        
 
-
+      function parseResults(results){
+        return results.map(ac => {
+          ac.winner = ac.candidate_json[0].party;
+          ac.ac_no = ac.const_code;
+          ac.candidates = ac.candidate_json.length;
+          return ac;
+        });
+      }  
     </script>
   </body>
 </html>

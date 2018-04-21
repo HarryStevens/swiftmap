@@ -4,26 +4,28 @@
     <style>
       body {
         margin: 0;
-        /*font-family: "Helvetica Neue", sans-serif;*/
       }
       #map {
         width: 100%;
         height: 100vh;
         background: #1f78b4;
       }
-      #map .subunit.subunit-india {
+      #map .subunit.subunit-0 {
         fill: #fff;
         stroke: #ddd;
-        stroke-dasharray: 5, 5;
+        stroke-dasharray: 5,5;
       }
-      #map .boundary.boundary-india {
-        stroke: none;
+      #map .boundary.boundary-0 {
+        stroke: #fff;
       }
-      #map .boundary.boundary-karnataka {
+      #map .boundary.boundary-1 {
         stroke-width: 2px;
       }
-      #map .label.label-cities {
+      #map .label {
         text-shadow: 1px 1px 1px #fcfcfc, 1px 1px 1px #eee, 0 -1px 0 #fff, -1px 0 0 #fff;
+      }
+      #map .label, #map .point {
+        pointer-events: none;
       }
     </style>
   </head>
@@ -39,6 +41,8 @@
         .values(d => d.winner)
         .colors({
           "INC": "#b2df8a",
+          "BJP": "#fdbf6f",
+          "JD(S)": "#fb9a99"
         });
 
       d3.queue()
@@ -50,49 +54,18 @@
 
       function ready(error, karnataka, results2013, resultsRandom, india){
 
-        // MASSIVE AND BIZARRE BUG: Update pattern not working for drawSubunits
-        
         // Update the scheme's data.
         scheme.data(parseResults(results2013), d => d.ac_no);
 
         // Add three layers.
-        map.polygons(india, null, "india")
+        map.polygons(india)
             .draw()
-          .polygons(karnataka, d => d.properties.ac_no, "karnataka")
+          .polygons(karnataka, d => d.properties.ac_no)
             .draw()
-            .drawScheme(scheme, 1000)
-          .points(karnataka, null, "cities")
+            .drawScheme(scheme)
+          .points(karnataka)
             .drawPoints()
-            .drawLabels(d => d.properties.name); // TODO: arguments: key, layer
-
-        setTimeout(() => {
-          
-          // Change the scheme's colors.
-          scheme.colors({
-            "INC": "#b2df8a",
-            "BJP": "#fdbf6f",
-            "JD(S)": "#fb9a99"
-          });
-
-          // Update the "karnataka" layer, even though it was not drawn most recently.
-          map.drawScheme(scheme, 1000, "karnataka");
-
-        }, 1000);
-
-        setTimeout(() => {
-
-          // Update the size of the points.
-          map.drawPoints(20, 1000, "cities");
-
-        }, 2000);
-
-        setTimeout(() => {
-
-          // Change the city labels.
-          map.drawLabels(() => "This is a city!", "cities");
-
-        }, 3000);
-
+            .drawLabels(d => d.properties.name);
 
         // Makes it easy to create resizable maps for responsive designs.
         window.onresize = () => map.resize();
@@ -107,6 +80,7 @@
           return ac;
         });
       }  
+
     </script>
   </body>
 </html>

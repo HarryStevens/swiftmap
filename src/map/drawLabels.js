@@ -14,9 +14,9 @@ export default function drawLabels(key, layer) {
     console.error("You must pass a key to drawLabels() so it knows which property to take text from.")
   }
   // type check the layer
-  if (layer && typeof layer !== "string"){
-    console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
-    layer = this.meta.last_layer;
+  if (layer && typeof layer !== "string" && typeof layer !== "number") {
+    console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+    layer = swiftmap.meta.last_layer;
   }
   // Determine which layer we are drawing on.
   var draw_layer = layer || this.meta.last_layer;

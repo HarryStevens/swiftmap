@@ -9,10 +9,10 @@ import keepNumber from "../utils/keepNumber";
 
 export default function drawScheme(scheme, duration, layer){
 
-	// calculate the layer that needs to be drawn
-  if (layer && typeof layer !== "string") {
-    console.warn("You must specify the layer to fit as a string. Layer will default to " + this.meta.last_layer);
-    layer = this.meta.last_layer;
+  // type check the layer
+  if (layer && typeof layer !== "string" && typeof layer !== "number") {
+    console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+    layer = swiftmap.meta.last_layer;
   }
   
   var fit_layer = layer || this.meta.last_layer;

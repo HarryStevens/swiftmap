@@ -13,12 +13,12 @@ export default function fit(layer) {
   var swiftmap = this;
 
   // type check the layer
-  if (layer && typeof layer !== "string") {
-    console.warn("You must specify the layer to fit as a string. Layer will default to " + swiftmap.meta.last_layer);
+  if (layer && typeof layer !== "string" && typeof layer !== "number") {
+    console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
     layer = swiftmap.meta.last_layer;
   }
 
-  // the layer to fit
+  // the layer
   var fit_layer = layer || swiftmap.meta.last_layer;
 
   // update this property so we know whether this geospatial data has been fit to the parent

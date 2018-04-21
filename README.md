@@ -148,9 +148,12 @@ If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the 
 <i>duration</i><br />
 An optional <i>duration</i> may be specified to enable an animated transition from the current style to the new style. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
 
-<a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
+<a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
 
-Updates the projection so that the map's outer boundary fits its parent element.
+Updates the projection so that the <i>layer</i>'s outer boundary fits the <i>map</i>'s parent element. Overrides any previous invocations of <i>map</i>.fit(), as the map can only have one projection.
+
+<i>layer</i><br />
+If <i>layer</i> is specified, fits the layer's outer boundary to the parent element. The <i>layer</i> must be specified as a string. If <i>layer</i> is not specified, defaults to the most recently added layer.
 
 <a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/resize.js "Source")
 

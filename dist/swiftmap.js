@@ -5128,9 +5128,9 @@
       return;
     }
     // type check the layer
-    if (layer && typeof layer !== "string"){
-      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
-      layer = this.meta.last_layer;
+    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+      layer = swiftmap.meta.last_layer;
     }
     // Determine which layer we are drawing on.
     var draw_layer = layer || this.meta.last_layer;
@@ -5174,9 +5174,9 @@
       console.error("You must pass a key to drawLabels() so it knows which property to take text from.");
     }
     // type check the layer
-    if (layer && typeof layer !== "string"){
-      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
-      layer = this.meta.last_layer;
+    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+      layer = swiftmap.meta.last_layer;
     }
     // Determine which layer we are drawing on.
     var draw_layer = layer || this.meta.last_layer;
@@ -5221,9 +5221,9 @@
       return;
     }
     // type check the layer
-    if (layer && typeof layer !== "string"){
-      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
-      layer = this.meta.last_layer;
+    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+      layer = swiftmap.meta.last_layer;
     }
     // Determine which layer we are drawing on.
     var draw_layer = layer || this.meta.last_layer;
@@ -5270,9 +5270,9 @@
       return;
     }
     // type check the layer
-    if (layer && typeof layer !== "string"){
-      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
-      layer = this.meta.last_layer;
+    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+      layer = swiftmap.meta.last_layer;
     }
     // Determine which layer we are drawing on.
     var draw_layer = layer || this.meta.last_layer;
@@ -5499,10 +5499,10 @@
 
   function drawScheme(scheme, duration, layer){
 
-  	// calculate the layer that needs to be drawn
-    if (layer && typeof layer !== "string") {
-      console.warn("You must specify the layer to fit as a string. Layer will default to " + this.meta.last_layer);
-      layer = this.meta.last_layer;
+    // type check the layer
+    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+      layer = swiftmap.meta.last_layer;
     }
     
     var fit_layer = layer || this.meta.last_layer;
@@ -5691,12 +5691,12 @@
     var swiftmap = this;
 
     // type check the layer
-    if (layer && typeof layer !== "string") {
-      console.warn("You must specify the layer to fit as a string. Layer will default to " + swiftmap.meta.last_layer);
+    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
       layer = swiftmap.meta.last_layer;
     }
 
-    // the layer to fit
+    // the layer
     var fit_layer = layer || swiftmap.meta.last_layer;
 
     // update this property so we know whether this geospatial data has been fit to the parent
@@ -5738,7 +5738,8 @@
       +keepNumber(select(swiftmap.parent).style("height"));
     swiftmap.svg.attr("width", swiftmap.width).attr("height", swiftmap.height);
     
-    // if any layer has been fit, fit to that layer
+    // find the most recently fitted layer
+
     var layers = Object.keys(swiftmap.layers).map(function(d){ return swiftmap.layers[d]; });
     var fit_layer = layers.filter(function(d){ return d.fit; })[0];
     if (fit_layer) swiftmap.fit(fit_layer.name);

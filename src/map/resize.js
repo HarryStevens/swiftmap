@@ -17,7 +17,8 @@ export default function resize() {
     +keepNumber(d3.select(swiftmap.parent).style("height"));
   swiftmap.svg.attr("width", swiftmap.width).attr("height", swiftmap.height);
   
-  // if any layer has been fit, fit to that layer
+  // find the most recently fitted layer
+
   var layers = Object.keys(swiftmap.layers).map(function(d){ return swiftmap.layers[d]; });
   var fit_layer = layers.filter(function(d){ return d.fit; })[0];
   if (fit_layer) swiftmap.fit(fit_layer.name);
