@@ -60,6 +60,9 @@ var swiftmap = require("swiftmap");
 ## API Reference
 
 - [Maps](#maps)
+- [Layers](#layers)
+  - [Polygons](#polygons)
+  - [Points](#points)
 - [Schemes](#schemes)
   - [Categorical](#schemeCategorical)
   - [Sequential](#schemeSequential)
@@ -67,30 +70,7 @@ var swiftmap = require("swiftmap");
 
 ### Maps
 
-Before drawing and styling a map, you must tell Swiftmap where on the DOM to place the map, as well as the geospatial data to use for the map.
-
-```js
-swiftmap.map("#map")
-  .polygons(TopoJSON, d => d.state_name, "states")
-    .draw()
-  .polygons(TopoJSON, d => d.county_name, "counties")
-    .draw();
-```
-
-```css
-#map .boundary {
-  stroke-width: 2px;
-}
-#map .boundary.boundary-states {
-  stroke-width: 3px;
-}
-#map .subunit {
-  fill: none;
-}
-#map .subunit.subunit-counties {
-  fill: blue;
-}
-```
+Before drawing and styling a map, you must tell Swiftmap where on the DOM to place the map. You may also specify a map projection and invoke methods for resizing the map when the browser window's dimensions change.
 
 <a name="map" href="#map">#</a> swiftmap.<b>map</b>([<i>parent</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/map.js "Source")
 
@@ -98,19 +78,6 @@ Initializes a <i>map</i>.
 
 <i>parent</i><br />
 If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
-
-<a name="polygons" href="#polygons">#</a> <i>map</i>.<b>polygons</b>([<i>data</i>[, <i>key</i>, <i>layer</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/polygons.js "Source")
-
-Sets or gets a polygons layer.
-
-<i>data</i><br />
-The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the current polygons associated with the layer.
-
-<i>key</i><br />
-Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
-
-<i>layer</i><br />
-If a <i>layer</i> is passed, the geospatial data will be associated with with the name of the layer, which must be specified as a string. In the <i>layer</i> string, space characters will be converted to hyphens so that DOM elements produced by the layer's geospatial data can be referenced with CSS selectors.
 
 <a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([<i>projection</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/projection.js "Source")
 
@@ -122,38 +89,7 @@ If <i>projection</i> is specified, sets the map's projection. The <i>projection<
 - `"equirectangular"`, for the [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection)
 - `"albersUsa"`, for the Albers USA projection, which is a composite of three [Albers' equal-area conic projections](https://en.wikipedia.org/wiki/Albers_projection)
 
-If <i>projection</i> is not specified, returns the current projection associated with the map. For more information, see the [documentation in d3-geo](https://github.com/d3/d3-geo#projections).
-
-<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
-
-Draws a map. This is a convenience method equivalent to <i>map</i>.fit().drawSubunits().drawBoundary().
-
-<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
-
-Draws the map's outer boundary.
-
-<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawSubunits.js "Source")
-
-Draws the map's subunits. For example, if your TopoJSON contains states, the subunits are the states.
-
-<a name="drawScheme" href="#drawScheme">#</a> <i>map</i>.<b>drawScheme</b>(<i>scheme</i>[, <i>duration</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawScheme.js "Source")
-
-Styles the map based on a scheme.
-
-<i>scheme</i><br />
-If the <i>scheme</i> is either [categorical](#schemeCategorical) or [sequential](#schemeSequential), fills the map's subunits to create a choropleth map based on the scheme. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
-
-If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's subunits based the scheme. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
-
-<i>duration</i><br />
-An optional <i>duration</i> may be specified to enable an animated transition from the current style to the new style. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
-
-<a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
-
-Updates the projection so that the <i>layer</i>'s outer boundary fits the <i>map</i>'s parent element. Overrides any previous invocations of <i>map</i>.fit(), as the map can only have one projection.
-
-<i>layer</i><br />
-If <i>layer</i> is specified, fits the layer's outer boundary to the parent element. The <i>layer</i> must be specified as a string. If <i>layer</i> is not specified, defaults to the most recently added layer.
+If <i>projection</i> is not specified, returns the projection associated with the map. For more information, see the [documentation in d3-geo](https://github.com/d3/d3-geo#projections).
 
 <a name="resize" href="#resize">#</a> <i>map</i>.<b>resize</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/resize.js "Source")
 
@@ -174,22 +110,175 @@ The D3 selection of the SVG element containing the map.
 
 A string of the map's parent element.
 
-<b>Layer attributes</b>
+### Layers
 
-Each of the map's drawn layers will have D3 selections associated with them.
+Layers let you add geospatial data to a <i>map</i>, as well as decide how that data should be drawn to the DOM. The recommended indenting pattern is to indent two spaces to declare a new layer, invoking either <i>map</i>.polygons() or <i>map</i>.points(), and to indent four spaces when invoking drawing functions on the preceding layer.
+
+```js
+swiftmap.map("#map")
+  .polygons(TopoJSON, d => d.state_name, "states")
+    .drawSubunits()
+    .drawBoundary()
+  .polygons(TopoJSON, d => d.county_name, "counties")
+    .draw()
+    .drawScheme(scheme)
+  .points(TopoJSON, d => d.city_name, "cities")
+    .drawPoints()
+    .drawLabels(d => d.city_name);
+```
+
+Layers can be styled with CSS selectors.
+
+```css
+#map .boundary {
+  stroke-width: 2px;
+}
+#map .boundary.boundary-states {
+  stroke-width: 3px;
+}
+#map .subunit {
+  fill: none;
+}
+#map .subunit.subunit-counties {
+  stroke-dasharray: 5, 5;
+}
+#map .point.point-cities {
+  fill: blue;
+}
+#map .label.label-cities {
+  font-size: 1.2em;
+}
+```
+
+<a name="polygons" href="#polygons">#</a> <i>map</i>.<b>polygons</b>([<i>data</i>[, <i>key</i>, <i>layer</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/polygons.js "Source")
+
+Sets or gets a polygons layer.
+
+<i>data</i><br />
+The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the geospatial data associated with the layer.
+
+<i>key</i><br />
+Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
+
+<i>layer</i><br />
+If a <i>layer</i> is passed, the geospatial data will be associated with with the name of the layer, which must be specified as a string. In the <i>layer</i> string, space characters will be converted to hyphens so that DOM elements produced by the layer's geospatial data can be referenced with CSS selectors.
+
+If a <i>layer</i> is not passed, the geospatial data will be associated with the index of the layer, where the first layer is indexed to `0`. For instance, the name of the third layer added to the map will default to `2`, and can be styled with CSS using the following pattern:
+
+```css
+#map .boundary.boundary-2 {
+  stroke-width: 2px;
+}
+```
+
+<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>([layer]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
+
+Draws a polygons layer. This is a convenience method equivalent to <i>map</i>.fit().drawSubunits().drawBoundary().
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the specified layer.
+
+<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>([layer]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
+
+Draws a polygons layer's outer boundary.
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the boundary of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the boundary of the specified layer.
+
+<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>([layer]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawSubunits.js "Source")
+
+Draws a polygons layer's subunits. For example, if the layer's TopoJSON contains states, the subunits are the states.
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the subunits of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the subunits of the specified layer.
+
+<a name="drawScheme" href="#drawScheme">#</a> <i>map</i>.<b>drawScheme</b>(<i>scheme</i>[, <i>duration</i>, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawScheme.js "Source")
+
+Styles a polygons layer based on a scheme.
+
+<i>scheme</i><br />
+If the <i>scheme</i> is either [categorical](#schemeCategorical) or [sequential](#schemeSequential), fills the map's subunits to create a choropleth map based on the scheme. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
+
+If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's subunits based the scheme. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
+
+<i>duration</i><br />
+An optional <i>duration</i> may be specified to enable an animated transition from the current style to the new style. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the most recently added layer will be styled by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will style or restyle the specified layer.
+
+<a name="fit" href="#fit">#</a> <i>map</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
+
+Updates the projection so that a layer's outer boundary fits the <i>map</i>'s parent element. Overrides any previous invocations of <i>map</i>.fit(), as the map can only have one projection.
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the most recently added layer will be fit the the boundary of the parent element. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will fit the specified layer's outer boundary to the parent element.
+
+<b>Polygons layer attributes</b>
+
+When drawn to the map, polygons layers will have D3 selections associated with them.
 
 <a name="boundary" href="#boundary">#</a> <i>map</i>.layers.< layername >.<b>boundary</b><br />
 <a name="subunits" href="#subunits">#</a> <i>map</i>.layers.< layername >.<b>subunits</b>
 
-[D3 selections](https://github.com/d3/d3-selection) of the layers's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
+[D3 selections](https://github.com/d3/d3-selection) of a polygons layer's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
 
 <a name="bubbles" href="#bubbles">#</a> <i>map</i>.layers.< layername >.<b>bubbles</b>
 
-[D3 selection](https://github.com/d3/d3-selection) of the map's bubbles after invoking <i>map</i>.drawScheme().
+[D3 selection](https://github.com/d3/d3-selection) of a polygons layers's bubbles after invoking <i>map</i>.drawScheme().
 
-<b>Map styles</b>
+<b>Polygons layer styles</b>
 
-Maps rendered with swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`. If you create a bubble map, the bubbles are exposed as the class `bubble`.
+Maps rendered with Swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`. If you add a bubble scheme to a polygons layer, the bubbles are exposed as the class `bubble`.
+
+<a name="points" href="#points">#</a> <i>map</i>.<b>points</b>([<i>data</i>[, <i>key</i>, <i>layer</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/points.js "Source")
+
+Sets or gets a points layer. See [<i>map</i>.polygons()](#polygons) for descriptions of the arguments.
+
+<a name="drawLabels" href="#drawLabels">#</a> <i>map</i>.<b>drawLabels</b>(<i>key</i>[, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawLabels.js "Source")
+
+Labels the points with text.
+
+<i>key</i><br />
+A <i>key</i> function tells Swiftmap how each datum should be labeled.
+
+```js
+var key = d => d.properties.name;
+
+map.drawLabels(key);
+```
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the labels of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the labels of the specified layer.
+
+<a name="drawPoints" href="#drawPoints">#</a> <i>map</i>.<b>drawPoints</b>([<i>radius</i>, <i>duration</i>, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")`
+
+Draws circles to the layer located at each point's coordinates.
+
+<i>radius</i><br />
+If <i>radius</i> is specified, sets each point's radius in pixels. Defaults to `2`.
+
+<i>duration</i><br />
+An optional <i>duration</i> may be specified to enable an animated transition from the current radius to the new radius. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the points of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the points of the specified layer.
+
+<b>Points layer attributes</b>
+
+When drawn to the map, points layers will have D3 selections associated with them.
+
+<a name="labels" href="#labels">#</a> <i>map</i>.layers.< layername >.<b>labels</b><br />
+
+[D3 selections](https://github.com/d3/d3-selection) of a points layer's labels. This attribute is only available after calling <i>map</i>.drawLabels(); 
+
+<a name="points" href="#points">#</a> <i>map</i>.layers.< layername >.<b>points</b><br />
+
+[D3 selections](https://github.com/d3/d3-selection) of a points layer's points. This attribute is only available after calling <i>map</i>.drawPoints();
+
+<b>Points layer styles</b>
+
+Maps rendered with Swiftmap can be styled with CSS. The labels are exposed as the class `label`, and the points are exposed as the class `point`. If you add a bubble scheme to a points layer, the bubbles are exposed as the class `bubble`.
 
 ### Schemes
 
@@ -218,10 +307,10 @@ var scheme = swiftmap.schemeCategorical()
 
 <a name="data-categorical" href="#data-categorical">#</a> <i>categorical</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
-Adds tabular data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>.
+Adds data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>.
 
 <i>data</i><br />
-The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the current tabular data associated with the <i>scheme</i>.
+The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the data associated with the <i>scheme</i>.
 
 <i>key</i><br />
 Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to <i>map</i>.drawScheme(). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
@@ -240,14 +329,14 @@ scheme.colors({
 });
 ```
 
-If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
+If <i>palette</i> is not specified, returns the color palette associated with the scheme.
 
 <a name="colorOther" href="#colorOther">#</a> <i>categorical</i>.<b>colorOther</b>([<i>color</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/colorOther.js "Source")
 
 Sets or gets an alternative color in the scheme.
 
 <i>color</i><br />
-If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.colors(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the current color, which defaults to `"#ccc"`.
+If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.colors(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the scheme's alternative color, which defaults to `"#ccc"`.
 
 <a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
@@ -293,7 +382,7 @@ See [<i>categorical</i>.data()](#data-categorical).
 Specifies the series of colors to which values should be assigned.
 
 <i>palette</i><br />
-If a <i>palette</i> is specified, the scheme will assign a series of values to each color in the <i>palette</i>. The <i>palette</i> must be specified as an array of strings. If <i>palette</i> is not specified, returns the current color palette associated with the scheme.
+If a <i>palette</i> is specified, the scheme will assign a series of values to each color in the <i>palette</i>. The <i>palette</i> must be specified as an array of strings. If <i>palette</i> is not specified, returns the color palette associated with the scheme.
 
 The <i>palette</i> will default to `["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]` if this method is not called.
 
@@ -359,7 +448,7 @@ See [<i>categorical</i>.data()](#data-categorical).
 Sets or gets the minimum and maximum radii of the bubble scheme.
 
 <i>range</i><br />
-If a <i>range</i> is specified, sets the minimum and maximum values of the bubbles' radii. If a <i>range</i> is not specified, returns the current range, which defaults to `[2, 20]`.
+If a <i>range</i> is specified, sets the minimum and maximum values of the bubbles' radii. If a <i>range</i> is not specified, returns the range associated with the scheme, which defaults to `[2, 20]`.
 
 <a name="values-bubble" href="#values-bubble">#</a> <i>bubble</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 

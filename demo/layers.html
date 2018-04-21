@@ -58,8 +58,10 @@
         scheme.data(parseResults(results2013), d => d.ac_no);
 
         // Add three layers.
-        map.polygons(india)
-            .draw()
+        map
+          .polygons(india)
+            .drawSubunits()
+            .drawBoundary()
           .polygons(karnataka, d => d.properties.ac_no)
             .draw()
             .drawScheme(scheme)

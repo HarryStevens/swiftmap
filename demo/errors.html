@@ -63,7 +63,10 @@
             .drawScheme(scheme, 1000)
           .points(karnataka, null, "cities")
             .drawPoints()
-            .drawLabels(d => d.properties.name); // TODO: arguments: key, layer
+            .drawLabels(d => d.properties.name);
+
+        // TODO
+        // Use flubber to allow for drawing transitions
 
         setTimeout(() => {
           
