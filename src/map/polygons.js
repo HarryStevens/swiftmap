@@ -36,7 +36,7 @@ export default function polygons(data, key, layer){
     // if the layer is passed but is not a slug, slugify it
     else if (toSlugCase(layer) !== layer){
       var slug = toSlugCase(layer);
-      console.warn("The CSS layer of the polygon layer's name will be slugified to '" + slug + "'.");
+      console.warn("The CSS class of the polygon layer's name will be slugified to '" + slug + "'.");
       layer = slug;
     }
 
@@ -58,7 +58,8 @@ export default function polygons(data, key, layer){
 
     // assign the key
     this.layers[layer].object.geometries.forEach(function(d, i, arr){
-      d.properties.key = key ? key(d, i, arr) : i;
+      d.properties.swiftmap = d.properties.swiftmap || {};
+      d.properties.swiftmap.key = key ? key(d, i, arr) : i;
       return d;
     });
 

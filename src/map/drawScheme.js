@@ -1,6 +1,7 @@
 // modules
 import feature from "../../lib/swiftmap-topojson-bundler/feature";
 import limits from "../../lib/swiftmap-chroma-bundler/limits";
+import * as d3 from "../../lib/swiftmap-d3-bundler";
 
 // utility functions
 import extent from "../utils/extent";
@@ -45,7 +46,7 @@ export default function drawScheme(scheme, duration, layer){
 	  var path = swiftmap.path;
 
 	  swiftmap.layers[fit_layer].bubbles = swiftmap.svg.selectAll(".bubble")
-	      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.key; });
+	      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; });
 
 	  swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
 	      .attr("cx", function(d){ return path.centroid(d)[0]; })
@@ -69,7 +70,7 @@ export default function drawScheme(scheme, duration, layer){
 	    // get the matching datum
 	    var match = scheme.meta.tab
 	      .filter(function(row){
-	        return row.key == d.properties.key;
+	        return row.key == d.properties.swiftmap.key;
 	      })
 	      .map(scheme.meta.values);
 
@@ -114,14 +115,13 @@ export default function drawScheme(scheme, duration, layer){
 	    return;
 	  }
 	  // check for subunits
-	  if (!swiftmap.layers[swiftmap.meta.last_layer].subunits) {
+	  if (!swiftmap.layers[fit_layer].subunits) {
 	    console.error("Your map does not have subunits to fill. Before calling map.drawScheme(), you must first call either map.drawSubunits() or map.draw().");
 	    return;
 	  }
 	  
 	  // put data in variables outside of the scope of the subunits fill
-	  var tab = scheme.meta.tab,
-	    geo = swiftmap.layers[fit_layer].data;
+	  var tab = scheme.meta.tab;
 
 	  // calculate the numerical buckets
 	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
@@ -134,15 +134,14 @@ export default function drawScheme(scheme, duration, layer){
 	  }
 
 	 	// fill the subunits
-	 	swiftmap.layers[fit_layer].subunits.transition().duration(duration).style("fill", fillSubunits);
-	  
+	 	d3.selectAll(".subunit.subunit-" + fit_layer).transition().duration(duration).style("fill", fillSubunits);
 
 	  function fillSubunits(d){
 
 	    // get the match and calculate the value
 	    var match = tab
 	      .filter(function(row){
-	        return row.key == d.properties.key;
+	        return row.key == d.properties.swiftmap.key;
 	      })
 	      .map(scheme.meta.values);
 

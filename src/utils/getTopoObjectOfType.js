@@ -5,7 +5,6 @@ import mode from "./mode";
 export default function getTopoObjectOfType(json, type){
 
 	var return_object;
-
 	var objects = Object.keys(json.objects);
 
 	// just return the first matching object
@@ -13,12 +12,13 @@ export default function getTopoObjectOfType(json, type){
 		var obj = objects[i];
 		var object = json.objects[obj];
 		var most_frequent_type = mode(object.geometries.map(function(d){ return d.type; }));
+		
 		if (type == "polygons" && most_frequent_type.indexOf("Polygon") !== -1) {
 			return_object = object;
 			break;
 		}
 
-		else if (type == "points" && most_frequent_type == "Points") {
+		else if (type == "points" && most_frequent_type == "Point") {
 			return_object = object;
 			break;
 		}

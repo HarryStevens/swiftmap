@@ -33,10 +33,14 @@ export default function fit(layer) {
   swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(curr_layer.data, curr_layer.object));
 
   // make sure all classes are updated
+  var projection = swiftmap.meta.projection.function;
   var path = swiftmap.path.projection(swiftmap.meta.projection.function);
   
   swiftmap.svg.selectAll("path").attr("d", path);
-  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.polygons.coordinates) + ")"; });
+  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+  swiftmap.svg.selectAll("circle.point")
+      .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
+      .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; });
 
   return swiftmap;
 }

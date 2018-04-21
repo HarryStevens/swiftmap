@@ -869,6 +869,12 @@
         : new Selection([[selector]], root);
   }
 
+  function selectAll(selector) {
+    return typeof selector === "string"
+        ? new Selection([document.querySelectorAll(selector)], [document.documentElement])
+        : new Selection([selector == null ? [] : selector], root);
+  }
+
   var noop = {value: function() {}};
 
   function dispatch() {
@@ -4318,7 +4324,7 @@
     return transform$$1;
   }
 
-  function projection$1(project) {
+  function projection(project) {
     return projectionMutator(function() { return project; })();
   }
 
@@ -4612,7 +4618,7 @@
   }
 
   function mercatorProjection(project) {
-    var m = projection$1(project),
+    var m = projection(project),
         center = m.center,
         scale = m.scale,
         translate = m.translate,
@@ -4654,7 +4660,7 @@
   equirectangularRaw.invert = equirectangularRaw;
 
   function equirectangular() {
-    return projection$1(equirectangularRaw)
+    return projection(equirectangularRaw)
         .scale(152.63);
   }
 
@@ -4685,7 +4691,6 @@
   function getTopoObjectOfType(json, type){
 
   	var return_object;
-
   	var objects = Object.keys(json.objects);
 
   	// just return the first matching object
@@ -4693,12 +4698,13 @@
   		var obj = objects[i];
   		var object = json.objects[obj];
   		var most_frequent_type = mode(object.geometries.map(function(d){ return d.type; }));
+  		
   		if (type == "polygons" && most_frequent_type.indexOf("Polygon") !== -1) {
   			return_object = object;
   			break;
   		}
 
-  		else if (type == "points" && most_frequent_type == "Points") {
+  		else if (type == "points" && most_frequent_type == "Point") {
   			return_object = object;
   			break;
   		}
@@ -4742,7 +4748,74 @@
       // if the layer is passed but is not a slug, slugify it
       else if (toSlugCase(layer) !== layer){
         var slug = toSlugCase(layer);
-        console.warn("The CSS layer of the polygon layer's name will be slugified to '" + slug + "'.");
+        console.warn("The CSS class of the polygon layer's name will be slugified to '" + slug + "'.");
+        layer = slug;
+      }
+
+      // update the last layer tracker
+      this.meta.last_layer = layer;
+
+      // create the new layer
+      this.layers[layer] = {name: layer, type: "points", boundary: false, data: data, subunits: false, scheme: false, fit: false};
+
+      // get the points object from the topojson
+      this.layers[layer].object = getTopoObjectOfType(data, "points");
+
+      // if the key was passed but is not a function,
+      // set the key property of each datum to its index
+      if (key && typeof key !== "function") {
+        console.warn("The key must be specified as a function. The key will default to (d, i) => i");
+        key = function(d, i){ return i; };
+      }
+
+      // assign the key
+      this.layers[layer].object.geometries.forEach(function(d, i, arr){
+        d.properties.swiftmap = d.properties.swiftmap || {};
+        d.properties.swiftmap.key = key ? key(d, i, arr) : i;
+        return d;
+      });
+
+      return this;
+    }
+
+    
+  }
+
+  function polygons$1(data, key, layer){
+
+    // if no data is passed, then this is a getter function
+    if (!data) {
+      return this.layers[this.meta.last_layer];
+    } 
+
+    // otherwise, data was passed, so we add a layer
+    else {
+
+      // test if the data is even TopoJSON
+      if (!isTopoJson(data)){
+        console.error("The geospatial data passed to map.polygons() must be formatted as TopoJSON.");
+        return;
+      }
+
+      // update the layer index
+      this.meta.layer_index = Object.keys(this.layers).length;
+
+      // if the layer was not passed, set it to the layer index
+      if (!layer){
+        layer = this.meta.layer_index;
+      }
+
+      // if the layer was passed but is not a string, set it to the layer index
+      // but also warn the user
+      else if (layer && typeof layer !== "string"){
+        console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + this.meta.layer_index + ".");
+        layer = this.meta.layer_index;
+      }
+
+      // if the layer is passed but is not a slug, slugify it
+      else if (toSlugCase(layer) !== layer){
+        var slug = toSlugCase(layer);
+        console.warn("The CSS class of the polygon layer's name will be slugified to '" + slug + "'.");
         layer = slug;
       }
 
@@ -4764,7 +4837,8 @@
 
       // assign the key
       this.layers[layer].object.geometries.forEach(function(d, i, arr){
-        d.properties.key = key ? key(d, i, arr) : i;
+        d.properties.swiftmap = d.properties.swiftmap || {};
+        d.properties.swiftmap.key = key ? key(d, i, arr) : i;
         return d;
       });
 
@@ -4776,7 +4850,7 @@
 
   // modules
 
-  function projection$2(projectionName){
+  function projection$1(projectionName){
     // if no data is passed, then this is a getter function
     if (!projectionName) {
       return this.meta.projection.function;
@@ -4803,7 +4877,7 @@
     return this;
   }
 
-  function draw(cl){
+  function draw(layer){
 
     // check for geospatial data
     if (Object.keys(this.layers).length === 0) {
@@ -4811,8 +4885,16 @@
       return;
     }
 
+    // type check the layer
+    if (layer && typeof layer !== "string"){
+      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
+      layer = this.meta.last_layer;
+    }
+    // Determine which layer we are drawing on.
+    var draw_layer = layer || this.meta.last_layer;
+
     // basic drawing
-    this.fit().drawSubunits().drawBoundary();
+    this.fit(draw_layer).drawSubunits(draw_layer).drawBoundary(draw_layer);
 
     return this;
 
@@ -5038,23 +5120,30 @@
   }
 
   // draws an outer boundary
-  function drawBoundary() {
+  function drawBoundary(layer) {
     
     // check for geospatial data
     if (Object.keys(this.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
     }
+    // type check the layer
+    if (layer && typeof layer !== "string"){
+      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
+      layer = this.meta.last_layer;
+    }
+    // Determine which layer we are drawing on.
+    var draw_layer = layer || this.meta.last_layer;
     
-    var curr_layer = this.layers[this.meta.last_layer];
+    var curr_layer = this.layers[draw_layer];
 
     // only append the first time
     if (!curr_layer.boundary){
       
-      this.layers[this.meta.last_layer].boundary = this.svg.append("path")
+      this.layers[draw_layer].boundary = this.svg.append("path")
         .datum(mesh(curr_layer.data, curr_layer.object, function(a, b) { return a === b; }))
         .attr("d", this.path)
-        .attr("class", "boundary boundary-" + this.meta.last_layer)
+        .attr("class", "boundary boundary-" + draw_layer)
         .attr("stroke", "#000")
         .attr("fill", "none");
 
@@ -5063,7 +5152,7 @@
     // otherwise, update the path subsequently
     else {
 
-      this.layers[this.meta.last_layer].boundary.attr("d", this.path);
+      this.layers[draw_layer].boundary.attr("d", this.path);
 
     }
 
@@ -5073,20 +5162,131 @@
   // modules
 
   // draws subunits
-  function drawSubunits() {
+  function drawLabels(key, layer) {
     
     // check for geospatial data
     if (Object.keys(this.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
     }
+    // check for a key
+    if (!key){
+      console.error("You must pass a key to drawLabels() so it knows which property to take text from.");
+    }
+    // type check the layer
+    if (layer && typeof layer !== "string"){
+      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
+      layer = this.meta.last_layer;
+    }
+    // Determine which layer we are drawing on.
+    var draw_layer = layer || this.meta.last_layer;
 
-    var curr_layer = this.layers[this.meta.last_layer];
+    // scope some variables
+    var projection = this.meta.projection.function;
+    var width = this.width;
 
-    this.layers[this.meta.last_layer].subunits = this.svg.selectAll(".subunit.subunit-" + this.meta.last_layer)
-        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.key; })
-      .enter().append("path")
-        .attr("class", "subunit subunit-" + this.meta.last_layer)
+    var curr_layer = this.layers[draw_layer];
+
+    // TODO
+    // Use the CSS selector of the labels to get the font size,
+    // from which you can calculate the dy as fontSize * (3 / 8).
+
+    this.layers[draw_layer].labels = this.svg.selectAll(".label.label-" + draw_layer)
+        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; });
+    
+    this.layers[draw_layer].labels
+        .text(key);
+
+    this.layers[draw_layer].labels.enter().append("text")
+        .attr("class", "label label-" + draw_layer)
+        .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
+        .attr("x", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? -6 : 6; })
+        .attr("font-size", ".8em")
+        .attr("dy", ".3em")
+        .attr("font-family", "sans-serif")
+        .style("text-anchor", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? "end" : "start"; })
+        .text(key);
+
+    return this;
+  }
+
+  // modules
+
+  // draws subunits
+  function drawPoints(radius, duration, layer) {
+    
+    // check for geospatial data
+    if (Object.keys(this.layers).length === 0) {
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+      return;
+    }
+    // type check the layer
+    if (layer && typeof layer !== "string"){
+      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
+      layer = this.meta.last_layer;
+    }
+    // Determine which layer we are drawing on.
+    var draw_layer = layer || this.meta.last_layer;
+
+    // calc the radius
+    var r = radius || 2;
+
+    // add the radius to the data, for use in other functions and with multiple layers
+    this.layers[draw_layer].object.geometries.forEach(function(d){
+      d.properties.swiftmap = d.properties.swiftmap || {};
+      d.properties.swiftmap.pointRadius = r;
+      return d;
+    });
+
+    // scope some variables
+    var projection = this.meta.projection.function;
+    var width = this.width;
+
+    var curr_layer = this.layers[draw_layer];
+
+    this.layers[draw_layer].points = this.svg.selectAll(".point.point-" + draw_layer)
+        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; });
+    
+    this.layers[draw_layer].points.transition().duration(duration)
+        .attr("r", function(d){ return d.properties.swiftmap.pointRadius; });
+
+    this.layers[draw_layer].points.enter().append("circle")
+        .attr("class", "point point-" + draw_layer)
+        .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
+        .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; })
+        .attr("r", r);
+        
+    return this;
+  }
+
+  // modules
+
+  // draws subunits
+  function drawSubunits(layer) {
+    
+    // check for geospatial data
+    if (Object.keys(this.layers).length === 0) {
+      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+      return;
+    }
+    // type check the layer
+    if (layer && typeof layer !== "string"){
+      console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
+      layer = this.meta.last_layer;
+    }
+    // Determine which layer we are drawing on.
+    var draw_layer = layer || this.meta.last_layer;
+
+    var curr_layer = this.layers[draw_layer];
+
+    this.layers[draw_layer].subunits = this.svg.selectAll(".subunit.subunit-" + draw_layer)
+        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; });
+    
+    this.layers[draw_layer].subunits
+        .attr("d", this.path);
+
+    this.layers[draw_layer].subunits.enter().append("path")
+        .attr("class", "subunit subunit-" + draw_layer)
         .attr("stroke", "#fff")
         .attr("stroke-width", "1px")
         .attr("fill", "#ccc")
@@ -5336,7 +5536,7 @@
   	  var path = swiftmap.path;
 
   	  swiftmap.layers[fit_layer].bubbles = swiftmap.svg.selectAll(".bubble")
-  	      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.key; });
+  	      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; });
 
   	  swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
   	      .attr("cx", function(d){ return path.centroid(d)[0]; })
@@ -5360,7 +5560,7 @@
   	    // get the matching datum
   	    var match = scheme.meta.tab
   	      .filter(function(row){
-  	        return row.key == d.properties.key;
+  	        return row.key == d.properties.swiftmap.key;
   	      })
   	      .map(scheme.meta.values);
 
@@ -5405,14 +5605,13 @@
   	    return;
   	  }
   	  // check for subunits
-  	  if (!swiftmap.layers[swiftmap.meta.last_layer].subunits) {
+  	  if (!swiftmap.layers[fit_layer].subunits) {
   	    console.error("Your map does not have subunits to fill. Before calling map.drawScheme(), you must first call either map.drawSubunits() or map.draw().");
   	    return;
   	  }
   	  
   	  // put data in variables outside of the scope of the subunits fill
-  	  var tab = scheme.meta.tab,
-  	    geo = swiftmap.layers[fit_layer].data;
+  	  var tab = scheme.meta.tab;
 
   	  // calculate the numerical buckets
   	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
@@ -5425,15 +5624,14 @@
   	  }
 
   	 	// fill the subunits
-  	 	swiftmap.layers[fit_layer].subunits.transition().duration(duration).style("fill", fillSubunits);
-  	  
+  	 	selectAll(".subunit.subunit-" + fit_layer).transition().duration(duration).style("fill", fillSubunits);
 
   	  function fillSubunits(d){
 
   	    // get the match and calculate the value
   	    var match = tab
   	      .filter(function(row){
-  	        return row.key == d.properties.key;
+  	        return row.key == d.properties.swiftmap.key;
   	      })
   	      .map(scheme.meta.values);
 
@@ -5513,10 +5711,14 @@
     swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(curr_layer.data, curr_layer.object));
 
     // make sure all classes are updated
+    var projection = swiftmap.meta.projection.function;
     var path = swiftmap.path.projection(swiftmap.meta.projection.function);
     
     swiftmap.svg.selectAll("path").attr("d", path);
-    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.polygons.coordinates) + ")"; });
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+    swiftmap.svg.selectAll("circle.point")
+        .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
+        .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; });
 
     return swiftmap;
   }
@@ -5541,11 +5743,15 @@
     var fit_layer = layers.filter(function(d){ return d.fit; })[0];
     if (fit_layer) swiftmap.fit(fit_layer.name);
 
-    var projection = swiftmap.projection;
+    // scrope the projection and path
+    var projection = swiftmap.meta.projection.function;
     var path = swiftmap.path;
 
     swiftmap.svg.selectAll("path").attr("d", path);
-    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.polygons.coordinates) + ")"; });
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+    swiftmap.svg.selectAll("circle.point")
+        .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
+        .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; });
 
     // need to reposition bubbles
     if (swiftmap.meta.bubbles) swiftmap.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true}, 0, fit_layer ? fit_layer.name : null);
@@ -5566,7 +5772,6 @@
       this.meta = {
         layer_index: -1,
         last_layer: "",
-        fit: false,
         bubbles: false,
         projection: {
           function: mercator(),
@@ -5591,12 +5796,15 @@
       this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
       // init functions
-      this.polygons = polygons;
-      this.projection = projection$2;
+      this.points = polygons;
+      this.polygons = polygons$1;
+      this.projection = projection$1;
 
       // draw functions
       this.draw = draw;
       this.drawBoundary = drawBoundary;
+      this.drawLabels = drawLabels;
+      this.drawPoints = drawPoints;
       this.drawSubunits = drawSubunits;
       this.drawScheme = drawScheme;
       this.fit = fit$1;

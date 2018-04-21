@@ -22,11 +22,15 @@ export default function resize() {
   var fit_layer = layers.filter(function(d){ return d.fit; })[0];
   if (fit_layer) swiftmap.fit(fit_layer.name);
 
-  var projection = swiftmap.projection;
+  // scrope the projection and path
+  var projection = swiftmap.meta.projection.function;
   var path = swiftmap.path;
 
   swiftmap.svg.selectAll("path").attr("d", path);
-  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.polygons.coordinates) + ")"; });
+  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+  swiftmap.svg.selectAll("circle.point")
+      .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
+      .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; });
 
   // need to reposition bubbles
   if (swiftmap.meta.bubbles) swiftmap.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true}, 0, fit_layer ? fit_layer.name : null);
