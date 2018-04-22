@@ -150,7 +150,7 @@ Layers can be styled with CSS selectors.
 }
 ```
 
-[See it in action]().
+[See it in action](https://bl.ocks.org/HarryStevens/ef47557d3639243956e26261199ee91c).
 
 <a name="polygons" href="#polygons">#</a> <i>map</i>.<b>polygons</b>([<i>data</i>[, <i>key</i>, <i>layer</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/polygons.js "Source")
 
