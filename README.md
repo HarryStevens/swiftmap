@@ -70,7 +70,7 @@ var swiftmap = require("swiftmap");
 
 ### Maps
 
-Before drawing and styling a map, you must tell Swiftmap where on the DOM to place the map. You may also specify a map projection and invoke methods for resizing the map when the browser window's dimensions change.
+Before drawing and styling a map, you can tell Swiftmap where on the DOM to place the map. You may also specify a map projection and call methods for resizing the map when the browser window's dimensions change.
 
 <a name="map" href="#map">#</a> swiftmap.<b>map</b>([<i>parent</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/map.js "Source")
 
@@ -343,7 +343,7 @@ If a <i>color</i> is specified, assigns a color to those subunits whose category
 Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. 
 
 <i>function</i><br />
-When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
+When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be called for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
 
 ```js
 var data = [
@@ -410,7 +410,7 @@ The <i>function</i> defaults to:
 d => d
 ```
 
-When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be invoked for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
+When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be called for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
 
 ```js
 var data = [
