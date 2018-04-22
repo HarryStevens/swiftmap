@@ -158,7 +158,7 @@ Sets or gets a polygons layer.
 The <i>data</i> must be specified as a TopoJSON object. If no <i>data</i> is passed, returns the geospatial data associated with the layer.
 
 <i>key</i><br />
-Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
+Each datum will be assigned a key value based on the value returned by an optional <i>key</i> function. This key will be used to match each datum of geospatial data to a corresponding datum of tabular data when a scheme is passed to the layer via [<i>map</i>.drawScheme()](#drawScheme). If no <i>key</i> is specified, each datum will be assigned a key according to its index.
 
 <i>layer</i><br />
 If a <i>layer</i> is passed, the geospatial data will be associated with with the name of the layer, which must be specified as a string. In the <i>layer</i> string, space characters will be converted to hyphens so that DOM elements produced by the layer's geospatial data can be referenced with CSS selectors.
