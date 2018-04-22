@@ -253,7 +253,7 @@ If <i>layer</i> is not specified, the labels of the most recently added layer wi
 
 <a name="drawPoints" href="#drawPoints">#</a> <i>map</i>.<b>drawPoints</b>([<i>radius</i>, <i>duration</i>, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")`
 
-Draws circles to the layer located at each point's coordinates.
+Draws circles, located at each point's coordinates, to a layer.
 
 <i>radius</i><br />
 If <i>radius</i> is specified, sets each point's radius in pixels. Defaults to `2`.
