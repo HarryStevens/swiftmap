@@ -112,7 +112,7 @@ A string of the map's parent element.
 
 ### Layers
 
-Layers let you add geospatial data to a <i>map</i>, as well as decide how that data should be drawn to the DOM. The recommended indenting pattern is to indent two spaces to declare a new layer, invoking either <i>map</i>.polygons() or <i>map</i>.points(), and to indent four spaces when invoking drawing functions on the preceding layer.
+Layers let you add geospatial data to a <i>map</i>, as well as decide how that data should be drawn to the DOM. The recommended indenting pattern is to indent two spaces to declare a new layer, calling either <i>map</i>.polygons() or <i>map</i>.points(), and to indent four spaces when calling drawing functions on the preceding layer.
 
 ```js
 swiftmap.map("#map")
@@ -225,7 +225,7 @@ When drawn to the map, polygons layers will have D3 selections associated with t
 
 <a name="bubbles" href="#bubbles">#</a> <i>map</i>.layers.< layername >.<b>bubbles</b>
 
-[D3 selection](https://github.com/d3/d3-selection) of a polygons layers's bubbles after invoking <i>map</i>.drawScheme().
+[D3 selection](https://github.com/d3/d3-selection) of a polygons layers's bubbles after calling <i>map</i>.drawScheme().
 
 <b>Polygons layer styles</b>
 
