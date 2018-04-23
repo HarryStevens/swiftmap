@@ -411,6 +411,8 @@ var scheme = swiftmap.schemeSequential()
   .values(d => d.value);
 ```
 
+[See it in action](https://bl.ocks.org/HarryStevens/9d052eec2ab33d0a84a4475030ede896).
+
 <a name="values-sequential" href="#values-sequential">#</a> <i>sequential</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
 Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data.
