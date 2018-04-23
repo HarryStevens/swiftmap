@@ -173,21 +173,21 @@ If a <i>layer</i> is not passed, the geospatial data will be associated with the
 }
 ```
 
-<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>([layer]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
+<a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
 
 Draws a polygons layer. This is a convenience method equivalent to <i>map</i>.fit().drawSubunits().drawBoundary().
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the specified layer.
 
-<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>([layer]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
+<a name="drawBoundary" href="#drawBoundary">#</a> <i>map</i>.<b>drawBoundary</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
 
 Draws a polygons layer's outer boundary.
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the boundary of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the boundary of the specified layer.
 
-<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>([layer]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawSubunits.js "Source")
+<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawSubunits.js "Source")
 
 Draws a polygons layer's subunits. For example, if the layer's TopoJSON contains states, the subunits are the states.
 
