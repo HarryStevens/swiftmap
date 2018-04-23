@@ -5668,12 +5668,12 @@
     }
     r.domain = [r.min, r.max];
     r.limits = function(mode, num) {
-      return limits$1(r, mode, num);
+      return limits(r, mode, num);
     };
     return r;
   }
 
-  function limits$1(data, mode, num) {
+  function limits(data, mode, num) {
     var aa, ab, ac, ad, ae, af, ag, ah, ai, aj, ak, al, am, assignments, best, centroids, cluster, clusterSizes, dist, i, j, kClusters, limits, max, max_log, min, min_log, mindist, n, nb_iters, newCentroids, o, p, pb, pr, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, repeat, sum, tmpKMeansBreaks, v, value, values, w;
     if (mode == null) {
       mode = 'equal';
@@ -5824,7 +5824,7 @@
   function calcBreaklist(scheme){
     return scheme.meta.breaktype == "c" ?
       scheme.meta.breaklist :
-      limits$1(scheme.meta.tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
+      limits(scheme.meta.tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
   }
 
   function colors(palette){
@@ -5879,29 +5879,23 @@
   function calcBreaklist$1(scheme){
     return scheme.meta.breaktype == "c" ?
       scheme.meta.breaklist :
-      limits$1(scheme.meta.tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
+      limits(scheme.meta.tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
   }
 
   function breaks(breakargument){
     if (!breakargument) return this.meta.breaklist;
 
-    // scope the scheme
-    var scheme = this;
-
-    // breaktype must match one of the available modes
-    var available_modes = ["e", "q", "l", "k"];
-
     // If the argument is not of a valid type, warn and default to quantile breaks
     if (typeof breakargument !== "string" && !Array.isArray(breakargument)) {
       console.warn("The argument passed to scheme.breaks() must be either a string or an array. The scheme will default to using quantile breaks.");
-      this.meta.breaklist = limits(tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
+      his.meta.breaklist = calcBreaklist$1(this);
     }
 
     // If the argument is a string, compute the breaklist based on the breaktype
     else if (typeof breakargument === "string") {
 
       // If the breaktype passed does not match an available mode, set it to the default.
-      if (available_modes.indexOf(breakargument) == -1) {
+      if (["e", "q", "l", "k"].indexOf(breakargument) == -1) {
         console.warn("You must specify the scheme's breaktype as either 'e', 'q', 'l', or 'k'. The breaktype will default to 'q'.");
       }
 
