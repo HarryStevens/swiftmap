@@ -401,7 +401,7 @@ If a <i>breaktype</i> is specified, the scheme will compute the class breaks bas
 
 The <i>breaktype</i> will default to `"q"` if <i>sequential</i>.breaks() is not called.
 
-<i>breaklist</i>
+<i>breaklist</i><br />
 If you'd rather use custom breaks, you can specify a <i>breaklist</i> as an array of numbers. The length of the <i>breaklist</i> should be one greater than the length of the <i>palette</i> passed to [<i>sequential</i>.colors()](#colors-sequential), and its extent should span the range of values returned by the <i>function</i> passed to [<i>sequential</i>.values()](#values-sequential). 
 
 ```js
