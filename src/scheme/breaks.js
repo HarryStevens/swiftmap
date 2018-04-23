@@ -1,3 +1,5 @@
+import calcBreaklist from "./calcBreaklist";
+
 export default function breaks(breakargument){
   if (!breakargument) return this.meta.breaklist;
 
@@ -24,6 +26,7 @@ export default function breaks(breakargument){
     // Otherwise, update the breaktype
     else {
       this.meta.breaktype = breakargument;  
+      this.meta.breaklist = calcBreaklist(this);
     }
   } 
 

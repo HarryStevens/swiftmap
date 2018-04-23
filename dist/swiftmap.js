@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.18. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.20. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -5874,6 +5874,14 @@
     return this;
   }
 
+  // a utility function for caclculating the breaklist of sequential schemes
+
+  function calcBreaklist$1(scheme){
+    return scheme.meta.breaktype == "c" ?
+      scheme.meta.breaklist :
+      limits$1(scheme.meta.tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
+  }
+
   function breaks(breakargument){
     if (!breakargument) return this.meta.breaklist;
 
@@ -5900,6 +5908,7 @@
       // Otherwise, update the breaktype
       else {
         this.meta.breaktype = breakargument;  
+        this.meta.breaklist = calcBreaklist$1(this);
       }
     } 
 
