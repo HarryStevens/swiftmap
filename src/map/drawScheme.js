@@ -1,6 +1,5 @@
 // modules
 import feature from "../../lib/swiftmap-topojson-bundler/feature";
-import limits from "../../lib/swiftmap-chroma-bundler/limits";
 import * as d3 from "../../lib/swiftmap-d3-bundler";
 
 // utility functions
@@ -123,9 +122,6 @@ export default function drawScheme(scheme, duration, layer){
 	  // put data in variables outside of the scope of the subunits fill
 	  var tab = scheme.meta.tab;
 
-	  // calculate the numerical buckets
-	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
-	  
 	  // set the duration
 	  if (!duration) duration = 0;
 	  if (typeof duration !== "number" || duration < 0) {
@@ -155,12 +151,11 @@ export default function drawScheme(scheme, duration, layer){
 
 	      // calculate the correct color
 	      var color;
-	      buckets.forEach(function(bucket, bucket_index){
+	      scheme.meta.breaklist.forEach(function(bucket, bucket_index, buckets){
 	        if (match[0] >= bucket && match[0] <= buckets[bucket_index + 1]){
 	          color = scheme.meta.colors[bucket_index];
 	        }
 	      });
-
 	      return color;
 
 	    }

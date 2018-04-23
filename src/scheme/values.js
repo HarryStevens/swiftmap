@@ -1,3 +1,5 @@
+import calcBreakList from "./calcBreakList";
+
 export default function values(mapper){
   // error
   if (!mapper) {
@@ -11,8 +13,11 @@ export default function values(mapper){
 
   // set the values mapper
   else {
-    this.meta.values = mapper;  
+    this.meta.values = mapper;
   }
   
+  // calculate the breaklist
+  this.meta.breaklist = calcBreakList(this);
+
   return this;
 }

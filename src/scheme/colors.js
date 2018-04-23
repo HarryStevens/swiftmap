@@ -1,3 +1,5 @@
+import calcBreakList from "./calcBreakList";
+
 export default function colors(palette){
   if (!palette) return this.meta.colors;
 
@@ -10,6 +12,9 @@ export default function colors(palette){
   }
 
   this.meta.colors = palette;
+
+  // calculate the breaklist
+  this.meta.breaklist = calcBreakList(this);
 
   return this;
 }

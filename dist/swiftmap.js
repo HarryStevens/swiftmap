@@ -5301,182 +5301,6 @@
     return this;
   }
 
-  function analyze(data) {
-    var len, o, r, val;
-    r = {
-      min: Number.MAX_VALUE,
-      max: Number.MAX_VALUE * -1,
-      sum: 0,
-      values: [],
-      count: 0
-    };
-    for (o = 0, len = data.length; o < len; o++) {
-      val = data[o];
-      if ((val != null) && !isNaN(val)) {
-        r.values.push(val);
-        r.sum += val;
-        if (val < r.min) {
-          r.min = val;
-        }
-        if (val > r.max) {
-          r.max = val;
-        }
-        r.count += 1;
-      }
-    }
-    r.domain = [r.min, r.max];
-    r.limits = function(mode, num) {
-      return limits(r, mode, num);
-    };
-    return r;
-  }
-
-  function limits(data, mode, num) {
-    var aa, ab, ac, ad, ae, af, ag, ah, ai, aj, ak, al, am, assignments, best, centroids, cluster, clusterSizes, dist, i, j, kClusters, limits, max, max_log, min, min_log, mindist, n, nb_iters, newCentroids, o, p, pb, pr, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, repeat, sum, tmpKMeansBreaks, v, value, values, w;
-    if (mode == null) {
-      mode = 'equal';
-    }
-    if (num == null) {
-      num = 7;
-    }
-    if (Array.isArray(data)) {
-      data = analyze(data);
-    }
-    min = data.min;
-    max = data.max;
-    sum = data.sum;
-    values = data.values.sort(function(a, b) {
-      return a - b;
-    });
-    if (num === 1) {
-      return [min, max];
-    }
-    limits = [];
-    if (mode.substr(0, 1) === 'c') {
-      limits.push(min);
-      limits.push(max);
-    }
-    if (mode.substr(0, 1) === 'e') {
-      limits.push(min);
-      for (i = o = 1, ref = num - 1; 1 <= ref ? o <= ref : o >= ref; i = 1 <= ref ? ++o : --o) {
-        limits.push(min + (i / num) * (max - min));
-      }
-      limits.push(max);
-    } else if (mode.substr(0, 1) === 'l') {
-      if (min <= 0) {
-        throw 'Logarithmic scales are only possible for values > 0';
-      }
-      min_log = Math.LOG10E * log(min);
-      max_log = Math.LOG10E * log(max);
-      limits.push(min);
-      for (i = w = 1, ref1 = num - 1; 1 <= ref1 ? w <= ref1 : w >= ref1; i = 1 <= ref1 ? ++w : --w) {
-        limits.push(pow(10, min_log + (i / num) * (max_log - min_log)));
-      }
-      limits.push(max);
-    } else if (mode.substr(0, 1) === 'q') {
-      limits.push(min);
-      for (i = aa = 1, ref2 = num - 1; 1 <= ref2 ? aa <= ref2 : aa >= ref2; i = 1 <= ref2 ? ++aa : --aa) {
-        p = (values.length - 1) * i / num;
-        pb = Math.floor(p);
-        if (pb === p) {
-          limits.push(values[pb]);
-        } else {
-          pr = p - pb;
-          limits.push(values[pb] * (1 - pr) + values[pb + 1] * pr);
-        }
-      }
-      limits.push(max);
-    } else if (mode.substr(0, 1) === 'k') {
-
-      /*
-      implementation based on
-      http://code.google.com/p/figue/source/browse/trunk/figue.js#336
-      simplified for 1-d input values
-       */
-      n = values.length;
-      assignments = new Array(n);
-      clusterSizes = new Array(num);
-      repeat = true;
-      nb_iters = 0;
-      centroids = null;
-      centroids = [];
-      centroids.push(min);
-      for (i = ab = 1, ref3 = num - 1; 1 <= ref3 ? ab <= ref3 : ab >= ref3; i = 1 <= ref3 ? ++ab : --ab) {
-        centroids.push(min + (i / num) * (max - min));
-      }
-      centroids.push(max);
-      while (repeat) {
-        for (j = ac = 0, ref4 = num - 1; 0 <= ref4 ? ac <= ref4 : ac >= ref4; j = 0 <= ref4 ? ++ac : --ac) {
-          clusterSizes[j] = 0;
-        }
-        for (i = ad = 0, ref5 = n - 1; 0 <= ref5 ? ad <= ref5 : ad >= ref5; i = 0 <= ref5 ? ++ad : --ad) {
-          value = values[i];
-          mindist = Number.MAX_VALUE;
-          for (j = ae = 0, ref6 = num - 1; 0 <= ref6 ? ae <= ref6 : ae >= ref6; j = 0 <= ref6 ? ++ae : --ae) {
-            dist = Math.abs(centroids[j] - value);
-            if (dist < mindist) {
-              mindist = dist;
-              best = j;
-            }
-          }
-          clusterSizes[best]++;
-          assignments[i] = best;
-        }
-        newCentroids = new Array(num);
-        for (j = af = 0, ref7 = num - 1; 0 <= ref7 ? af <= ref7 : af >= ref7; j = 0 <= ref7 ? ++af : --af) {
-          newCentroids[j] = null;
-        }
-        for (i = ag = 0, ref8 = n - 1; 0 <= ref8 ? ag <= ref8 : ag >= ref8; i = 0 <= ref8 ? ++ag : --ag) {
-          cluster = assignments[i];
-          if (newCentroids[cluster] === null) {
-            newCentroids[cluster] = values[i];
-          } else {
-            newCentroids[cluster] += values[i];
-          }
-        }
-        for (j = ah = 0, ref9 = num - 1; 0 <= ref9 ? ah <= ref9 : ah >= ref9; j = 0 <= ref9 ? ++ah : --ah) {
-          newCentroids[j] *= 1 / clusterSizes[j];
-        }
-        repeat = false;
-        for (j = ai = 0, ref10 = num - 1; 0 <= ref10 ? ai <= ref10 : ai >= ref10; j = 0 <= ref10 ? ++ai : --ai) {
-          if (newCentroids[j] !== centroids[i]) {
-            repeat = true;
-            break;
-          }
-        }
-        centroids = newCentroids;
-        nb_iters++;
-        if (nb_iters > 200) {
-          repeat = false;
-        }
-      }
-      kClusters = {};
-      for (j = aj = 0, ref11 = num - 1; 0 <= ref11 ? aj <= ref11 : aj >= ref11; j = 0 <= ref11 ? ++aj : --aj) {
-        kClusters[j] = [];
-      }
-      for (i = ak = 0, ref12 = n - 1; 0 <= ref12 ? ak <= ref12 : ak >= ref12; i = 0 <= ref12 ? ++ak : --ak) {
-        cluster = assignments[i];
-        kClusters[cluster].push(values[i]);
-      }
-      tmpKMeansBreaks = [];
-      for (j = al = 0, ref13 = num - 1; 0 <= ref13 ? al <= ref13 : al >= ref13; j = 0 <= ref13 ? ++al : --al) {
-        tmpKMeansBreaks.push(kClusters[j][0]);
-        tmpKMeansBreaks.push(kClusters[j][kClusters[j].length - 1]);
-      }
-      tmpKMeansBreaks = tmpKMeansBreaks.sort(function(a, b) {
-        return a - b;
-      });
-      limits.push(tmpKMeansBreaks[0]);
-      for (i = am = 1, ref14 = tmpKMeansBreaks.length - 1; am <= ref14; i = am += 2) {
-        v = tmpKMeansBreaks[i];
-        if (!isNaN(v) && limits.indexOf(v) === -1) {
-          limits.push(v);
-        }
-      }
-    }
-    return limits;
-  }
-
   // Returns the maximum value of an array.
   function max$1(arr){
     return arr.reduce(function(a, b) {
@@ -5619,9 +5443,6 @@
   	  // put data in variables outside of the scope of the subunits fill
   	  var tab = scheme.meta.tab;
 
-  	  // calculate the numerical buckets
-  	  var buckets = limits(tab.map(scheme.meta.values), scheme.meta.mode, scheme.meta.colors.length);
-  	  
   	  // set the duration
   	  if (!duration) duration = 0;
   	  if (typeof duration !== "number" || duration < 0) {
@@ -5651,12 +5472,11 @@
 
   	      // calculate the correct color
   	      var color;
-  	      buckets.forEach(function(bucket, bucket_index){
+  	      scheme.meta.breaklist.forEach(function(bucket, bucket_index, buckets){
   	        if (match[0] >= bucket && match[0] <= buckets[bucket_index + 1]){
   	          color = scheme.meta.colors[bucket_index];
   	        }
   	      });
-
   	      return color;
 
   	    }
@@ -5823,6 +5643,190 @@
 
   }
 
+  function analyze(data) {
+    var len, o, r, val;
+    r = {
+      min: Number.MAX_VALUE,
+      max: Number.MAX_VALUE * -1,
+      sum: 0,
+      values: [],
+      count: 0
+    };
+    for (o = 0, len = data.length; o < len; o++) {
+      val = data[o];
+      if ((val != null) && !isNaN(val)) {
+        r.values.push(val);
+        r.sum += val;
+        if (val < r.min) {
+          r.min = val;
+        }
+        if (val > r.max) {
+          r.max = val;
+        }
+        r.count += 1;
+      }
+    }
+    r.domain = [r.min, r.max];
+    r.limits = function(mode, num) {
+      return limits$1(r, mode, num);
+    };
+    return r;
+  }
+
+  function limits$1(data, mode, num) {
+    var aa, ab, ac, ad, ae, af, ag, ah, ai, aj, ak, al, am, assignments, best, centroids, cluster, clusterSizes, dist, i, j, kClusters, limits, max, max_log, min, min_log, mindist, n, nb_iters, newCentroids, o, p, pb, pr, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, repeat, sum, tmpKMeansBreaks, v, value, values, w;
+    if (mode == null) {
+      mode = 'equal';
+    }
+    if (num == null) {
+      num = 7;
+    }
+    if (Array.isArray(data)) {
+      data = analyze(data);
+    }
+    min = data.min;
+    max = data.max;
+    sum = data.sum;
+    values = data.values.sort(function(a, b) {
+      return a - b;
+    });
+    if (num === 1) {
+      return [min, max];
+    }
+    limits = [];
+    if (mode.substr(0, 1) === 'c') {
+      limits.push(min);
+      limits.push(max);
+    }
+    if (mode.substr(0, 1) === 'e') {
+      limits.push(min);
+      for (i = o = 1, ref = num - 1; 1 <= ref ? o <= ref : o >= ref; i = 1 <= ref ? ++o : --o) {
+        limits.push(min + (i / num) * (max - min));
+      }
+      limits.push(max);
+    } else if (mode.substr(0, 1) === 'l') {
+      if (min <= 0) {
+        throw 'Logarithmic scales are only possible for values > 0';
+      }
+      min_log = Math.LOG10E * log(min);
+      max_log = Math.LOG10E * log(max);
+      limits.push(min);
+      for (i = w = 1, ref1 = num - 1; 1 <= ref1 ? w <= ref1 : w >= ref1; i = 1 <= ref1 ? ++w : --w) {
+        limits.push(pow(10, min_log + (i / num) * (max_log - min_log)));
+      }
+      limits.push(max);
+    } else if (mode.substr(0, 1) === 'q') {
+      limits.push(min);
+      for (i = aa = 1, ref2 = num - 1; 1 <= ref2 ? aa <= ref2 : aa >= ref2; i = 1 <= ref2 ? ++aa : --aa) {
+        p = (values.length - 1) * i / num;
+        pb = Math.floor(p);
+        if (pb === p) {
+          limits.push(values[pb]);
+        } else {
+          pr = p - pb;
+          limits.push(values[pb] * (1 - pr) + values[pb + 1] * pr);
+        }
+      }
+      limits.push(max);
+    } else if (mode.substr(0, 1) === 'k') {
+
+      /*
+      implementation based on
+      http://code.google.com/p/figue/source/browse/trunk/figue.js#336
+      simplified for 1-d input values
+       */
+      n = values.length;
+      assignments = new Array(n);
+      clusterSizes = new Array(num);
+      repeat = true;
+      nb_iters = 0;
+      centroids = null;
+      centroids = [];
+      centroids.push(min);
+      for (i = ab = 1, ref3 = num - 1; 1 <= ref3 ? ab <= ref3 : ab >= ref3; i = 1 <= ref3 ? ++ab : --ab) {
+        centroids.push(min + (i / num) * (max - min));
+      }
+      centroids.push(max);
+      while (repeat) {
+        for (j = ac = 0, ref4 = num - 1; 0 <= ref4 ? ac <= ref4 : ac >= ref4; j = 0 <= ref4 ? ++ac : --ac) {
+          clusterSizes[j] = 0;
+        }
+        for (i = ad = 0, ref5 = n - 1; 0 <= ref5 ? ad <= ref5 : ad >= ref5; i = 0 <= ref5 ? ++ad : --ad) {
+          value = values[i];
+          mindist = Number.MAX_VALUE;
+          for (j = ae = 0, ref6 = num - 1; 0 <= ref6 ? ae <= ref6 : ae >= ref6; j = 0 <= ref6 ? ++ae : --ae) {
+            dist = Math.abs(centroids[j] - value);
+            if (dist < mindist) {
+              mindist = dist;
+              best = j;
+            }
+          }
+          clusterSizes[best]++;
+          assignments[i] = best;
+        }
+        newCentroids = new Array(num);
+        for (j = af = 0, ref7 = num - 1; 0 <= ref7 ? af <= ref7 : af >= ref7; j = 0 <= ref7 ? ++af : --af) {
+          newCentroids[j] = null;
+        }
+        for (i = ag = 0, ref8 = n - 1; 0 <= ref8 ? ag <= ref8 : ag >= ref8; i = 0 <= ref8 ? ++ag : --ag) {
+          cluster = assignments[i];
+          if (newCentroids[cluster] === null) {
+            newCentroids[cluster] = values[i];
+          } else {
+            newCentroids[cluster] += values[i];
+          }
+        }
+        for (j = ah = 0, ref9 = num - 1; 0 <= ref9 ? ah <= ref9 : ah >= ref9; j = 0 <= ref9 ? ++ah : --ah) {
+          newCentroids[j] *= 1 / clusterSizes[j];
+        }
+        repeat = false;
+        for (j = ai = 0, ref10 = num - 1; 0 <= ref10 ? ai <= ref10 : ai >= ref10; j = 0 <= ref10 ? ++ai : --ai) {
+          if (newCentroids[j] !== centroids[i]) {
+            repeat = true;
+            break;
+          }
+        }
+        centroids = newCentroids;
+        nb_iters++;
+        if (nb_iters > 200) {
+          repeat = false;
+        }
+      }
+      kClusters = {};
+      for (j = aj = 0, ref11 = num - 1; 0 <= ref11 ? aj <= ref11 : aj >= ref11; j = 0 <= ref11 ? ++aj : --aj) {
+        kClusters[j] = [];
+      }
+      for (i = ak = 0, ref12 = n - 1; 0 <= ref12 ? ak <= ref12 : ak >= ref12; i = 0 <= ref12 ? ++ak : --ak) {
+        cluster = assignments[i];
+        kClusters[cluster].push(values[i]);
+      }
+      tmpKMeansBreaks = [];
+      for (j = al = 0, ref13 = num - 1; 0 <= ref13 ? al <= ref13 : al >= ref13; j = 0 <= ref13 ? ++al : --al) {
+        tmpKMeansBreaks.push(kClusters[j][0]);
+        tmpKMeansBreaks.push(kClusters[j][kClusters[j].length - 1]);
+      }
+      tmpKMeansBreaks = tmpKMeansBreaks.sort(function(a, b) {
+        return a - b;
+      });
+      limits.push(tmpKMeansBreaks[0]);
+      for (i = am = 1, ref14 = tmpKMeansBreaks.length - 1; am <= ref14; i = am += 2) {
+        v = tmpKMeansBreaks[i];
+        if (!isNaN(v) && limits.indexOf(v) === -1) {
+          limits.push(v);
+        }
+      }
+    }
+    return limits;
+  }
+
+  // a utility function for caclculating the breaklist of sequential schemes
+
+  function calcBreaklist(scheme){
+    return scheme.meta.breaktype == "c" ?
+      scheme.meta.breaklist :
+      limits$1(scheme.meta.tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
+  }
+
   function colors(palette){
     if (!palette) return this.meta.colors;
 
@@ -5835,6 +5839,9 @@
     }
 
     this.meta.colors = palette;
+
+    // calculate the breaklist
+    this.meta.breaklist = calcBreaklist(this);
 
     return this;
   }
@@ -5860,21 +5867,46 @@
       d.key = key ? key(d, i, arr) : i;
       return d;
     });
+
+    // calculate the breaklist
+    this.meta.breaklist = calcBreaklist(this);
     
     return this;
   }
 
-  function mode$1(breaktype){
-    if (!breaktype) return this.meta.mode;
+  function breaks(breakargument){
+    if (!breakargument) return this.meta.breaklist;
 
+    // scope the scheme
+    var scheme = this;
+
+    // breaktype must match one of the available modes
     var available_modes = ["e", "q", "l", "k"];
 
-    if (typeof breaktype !== "string") {
-      console.warn("You must specify the scheme's mode as a string. The mode will default to 'e'.");
-    } else if (available_modes.indexOf(breaktype) == -1) {
-      console.warn("You must specify the scheme's mode as either 'e', 'q', 'l', or 'k'. The mode will default to 'e'.");
-    } else {
-      this.meta.mode = breaktype;
+    // If the argument is not of a valid type, warn and default to quantile breaks
+    if (typeof breakargument !== "string" && !Array.isArray(breakargument)) {
+      console.warn("The argument passed to scheme.breaks() must be either a string or an array. The scheme will default to using quantile breaks.");
+      this.meta.breaklist = limits(tab.map(scheme.meta.values), scheme.meta.breaktype, scheme.meta.colors.length);
+    }
+
+    // If the argument is a string, compute the breaklist based on the breaktype
+    else if (typeof breakargument === "string") {
+
+      // If the breaktype passed does not match an available mode, set it to the default.
+      if (available_modes.indexOf(breakargument) == -1) {
+        console.warn("You must specify the scheme's breaktype as either 'e', 'q', 'l', or 'k'. The breaktype will default to 'q'.");
+      }
+
+      // Otherwise, update the breaktype
+      else {
+        this.meta.breaktype = breakargument;  
+      }
+    } 
+
+    // If the argument is an array, we're using custom breaks, so just set the breaklist.
+    else {
+      this.meta.breaktype = "c";
+      this.meta.breaklist = breakargument;
     }
     
     return this;
@@ -5893,9 +5925,12 @@
 
     // set the values mapper
     else {
-      this.meta.values = mapper;  
+      this.meta.values = mapper;
     }
     
+    // calculate the breaklist
+    this.meta.breaklist = calcBreaklist(this);
+
     return this;
   }
 
@@ -5908,14 +5943,15 @@
       this.meta = {
         tab: [],
         colors: ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
-        mode: "q",
+        breaktype: "q",
+        breaklist: [],
         values: function(d){ return d; }
       };
 
       // functions
       this.colors = colors;
       this.data = data;
-      this.mode = mode$1;
+      this.breaks = breaks;
       this.values = values;
     }
     

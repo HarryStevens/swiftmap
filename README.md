@@ -369,7 +369,7 @@ Sequential schemes are used to assign colors to discrete ranges in a series of v
 var scheme = swiftmap.schemeSequential()
   .data(JSON)
   .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"])
-  .mode("q")
+  .breaks("q")
   .values(d => d.value);
 ```
 
@@ -388,18 +388,28 @@ If a <i>palette</i> is specified, the scheme will assign a series of values to e
 
 The <i>palette</i> will default to `["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]` if this method is not called.
 
-<a name="mode" href="#mode">#</a> <i>sequential</i>.<b>mode</b>([<i>breaktype</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/mode.js "Source")
+<a name="breaks" href="#breaks">#</a> <i>sequential</i>.<b>breaks</b>([<i>breaktype</i> | <i>breaklist</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/breaks.js "Source")
 
-Computes class breaks based on data.
+Computes class breaks based on data. If no argument is passed, returns the scheme's <i>breaklist</i> – an array of numbers representing the breaks associated with the scheme.
 
 <i>breaktype</i><br />
-If a <i>breaktype</i> is specified, the scheme will compute the class breaks based on data. The <i>breaktype</i> must be specified as a string, either `"e"`, `"q"`, `"l"` or `"k"`.
+If a <i>breaktype</i> is specified, the scheme will compute the class breaks based on the values returned by the <i>function</i> passed to [<i>sequential</i>.values()](#values-sequential). The <i>breaktype</i> must be specified as a string, either `"e"`, `"q"`, `"l"` or `"k"`.
 - `"e"` specifies <b>equidistant</b> breaks, where each break spans an equal numeric range.
 - `"l"` specifies <b>logarithmic</b> breaks, which are just like equidistant breaks but on a logarithmic scale.
-- `"q"` specifies <b>quantile</b> breaks, where an equal number of data points is placed into each break.
+- `"q"` specifies <b>quantile</b> breaks, where an equal number of data points are placed into each break.
 - `"k"` specifies <b>k-means</b> breaks, which use a [<i>k</i>-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) algorithm to group similar data points with each other.
 
-The <i>breaktype</i> will default to `"q"` if this method is not called. If a <i>breaktype</i> is not specified, returns the <i>breaktype</i> associated with the scheme.
+The <i>breaktype</i> will default to `"q"` if <i>sequential</i>.breaks() is not called.
+
+<i>breaklist</i>
+If you'd rather use custom breaks, you can specify a <i>breaklist</i> as an array of numbers. The length of the <i>breaklist</i> should be one greater than the length of the <i>palette</i> passed to [<i>sequential</i>.colors()](#colors-sequential), and its extent should span the range of values returned by the <i>function</i> passed to [<i>sequential</i>.values()](#values-sequential). 
+
+```js
+var scheme = swiftmap.schemeSequential()
+  .breaks([-.5, 0, 20, 25, 55])
+  .colors(["tomato", "lightblue", "steelblue", "darkblue"])
+  .values(d => d.value);
+```
 
 <a name="values-sequential" href="#values-sequential">#</a> <i>sequential</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 

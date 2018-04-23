@@ -1,3 +1,5 @@
+import calcBreakList from "./calcBreakList";
+
 export default function data(data, key){
   // if no data is passed, then this is a getter function
   if (!data) {
@@ -19,6 +21,9 @@ export default function data(data, key){
     d.key = key ? key(d, i, arr) : i;
     return d;
   });
+
+  // calculate the breaklist
+  this.meta.breaklist = calcBreakList(this);
   
   return this;
 }
