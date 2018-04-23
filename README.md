@@ -152,7 +152,7 @@ Layers can be styled with CSS selectors.
 
 [See it in action](https://bl.ocks.org/HarryStevens/ef47557d3639243956e26261199ee91c).
 
-<a name="polygons" href="#polygons">#</a> <i>map</i>.<b>polygons</b>([<i>data</i>[, <i>key</i>, <i>layer</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/polygons.js "Source")
+<a name="polygons" href="#polygons">#</a> <i>map</i>.<b>polygons</b>([<i>data</i>][, <i>key</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/polygons.js "Source")
 
 Sets or gets a polygons layer.
 
@@ -194,7 +194,7 @@ Draws a polygons layer's subunits. For example, if the layer's TopoJSON contains
 <i>layer</i><br />
 If <i>layer</i> is not specified, the subunits of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the subunits of the specified layer.
 
-<a name="drawScheme" href="#drawScheme">#</a> <i>map</i>.<b>drawScheme</b>(<i>scheme</i>[, <i>duration</i>, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawScheme.js "Source")
+<a name="drawScheme" href="#drawScheme">#</a> <i>map</i>.<b>drawScheme</b>(<i>scheme</i>[, <i>duration</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawScheme.js "Source")
 
 Styles a polygons layer based on a scheme.
 
@@ -233,7 +233,7 @@ When drawn to the map, polygons layers will have D3 selections associated with t
 
 Maps rendered with Swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`. If you add a bubble scheme to a polygons layer, the bubbles are exposed as the class `bubble`.
 
-<a name="points" href="#points">#</a> <i>map</i>.<b>points</b>([<i>data</i>[, <i>key</i>, <i>layer</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/points.js "Source")
+<a name="points" href="#points">#</a> <i>map</i>.<b>points</b>([<i>data</i>][, <i>key</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/points.js "Source")
 
 Sets or gets a points layer. See [<i>map</i>.polygons()](#polygons) for descriptions of the arguments.
 
@@ -253,7 +253,7 @@ map.drawLabels(key);
 <i>layer</i><br />
 If <i>layer</i> is not specified, the labels of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the labels of the specified layer.
 
-<a name="drawPoints" href="#drawPoints">#</a> <i>map</i>.<b>drawPoints</b>([<i>radius</i>, <i>duration</i>, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")`
+<a name="drawPoints" href="#drawPoints">#</a> <i>map</i>.<b>drawPoints</b>([<i>radius</i>][, <i>duration</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")`
 
 Draws circles, located at each point's coordinates, to a layer.
 
@@ -307,7 +307,7 @@ var scheme = swiftmap.schemeCategorical()
 
 [See it in action](https://bl.ocks.org/HarryStevens/bc32fe303275b00a2aeea96328a3b143).
 
-<a name="data-categorical" href="#data-categorical">#</a> <i>categorical</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
+<a name="data-categorical" href="#data-categorical">#</a> <i>categorical</i>.<b>data</b>([<i>data</i>][, <i>key</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
 Adds data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>.
 
@@ -375,7 +375,7 @@ var scheme = swiftmap.schemeSequential()
 
 [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-<a name="data-sequential" href="#data-sequential">#</a> <i>sequential</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
+<a name="data-sequential" href="#data-sequential">#</a> <i>sequential</i>.<b>data</b>([<i>data</i>][, <i>key</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
 See [<i>categorical</i>.data()](#data-categorical).
 
@@ -441,7 +441,7 @@ var scheme = swiftmap.schemeBubble()
 
 [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
 
-<a name="data-bubble" href="#data-bubble">#</a> <i>bubble</i>.<b>data</b>([<i>data</i>[, <i>key</i>]]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
+<a name="data-bubble" href="#data-bubble">#</a> <i>bubble</i>.<b>data</b>([<i>data</i>][, <i>key</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
 See [<i>categorical</i>.data()](#data-categorical).
 
