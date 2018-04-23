@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.15. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.17. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4893,9 +4893,8 @@
     // Determine which layer we are drawing on.
     var draw_layer = layer || this.meta.last_layer;
 
-    // basic drawing
     this.fit(draw_layer).drawSubunits(draw_layer).drawBoundary(draw_layer);
-
+    
     return this;
 
   }
@@ -5279,18 +5278,25 @@
 
     var curr_layer = this.layers[draw_layer];
 
-    this.layers[draw_layer].subunits = this.svg.selectAll(".subunit.subunit-" + draw_layer)
-        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; });
-    
-    this.layers[draw_layer].subunits
-        .attr("d", this.path);
 
-    this.layers[draw_layer].subunits.enter().append("path")
-        .attr("class", "subunit subunit-" + draw_layer)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", "1px")
-        .attr("fill", "#ccc")
-        .attr("d", this.path);
+    // only append if layer is new
+    if (!curr_layer.subunits) {
+
+      this.layers[draw_layer].subunits = this.svg.selectAll(".subunit.subunit-" + draw_layer)
+          .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+        .enter().append("path")
+          .attr("class", "subunit subunit-" + draw_layer)
+          .attr("stroke", "#fff")
+          .attr("stroke-width", "1px")
+          .attr("fill", "#ccc")
+          .attr("d", this.path);  
+
+    } else {
+      this.layers[draw_layer].subunits
+          .attr("d", this.path);
+    }
+    
+
 
     return this;
   }

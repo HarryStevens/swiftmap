@@ -19,18 +19,25 @@ export default function drawSubunits(layer) {
 
   var curr_layer = this.layers[draw_layer];
 
-  this.layers[draw_layer].subunits = this.svg.selectAll(".subunit.subunit-" + draw_layer)
-      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
-  
-  this.layers[draw_layer].subunits
-      .attr("d", this.path);
 
-  this.layers[draw_layer].subunits.enter().append("path")
-      .attr("class", "subunit subunit-" + draw_layer)
-      .attr("stroke", "#fff")
-      .attr("stroke-width", "1px")
-      .attr("fill", "#ccc")
-      .attr("d", this.path);
+  // only append if layer is new
+  if (!curr_layer.subunits) {
+
+    this.layers[draw_layer].subunits = this.svg.selectAll(".subunit.subunit-" + draw_layer)
+        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+      .enter().append("path")
+        .attr("class", "subunit subunit-" + draw_layer)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", "1px")
+        .attr("fill", "#ccc")
+        .attr("d", this.path);  
+
+  } else {
+    this.layers[draw_layer].subunits
+        .attr("d", this.path);
+  }
+  
+
 
   return this;
 }
