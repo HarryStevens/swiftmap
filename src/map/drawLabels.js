@@ -6,12 +6,12 @@ export default function drawLabels(key, layer) {
   
   // check for geospatial data
   if (Object.keys(this.layers).length === 0) {
-    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.")
+    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
     return;
   }
   // check for a key
   if (!key){
-    console.error("You must pass a key to drawLabels() so it knows which property to take text from.")
+    console.error("You must pass a key to drawLabels() so it knows which property to take text from.");
   }
   // type check the layer
   if (layer && typeof layer !== "string" && typeof layer !== "number") {
