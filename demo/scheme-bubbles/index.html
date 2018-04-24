@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Helvetica Neue", sans-serif;
+      }
+
+      #select-wrapper {
+        position: absolute;
+        padding: 5px;
+        background: rgba(255, 255, 255, .75);
+      }
+      #select-wrapper .select-title {
+        font-size: .8em;
+      }
+
+      #map {
+        width: 100%;
+        height: 100vh;
+      }
+      /* Swiftmap exposes the .bubble class */
+      #map .bubble {
+        fill: steelblue;
+        stroke: steelblue;
+        stroke-width: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="select-wrapper">
+      <div class="select-title">Select metric</div>
+      <select id="select">
+        <option value="growth">Growth</option>
+        <option value="density">Population density</option>
+        <option value="population">Population</option>
+      </select>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+    <script src="https://d3js.org/d3-request.v1.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+
+    <script src="../../dist/swiftmap.js"></script>
+
+    <script>
+
+      // Create the map.
+      var map = swiftmap.map("#map");
+
+      // In this example, each metric has its own value function,
+      // which will be passed to scheme.values() when the dropdown changes.
+      var f = {
+        growth: d => +d.growth_2001_2011.replace("%", ""),
+        density: d => +d.population / +d.area,
+        population: d => +d.population
+      };
+
+      // Create the bubble schemes.
+      var scheme = swiftmap.schemeBubble()
+        .radiusValues(f.growth)
+        .radiusRange([3, 30]);
+
+      d3.queue()
+        .defer(d3.json, "india_state.json") // geospatial data
+        .defer(d3.csv, "india_state_population.csv") // tabular data
+        .await(ready);
+
+      function ready(error, geo, tab){
+
+        // Add data to the scheme.
+        scheme.data(tab, d => d.state);
+
+        // Add geospatial data to your map.
+        // Then draw the map and bubbles.
+        map
+          .polygons(geo, d => d.properties.ST_NM)
+            .draw()
+            .drawScheme(scheme);
+
+        // When the dropdown changes...
+        var sel = document.getElementById("select");
+        sel.onchange = () => {
+
+          // ...update the scheme with the appropriate value function...
+          scheme.radiusValues(f[sel.value]);
+
+          // ...and redraw the bubbles, with a 750ms transition.
+          map.drawScheme(scheme, 750);
+
+        }
+
+        // It's easy to resize a Swiftmap.
+        window.onresize = () => map.resize();
+
+      }
+      
+    </script>
+  </body>
+</html>

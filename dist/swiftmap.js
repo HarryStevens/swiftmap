@@ -5367,13 +5367,9 @@
 
   	  swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
   	      .attr("cx", function(d){ return path.centroid(d)[0]; })
-  	      .attr("cy", function(d){ return path.centroid(d)[1]; });
-
-  	  if (!scheme.skipRadius){
-  	    swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
-  	        .attr("r", radius);
-  	  }
-
+  	      .attr("cy", function(d){ return path.centroid(d)[1]; })
+  	      .attr("r", radius);
+  	  
   	  swiftmap.layers[fit_layer].bubbles.enter().append("circle")
   	      .attr("fill-opacity", .75)
   	      .attr("stroke", "#000")
