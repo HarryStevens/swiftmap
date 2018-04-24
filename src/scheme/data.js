@@ -23,7 +23,7 @@ export default function data(data, key){
   });
 
   // calculate the breaklist
-  this.meta.breaklist = calcBreakList(this);
+  if (this.constructor.name !== "SchemeBubble") this.meta.breaklist = calcBreakList(this);
   
   return this;
 }

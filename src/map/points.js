@@ -2,7 +2,7 @@ import toSlugCase from "../utils/toSlugCase";
 import isTopoJson from "../utils/isTopoJson";
 import getTopoObjectOfType from "../utils/getTopoObjectOfType";
 
-export default function polygons(data, key, layer){
+export default function points(data, key, layer){
 
   // if no data is passed, then this is a getter function
   if (!data) {
@@ -14,7 +14,7 @@ export default function polygons(data, key, layer){
 
     // test if the data is even TopoJSON
     if (!isTopoJson(data)){
-      console.error("The geospatial data passed to map.polygons() must be formatted as TopoJSON.");
+      console.error("The geospatial data passed to map.points() must be formatted as TopoJSON.");
       return;
     }
 

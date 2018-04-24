@@ -13,7 +13,7 @@ export default function drawScheme(scheme, duration, layer){
     console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
     layer = swiftmap.meta.last_layer;
   }
-  
+
   var fit_layer = layer || this.meta.last_layer;
 
 	if (scheme.constructor.name == "SchemeCategorical" || scheme.constructor.name == "SchemeSequential"){
@@ -37,9 +37,6 @@ export default function drawScheme(scheme, duration, layer){
 	    return;
 	  }
 
-	  // set this to true for resizing operations
-	  swiftmap.meta.bubbles = true;
-	  
 	  // store some data in variables
 	  var curr_layer = swiftmap.layers[fit_layer];
 	  var path = swiftmap.path;
@@ -50,18 +47,14 @@ export default function drawScheme(scheme, duration, layer){
 	  swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
 	      .attr("cx", function(d){ return path.centroid(d)[0]; })
 	      .attr("cy", function(d){ return path.centroid(d)[1]; })
-
-	  if (!scheme.skipRadius){
-	    swiftmap.layers[fit_layer].bubbles.transition().duration(duration)
-	        .attr("r", radius);
-	  }
-
+	      .attr("r", radius);
+	  
 	  swiftmap.layers[fit_layer].bubbles.enter().append("circle")
 	      .attr("fill-opacity", .75)
 	      .attr("stroke", "#000")
 	      .attr("cx", function(d){ return path.centroid(d)[0]; })
 	      .attr("cy", function(d){ return path.centroid(d)[1]; })
-	      .attr("class", "bubble")
+	      .attr("class", "bubble bubble-" + fit_layer)
 	    .transition().duration(duration)
 	      .attr("r", radius);
 
@@ -71,7 +64,7 @@ export default function drawScheme(scheme, duration, layer){
 	      .filter(function(row){
 	        return row.key == d.properties.swiftmap.key;
 	      })
-	      .map(scheme.meta.values);
+	      .map(scheme.meta.radiusValues);
 
 	    // if no match, no bubble
 	    if (match.length == 0) return 0;
@@ -81,7 +74,7 @@ export default function drawScheme(scheme, duration, layer){
 
 	    // create a scale to calculate the appropriate radius
 	  function scale(datum){
-	    var scheme_domain_extent = extent(scheme.meta.tab.map(scheme.meta.values));
+	    var scheme_domain_extent = extent(scheme.meta.tab.map(scheme.meta.radiusValues));
 	    var scheme_range_extent = scheme.meta.radiusRange;
 
 	    // where does the datum fall in the extent?

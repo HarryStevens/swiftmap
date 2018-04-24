@@ -28,7 +28,6 @@ export default function map(parent){
     this.meta = {
       layer_index: -1,
       last_layer: "",
-      bubbles: false,
       projection: {
         function: d3.geoMercator(),
         name: "mercator"

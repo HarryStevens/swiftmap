@@ -464,7 +464,7 @@ Sets or gets the minimum and maximum radii of the bubble scheme.
 <i>range</i><br />
 If a <i>range</i> is specified, sets the minimum and maximum values of the bubbles' radii. If a <i>range</i> is not specified, returns the range associated with the scheme, which defaults to `[2, 20]`.
 
-<a name="values-bubble" href="#values-bubble">#</a> <i>bubble</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
+<a name="radiusValues" href="#radiusValues">#</a> <i>bubble</i>.<b>radiusValues</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
 See [<i>sequential</i>.values()](#values-sequential).
 

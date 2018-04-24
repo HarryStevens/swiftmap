@@ -4676,7 +4676,7 @@
 
   // tests whether geospatial json is topojson
   function isTopoJson(json){
-  	return json.type == "Topology" && !!json.arcs && !!json.transform && !!json.objects;
+  	return json.type == "Topology" && !!json.arcs && !!json.objects;
   }
 
   // returns the mode from an array of numbers
@@ -4714,7 +4714,7 @@
   	return return_object;
   }
 
-  function polygons(data, key, layer){
+  function points(data, key, layer){
 
     // if no data is passed, then this is a getter function
     if (!data) {
@@ -4726,7 +4726,7 @@
 
       // test if the data is even TopoJSON
       if (!isTopoJson(data)){
-        console.error("The geospatial data passed to map.polygons() must be formatted as TopoJSON.");
+        console.error("The geospatial data passed to map.points() must be formatted as TopoJSON.");
         return;
       }
 
@@ -4781,7 +4781,7 @@
     
   }
 
-  function polygons$1(data, key, layer){
+  function polygons(data, key, layer){
 
     // if no data is passed, then this is a getter function
     if (!data) {
@@ -5216,7 +5216,7 @@
     
     // check for geospatial data
     if (Object.keys(this.layers).length === 0) {
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+      console.error("You must pass TopoJSON data through swiftmap.points() before you can draw the map.");
       return;
     }
     // type check the layer
@@ -5334,7 +5334,7 @@
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
       layer = swiftmap.meta.last_layer;
     }
-    
+
     var fit_layer = layer || this.meta.last_layer;
 
   	if (scheme.constructor.name == "SchemeCategorical" || scheme.constructor.name == "SchemeSequential"){
@@ -5358,9 +5358,6 @@
   	    return;
   	  }
 
-  	  // set this to true for resizing operations
-  	  swiftmap.meta.bubbles = true;
-  	  
   	  // store some data in variables
   	  var curr_layer = swiftmap.layers[fit_layer];
   	  var path = swiftmap.path;
@@ -5382,7 +5379,7 @@
   	      .attr("stroke", "#000")
   	      .attr("cx", function(d){ return path.centroid(d)[0]; })
   	      .attr("cy", function(d){ return path.centroid(d)[1]; })
-  	      .attr("class", "bubble")
+  	      .attr("class", "bubble bubble-" + fit_layer)
   	    .transition().duration(duration)
   	      .attr("r", radius);
 
@@ -5392,7 +5389,7 @@
   	      .filter(function(row){
   	        return row.key == d.properties.swiftmap.key;
   	      })
-  	      .map(scheme.meta.values);
+  	      .map(scheme.meta.radiusValues);
 
   	    // if no match, no bubble
   	    if (match.length == 0) return 0;
@@ -5402,7 +5399,7 @@
 
   	    // create a scale to calculate the appropriate radius
   	  function scale(datum){
-  	    var scheme_domain_extent = extent$2(scheme.meta.tab.map(scheme.meta.values));
+  	    var scheme_domain_extent = extent$2(scheme.meta.tab.map(scheme.meta.radiusValues));
   	    var scheme_range_extent = scheme.meta.radiusRange;
 
   	    // where does the datum fall in the extent?
@@ -5568,7 +5565,7 @@
 
     var layers = Object.keys(swiftmap.layers).map(function(d){ return swiftmap.layers[d]; });
     var fit_layer = layers.filter(function(d){ return d.fit; })[0];
-    if (fit_layer) swiftmap.fit(fit_layer.name);
+    if (fit_layer) swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(fit_layer.data, fit_layer.object));
 
     // scrope the projection and path
     var projection = swiftmap.meta.projection.function;
@@ -5580,8 +5577,26 @@
         .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
         .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; });
 
-    // need to reposition bubbles
-    if (swiftmap.meta.bubbles) swiftmap.drawScheme({constructor: {name: "SchemeBubble"}, skipRadius: true}, 0, fit_layer ? fit_layer.name : null);
+    // if there are any bubbles, they need to be repositions
+    var bubble_layers = Object.keys(swiftmap.layers)
+      .map(function(layer){
+        return swiftmap.layers[layer]
+      })
+      .filter(function(layer){
+        return layer.bubbles;
+      });
+
+    if (bubble_layers.length > 0){
+
+      bubble_layers.forEach(function(layer){
+
+        selectAll(".bubble.bubble-" + layer.name)
+          .attr("cx", function(d){ return path.centroid(d)[0]; })
+          .attr("cy", function(d){ return path.centroid(d)[1]; });
+
+      });
+
+    }
            
     return swiftmap;
   }
@@ -5599,7 +5614,6 @@
       this.meta = {
         layer_index: -1,
         last_layer: "",
-        bubbles: false,
         projection: {
           function: mercator(),
           name: "mercator"
@@ -5623,8 +5637,8 @@
       this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
       // init functions
-      this.points = polygons;
-      this.polygons = polygons$1;
+      this.points = points;
+      this.polygons = polygons;
       this.projection = projection$1;
 
       // draw functions
@@ -5869,7 +5883,7 @@
     });
 
     // calculate the breaklist
-    this.meta.breaklist = calcBreaklist(this);
+    if (this.constructor.name !== "SchemeBubble") this.meta.breaklist = calcBreaklist(this);
     
     return this;
   }
@@ -6016,6 +6030,25 @@
     return this;
   }
 
+  function radiusValues(mapper){
+    // error
+    if (!mapper) {
+      console.warn("You must specify a mapper for bubble.radiusValues()");
+    }
+
+    // warning
+    else if (typeof mapper !== "function") {
+      console.warn("You must specify the bubble scheme's radius values as a mapping function. The mapping function will default to function(d){ return d; }.");
+    }
+
+    // set the values mapper
+    else {
+      this.meta.radiusValues = mapper;
+    }
+    
+    return this;
+  }
+
   // scheme functions
 
   function schemeBubble(){
@@ -6025,13 +6058,13 @@
       this.meta = {
         radiusRange: [2, 20],
         tab: [],
-        values: function(d){ return d; }
+        radiusValues: function(d){ return d; }
       };
 
       // functions
       this.data = data;
       this.radiusRange = radiusRange;
-      this.values = values;
+      this.radiusValues = radiusValues;
     }
     
     return new SchemeBubble;
