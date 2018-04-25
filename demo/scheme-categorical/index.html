@@ -14,13 +14,14 @@
   <body>
     <div id="map"></div>
 
-    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+<!--     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
     <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
-    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
 
-    <script src="https://unpkg.com/swiftmap@0.1.18/dist/swiftmap.min.js"></script>
+    <script src="../d3.v4.min.js"></script>
+    <script src="../../dist/swiftmap.js"></script>
 
     <script>
 
@@ -29,15 +30,15 @@
 
       // Create a categorical color scheme.
       var scheme = swiftmap.schemeCategorical()
-        .values(d => d.Party)
-        .colors({
+        .from(d => d.Party)
+        .to({
           "TDP": "#4daf4a",
           "TRS": "#e41a1c",
           "YSRCP": "#984ea3",
           "BJP": "#ff7f00",
           "INC": "#377eb8"
         })
-        .colorOther("#000");
+        .toOther("#000");
 
       d3.queue()
         .defer(d3.json, "andhrapradesh-pre2014_AC.json") // geospatial data
@@ -55,9 +56,12 @@
         // Join geospatial data to your map.
         // Then draw the map and fill it based on your color scheme.
         map
-          .polygons(geo, function(d){ return d.properties.AC_NO; })
-            .draw()
-            .drawScheme(scheme, 1000);
+          .layerPolygons(geo, function(d){ return d.properties.AC_NO; })
+            .draw();
+
+        map.layers[0].polygons
+          .transition().duration(1000)
+            .attr("fill", scheme);
 
         window.onresize = () => map.resize();
 

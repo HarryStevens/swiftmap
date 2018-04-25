@@ -1,6 +1,6 @@
 // modules
-import * as d3 from "../../lib/swiftmap-d3-bundler";
-import feature from "../../lib/swiftmap-topojson-bundler/feature";
+import * as d3 from "../../lib/d3";
+import feature from "../../lib/topojson/feature";
 
 // utility functions
 import keepNumber from "../utils/keepNumber";
@@ -31,29 +31,8 @@ export default function resize() {
   swiftmap.svg.selectAll("path").attr("d", path);
   swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
   swiftmap.svg.selectAll("circle.point")
-      .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
-      .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; });
-
-  // if there are any bubbles, they need to be repositions
-  var bubble_layers = Object.keys(swiftmap.layers)
-    .map(function(layer){
-      return swiftmap.layers[layer]
-    })
-    .filter(function(layer){
-      return layer.bubbles;
-    })
-
-  if (bubble_layers.length > 0){
-
-    bubble_layers.forEach(function(layer){
-
-      d3.selectAll(".bubble.bubble-" + layer.name)
-        .attr("cx", function(d){ return path.centroid(d)[0]; })
-        .attr("cy", function(d){ return path.centroid(d)[1]; });
-
-    });
-
-  }
+      .attr("cx", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
+      .attr("cy", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
          
   return swiftmap;
 }

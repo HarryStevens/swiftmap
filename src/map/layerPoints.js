@@ -1,8 +1,10 @@
 import toSlugCase from "../utils/toSlugCase";
 import isTopoJson from "../utils/isTopoJson";
+import isString from "../utils/isString";
+import isFunction from "../utils/isFunction";
 import getTopoObjectOfType from "../utils/getTopoObjectOfType";
 
-export default function points(data, key, layer){
+export default function layerPoints(data, key, layer){
 
   // if no data is passed, then this is a getter function
   if (!data) {
@@ -28,7 +30,7 @@ export default function points(data, key, layer){
 
     // if the layer was passed but is not a string, set it to the layer index
     // but also warn the user
-    else if (layer && typeof layer !== "string"){
+    else if (layer && !isString(layer)){
       console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + this.meta.layer_index + ".")
       layer = this.meta.layer_index;
     }
@@ -44,14 +46,14 @@ export default function points(data, key, layer){
     this.meta.last_layer = layer;
 
     // create the new layer
-    this.layers[layer] = {name: layer, type: "points", boundary: false, data: data, subunits: false, scheme: false, fit: false};
+    this.layers[layer] = {name: layer, type: "points", boundary: false, data: data, polygons: false, scheme: false, fit: false};
 
     // get the points object from the topojson
     this.layers[layer].object = getTopoObjectOfType(data, "points");
 
     // if the key was passed but is not a function,
     // set the key property of each datum to its index
-    if (key && typeof key !== "function") {
+    if (key && !isFunction(key)) {
       console.warn("The key must be specified as a function. The key will default to (d, i) => i");
       key = function(d, i){ return i; }
     }

@@ -1,7 +1,7 @@
 // modules
-import feature from "../../lib/swiftmap-topojson-bundler/feature";
+import feature from "../../lib/topojson/feature";
 
-// draws subunits
+// draws polygons
 export default function drawLabels(key, layer) {
   
   // check for geospatial data

@@ -10,7 +10,7 @@
         height: 100vh;
         background: #1f78b4;
       }
-      #map .subunit.subunit-0 {
+      #map .polygon.polygon-0 {
         fill: #fff;
         stroke: #ddd;
         stroke-dasharray: 5,5;
@@ -33,13 +33,14 @@
     <div id="map"></div>
 
     <!-- D3 modules for d3-request and d3-queue -->
-    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <!-- <script src="https://d3js.org/d3-collection.v1.min.js"></script>
     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
     <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
-    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
 
-    <script src="https://unpkg.com/swiftmap@0.1.18/dist/swiftmap.min.js"></script>
+    <script src="../d3.v4.min.js"></script>
+    <script src="../../dist/swiftmap.js"></script>
     <script>
 
       // Initialize a map.
@@ -47,8 +48,8 @@
 
       // Create a color scheme.
       var scheme = swiftmap.schemeCategorical()
-        .values(d => d.winner)
-        .colors({
+        .from(d => d.winner)
+        .to({
           "INC": "#b2df8a"
         });
 
@@ -65,24 +66,29 @@
 
         // Add three layers to the map.
         map
-          .polygons(india)
-            .drawSubunits()
+          .layerPolygons(india)
+            .drawPolygons()
             .drawBoundary()
-          .polygons(karnataka, d => d.properties.ac_no)
+          .layerPolygons(karnataka, d => d.properties.ac_no)
             .draw()
-            .drawScheme(scheme)
-          .points(karnataka)
+          .layerPoints(karnataka)
             .drawPoints()
             .drawLabels(d => d.properties.name);
 
-        // You can update a layer later.
+        map.layers[1].polygons
+            .style("fill", scheme);
+
+        // After two seconds, update the layer.
         setTimeout(() => {
           // Add colors, with a one second transition, to the second layer.
-          map.drawScheme(scheme.colors({
-            "INC": "#b2df8a",
-            "BJP": "#fdbf6f",
-            "JD(S)": "#fb9a99"
-          }), 1000, 1);
+          map.layers[1].polygons
+            .transition().duration(1000)
+              .style("fill", scheme.to({
+                  "INC": "#b2df8a",
+                  "BJP": "#fdbf6f",
+                  "JD(S)": "#fb9a99"
+                })
+              );
         }, 2000);
 
         // Responsive resize.

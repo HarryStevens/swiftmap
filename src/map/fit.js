@@ -1,4 +1,6 @@
-import feature from "../../lib/swiftmap-topojson-bundler/feature";
+import feature from "../../lib/topojson/feature";
+import isString from "../utils/isString.js"
+import isNumber from "../utils/isNumber.js"
 
 // centers and zooms a projection
 export default function fit(layer) {  
@@ -13,7 +15,7 @@ export default function fit(layer) {
   var swiftmap = this;
 
   // type check the layer
-  if (layer && typeof layer !== "string" && typeof layer !== "number") {
+  if (layer && !isString(layer) && !isNumber(layer)) {
     console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
     layer = swiftmap.meta.last_layer;
   }
@@ -39,8 +41,8 @@ export default function fit(layer) {
   swiftmap.svg.selectAll("path").attr("d", path);
   swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
   swiftmap.svg.selectAll("circle.point")
-      .attr("cx", function(d) { return projection(d.geometry.coordinates)[0]; })
-      .attr("cy", function(d) { return projection(d.geometry.coordinates)[1]; });
+      .attr("cx", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
+      .attr("cy", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
 
   return swiftmap;
 }

@@ -14,20 +14,22 @@
   <body>
     <div id="map"></div>
 
-    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+<!--     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
     <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
-    <script src="https://unpkg.com/jeezy@1.12.17/lib/jeezy.js"></script>
+    <script src="https://unpkg.com/jeezy@1.12.17/lib/jeezy.js"></script> -->
 
-    <script src="https://unpkg.com/swiftmap@0.1.18/dist/swiftmap.min.js"></script>
+    <script src="../d3.v4.min.js"></script>
+    <script src="../jeezy.min.js"></script>
+    <script src="../../dist/swiftmap.js"></script>
     <script>
 
       // Create the color scheme.
       var scheme = swiftmap.schemeCategorical()
-        .values(d => d.state)
-        .colors({
+        .from(d => d.state)
+        .to({
           "Uttar Pradesh": "steelblue"
         });
 
@@ -41,25 +43,31 @@
 
         // Initialize and draw the map.
         var map = swiftmap.map("#map")
-          .polygons(geo, d => d.properties.ST_NM)
+          .layerPolygons(geo, d => d.properties.ST_NM)
             .draw();
 
-        // Add data to the scheme, and fill the map.
+        // Add data to the scheme...
         scheme.data(tab, d => d.state)
-        map.drawScheme(scheme);
+        
+        // ...and fill the layer.
+        map.layers[0].polygons
+          .transition().duration(500)
+            .style("fill", scheme)
 
         // Get a list of unique states whose population is greater than 10 million.
         var states = tab.filter(d => +d.population > 1e7).map(d => d.state);
 
-        // Change the map's scheme and fill every second.
+        // Every second, change the scheme and refill the layer.
         setInterval(function(){
 
-          // Update the object passed to scheme.colors().
+          // Update the object passed to scheme.to().
           var obj = {};
           obj[jz.arr.random(states)] = "steelblue";
 
-          // Refill the map, with a half-second transition between fills.
-          map.drawScheme(scheme.colors(obj), 500);
+          // Refill the layer, with a half-second transition between fills.
+          map.layers[0].polygons
+            .transition().duration(500)
+              .style("fill", scheme.to(obj));
 
         }, 1000);
 

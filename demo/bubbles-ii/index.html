@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Helvetica Neue", sans-serif;
+      }
+
+      #select-wrapper {
+        position: absolute;
+        padding: 5px;
+        background: rgba(255, 255, 255, .75);
+      }
+      #select-wrapper .select-title {
+        font-size: .8em;
+      }
+
+      #map {
+        width: 100%;
+        height: 100vh;
+      }
+      #map .polygon {
+        fill: #fff;
+        stroke: #555;
+      }
+      /* Swiftmap exposes the .bubble class */
+      #map .bubble {
+        stroke-width: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+<!--     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+    <script src="https://d3js.org/d3-request.v1.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
+
+    <script src="../d3.v4.min.js"></script>
+    <script src="../../dist/swiftmap.js"></script>
+
+    <script>
+
+      // Create the map.
+      var map = swiftmap.map("#map");
+
+      // Set up a scheme for each visual property.
+      var schemeRadius = swiftmap.schemeContinuous()
+        .from(d => d.student_teacher_ratio)
+        .to([1, 30]);
+
+      var schemeFill = swiftmap.schemeCategorical()
+        .from(d => d.most_urgent)
+        .to({
+          "TRUE": "#e74c3c",
+          "FALSE": "rgb(119, 119, 119)"          
+        });
+
+      var schemeStroke = swiftmap.schemeCategorical()
+        .from(d => d.most_urgent)
+        .to({
+          "TRUE": "rgb(191, 39, 24)",
+          "FALSE": "rgb(51, 51, 51)"        
+        });
+
+      var schemeOpacity = swiftmap.schemeCategorical()
+        .from(d => d.most_urgent)
+        .to({
+          "TRUE": .9,
+          "FALSE": .4
+        });
+
+      d3.queue()
+        .defer(d3.json, "delhi_1997-2012_district.json") // polygons data
+        .defer(d3.json, "new_schools.json") // points data
+        .defer(d3.csv, "schools.csv") // tabular data
+        .await(ready);
+
+      function ready(error, districts, schools, data){
+
+        // Add data to each scheme.
+        schemeRadius.data(data, d => +d.edudel_code);
+        schemeFill.data(data, d => +d.edudel_code);
+        schemeStroke.data(data, d => +d.edudel_code);
+        schemeOpacity.data(data, d => +d.edudel_code);
+
+        // Add geospatial data to your map.
+        // Then draw the map and bubbles.
+        map
+          .layerPolygons(districts)
+            .draw()
+          .layerPoints(schools, d => +d.properties.edudel_code)
+            .drawPoints();
+
+        map.layers[1].points
+            .attr("r", schemeRadius)
+            .style("fill", schemeFill)
+            .style("stroke", schemeStroke)
+            .style("opacity", schemeOpacity);
+
+        // It's easy to resize a Swiftmap.
+        window.onresize = () => map.resize();
+
+      }
+      
+    </script>
+  </body>
+</html>

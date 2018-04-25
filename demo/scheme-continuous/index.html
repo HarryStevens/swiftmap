@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0;
+			}
+			#map {
+				width: 100%;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="map"></div>
+
+		<script src="../d3.v4.min.js"></script>
+		<script src="../topojson.v1.min.js"></script>
+		<script src="../../dist/swiftmap.js"></script>
+
+		<script>
+
+			var map = swiftmap.map("#map");
+
+			var scheme = swiftmap.schemeContinuous()
+				.from(d => +d.h)
+				.to(["#d4b9da", "#ce1256"]);
+
+			d3.json("cb_2017_us_county_500k.json", (error, counties) => {
+
+				map
+					.projection("albersUsa")
+					.layerPolygons(counties, d => d.properties.AFFGEOID)
+						.draw();
+
+				var data = topojson.feature(map.layers[0].data, map.layers[0].object).features;
+				var out = [];
+				for (var i = 0, l = data.length; i < l; i++){
+					var d = data[i],
+						  c = map.path.centroid(d);
+
+					out.push({
+						key: d.properties.AFFGEOID,
+						h: c[0],
+						v: c[1]					
+					});
+				}
+
+				scheme.data(out, d => d.key);
+
+				map.layers[0].polygons
+						.style("fill", scheme);
+
+				window.onresize = () => map.resize();	
+
+			});
+
+		</script>
+	</body>
+</html>

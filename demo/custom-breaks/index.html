@@ -14,13 +14,13 @@
   <body>
     <div id="map"></div>
 
-    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+<!--     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
     <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
-    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
-
-    <script src="https://unpkg.com/swiftmap@0.1.20/dist/swiftmap.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
+    <script src="../d3.v4.js"></script>
+    <script src="../../dist/swiftmap.js"></script>
 
     <script>
 
@@ -29,9 +29,9 @@
 
       // Create a sequential color scheme with custom breaks.
       var scheme = swiftmap.schemeSequential()
-        .breaks([-.5, 0, 20, 25, 55])
-        .colors(["#ef8a62", "#d1e5f0", "#67a9cf", "#2166ac"])
-        .values(d => +d.growth_2001_2011.replace("%", ""));
+        .from(d => +d.growth_2001_2011.replace("%", ""))
+        .to(["#ef8a62", "#d1e5f0", "#67a9cf", "#2166ac"])
+        .breaks([-.5, 0, 20, 25, 55]);
 
       d3.queue()
         .defer(d3.json, "india_state.json") // geospatial data
@@ -43,13 +43,16 @@
         // Add data to the scheme.
         scheme.data(tab, d => d.state);
 
-        // Add geospatial data to your map.
-        // Then draw the map and fill it based on your color scheme.
+        // Add a polygons layer to your map and draw it.
         map
-          .polygons(geo, d => d.properties.ST_NM)
-            .draw()
-            .drawScheme(scheme);
+          .layerPolygons(geo, d => d.properties.ST_NM)
+            .draw();
 
+        // Fill the layer based on your color scheme.
+        map.layers[0].polygons
+            .style("fill", scheme);
+
+        // Resize the map when the window changes.
         window.onresize = () => map.resize()
 
       }

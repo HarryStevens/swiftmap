@@ -2,7 +2,7 @@ import toSlugCase from "../utils/toSlugCase";
 import isTopoJson from "../utils/isTopoJson";
 import getTopoObjectOfType from "../utils/getTopoObjectOfType";
 
-export default function polygons(data, key, layer){
+export default function layerPolygons(data, key, layer){
 
   // if no data is passed, then this is a getter function
   if (!data) {
@@ -44,7 +44,7 @@ export default function polygons(data, key, layer){
     this.meta.last_layer = layer;
 
     // create the new layer
-    this.layers[layer] = {name: layer, type: "polygons", boundary: false, data: data, subunits: false, scheme: false, fit: false};
+    this.layers[layer] = {name: layer, type: "polygons", boundary: false, data: data, polygons: false, scheme: false, fit: false};
 
     // get the polygons object from the topojson
     this.layers[layer].object = getTopoObjectOfType(data, "polygons");

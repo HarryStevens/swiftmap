@@ -14,7 +14,7 @@ export default function draw(layer){
   // Determine which layer we are drawing on.
   var draw_layer = layer || this.meta.last_layer;
 
-  this.fit(draw_layer).drawSubunits(draw_layer).drawBoundary(draw_layer);
+  this.fit(draw_layer).drawPolygons(draw_layer).drawBoundary(draw_layer);
   
   return this;
 

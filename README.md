@@ -13,7 +13,7 @@ var map = swiftmap.map().polygons(TopoJSONObject).draw();
 
 ```js
 var colors = ["red", "orange", "yellow", "green", "blue", "purple"];
-map.layers[0].subunits.style("fill", (d, i) => colors[i % colors.length]);
+map.layers[0].polygons.style("fill", (d, i) => colors[i % colors.length]);
 ```
 
 * Makes it easy to create resizable maps for responsive designs.
@@ -26,7 +26,7 @@ window.onresize = () => map.resize();
 
 ```js
 var scheme = swiftmap.schemeSequential()
-  .data(JSON, d => d.subunit)
+  .data(JSON, d => d.polygon)
   .values(d => d.population)
   .colors(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]);
 
@@ -117,7 +117,7 @@ Layers let you add geospatial data to a <i>map</i>, as well as decide how that d
 ```js
 swiftmap.map("#map")
   .polygons(TopoJSON, d => d.state_name, "states")
-    .drawSubunits()
+    .drawPolygons()
     .drawBoundary()
   .polygons(TopoJSON, d => d.county_name, "counties")
     .draw()
@@ -136,10 +136,10 @@ Layers can be styled with CSS selectors.
 #map .boundary.boundary-states {
   stroke-width: 3px;
 }
-#map .subunit {
+#map .polygon {
   fill: none;
 }
-#map .subunit.subunit-counties {
+#map .polygon.polygon-counties {
   stroke-dasharray: 5, 5;
 }
 #map .point.point-cities {
@@ -175,7 +175,7 @@ If a <i>layer</i> is not passed, the geospatial data will be associated with the
 
 <a name="draw" href="#draw">#</a> <i>map</i>.<b>draw</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/draw.js "Source")
 
-Draws a polygons layer. This is a convenience method equivalent to <i>map</i>.fit().drawSubunits().drawBoundary().
+Draws a polygons layer. This is a convenience method equivalent to <i>map</i>.fit().drawPolygons().drawBoundary().
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the specified layer.
@@ -187,21 +187,21 @@ Draws a polygons layer's outer boundary.
 <i>layer</i><br />
 If <i>layer</i> is not specified, the boundary of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the boundary of the specified layer.
 
-<a name="drawSubunits" href="#drawSubunits">#</a> <i>map</i>.<b>drawSubunits</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawSubunits.js "Source")
+<a name="drawPolygons" href="#drawPolygons">#</a> <i>map</i>.<b>drawPolygons</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPolygons.js "Source")
 
-Draws a polygons layer's subunits. For example, if the layer's TopoJSON contains states, the subunits are the states.
+Draws a polygons layer's polygons. For example, if the layer's TopoJSON contains states, the polygons are the states.
 
 <i>layer</i><br />
-If <i>layer</i> is not specified, the subunits of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the subunits of the specified layer.
+If <i>layer</i> is not specified, the polygons of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the polygons of the specified layer.
 
 <a name="drawScheme" href="#drawScheme">#</a> <i>map</i>.<b>drawScheme</b>(<i>scheme</i>[, <i>duration</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawScheme.js "Source")
 
 Styles a polygons layer based on a scheme.
 
 <i>scheme</i><br />
-If the <i>scheme</i> is either [categorical](#schemeCategorical) or [sequential](#schemeSequential), fills the map's subunits to create a choropleth map based on the scheme. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
+If the <i>scheme</i> is either [categorical](#schemeCategorical) or [sequential](#schemeSequential), fills the map's polygons to create a choropleth map based on the scheme. [See it in action](https://bl.ocks.org/HarryStevens/4db2b695df4b02042bfa0c1ee6eac299).
 
-If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's subunits based the scheme. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
+If the <i>scheme</i> is a [bubble scheme](#schemeBubbles), draws bubbles on the centroids of the map's polygons based the scheme. [See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
 
 <i>duration</i><br />
 An optional <i>duration</i> may be specified to enable an animated transition from the current style to the new style. The <i>duration</i> must be specified as a positive number corresponding to the time of the transition in milliseconds. 
@@ -221,9 +221,9 @@ If <i>layer</i> is not specified, the most recently added layer will be fit the 
 When drawn to the map, polygons layers will have D3 selections associated with them.
 
 <a name="boundary" href="#boundary">#</a> <i>map</i>.layers.< layername >.<b>boundary</b><br />
-<a name="subunits" href="#subunits">#</a> <i>map</i>.layers.< layername >.<b>subunits</b>
+<a name="polygons" href="#polygons">#</a> <i>map</i>.layers.< layername >.<b>polygons</b>
 
-[D3 selections](https://github.com/d3/d3-selection) of a polygons layer's boundary and subunits. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawSubunits(), or <i>map</i>.draw(), which makes both available.
+[D3 selections](https://github.com/d3/d3-selection) of a polygons layer's boundary and polygons. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawPolygons(), or <i>map</i>.draw(), which makes both available.
 
 <a name="bubbles" href="#bubbles">#</a> <i>map</i>.layers.< layername >.<b>bubbles</b>
 
@@ -231,7 +231,7 @@ When drawn to the map, polygons layers will have D3 selections associated with t
 
 <b>Polygons layer styles</b>
 
-Maps rendered with Swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the subunits are exposed as the class `subunit`. If you add a bubble scheme to a polygons layer, the bubbles are exposed as the class `bubble`.
+Maps rendered with Swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the polygons are exposed as the class `polygon`. If you add a bubble scheme to a polygons layer, the bubbles are exposed as the class `bubble`.
 
 <a name="points" href="#points">#</a> <i>map</i>.<b>points</b>([<i>data</i>][, <i>key</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/points.js "Source")
 
@@ -309,7 +309,7 @@ var scheme = swiftmap.schemeCategorical()
 
 <a name="data-categorical" href="#data-categorical">#</a> <i>categorical</i>.<b>data</b>([<i>data</i>][, <i>key</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/data.js "Source")
 
-Adds data to the <i>scheme</i>, where each datum corresponds to each subunit of a <i>map</i>.
+Adds data to the <i>scheme</i>, where each datum corresponds to each polygon of a <i>map</i>.
 
 <i>data</i><br />
 The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the data associated with the <i>scheme</i>.
@@ -338,14 +338,14 @@ If <i>palette</i> is not specified, returns the color palette associated with th
 Sets or gets an alternative color in the scheme.
 
 <i>color</i><br />
-If a <i>color</i> is specified, assigns a color to those subunits whose category is not present among the properties of the object passed to <i>categorical</i>.colors(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the scheme's alternative color, which defaults to `"#ccc"`.
+If a <i>color</i> is specified, assigns a color to those polygons whose category is not present among the properties of the object passed to <i>categorical</i>.colors(). The <i>color</i> must be specified as a string. If <i>color</i> is not specified, returns the scheme's alternative color, which defaults to `"#ccc"`.
 
 <a name="values-categorical" href="#values-categorical">#</a> <i>categorical</i>.<b>values</b>(<i>function</i>) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/values.js "Source")
 
 Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. 
 
 <i>function</i><br />
-When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be called for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each subunit's party:
+When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be called for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each polygon's party:
 
 ```js
 var data = [
@@ -424,7 +424,7 @@ The <i>function</i> defaults to:
 d => d
 ```
 
-When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be called for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each subunit's population density:
+When the scheme is passed to <i>map</i>.drawScheme(), the <i>function</i> will be called for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each polygon's population density:
 
 ```js
 var data = [
@@ -484,4 +484,4 @@ npm run minify # minify the library
 npm run build # compile and minify the library
 ```
 
-Swiftmap also uses a custom version of D3.js, which can be found in [`lib/swiftmap-d3-bundler`](https://github.com/HarryStevens/swiftmap/tree/master/lib/swiftmap-d3-bundler). If you need to update the bundle, do `cd lib/swiftmap-d3-bundler`, where you can install additional dependencies and update the [`index.js`](https://github.com/HarryStevens/swiftmap/blob/master/lib/swiftmap-d3-bundler/index.js) file. You will also have to update the `globals` object and the `only` array in the `resolve()` function in [`rollup.config.js`](https://github.com/HarryStevens/swiftmap/blob/master/rollup.config.js).
+Swiftmap also uses a custom version of D3.js, which can be found in [`lib/d3`](https://github.com/HarryStevens/swiftmap/tree/master/lib/d3). If you need to update the bundle, do `cd lib/d3`, where you can install additional dependencies and update the [`index.js`](https://github.com/HarryStevens/swiftmap/blob/master/lib/d3/index.js) file. You will also have to update the `globals` object and the `only` array in the `resolve()` function in [`rollup.config.js`](https://github.com/HarryStevens/swiftmap/blob/master/rollup.config.js).

@@ -20,8 +20,9 @@
         width: 100%;
         height: 100vh;
       }
-      /* Swiftmap exposes the .bubble class */
-      #map .bubble {
+      /* Swiftmap exposes the .point class */
+      #map .point {
+        fill-opacity: .75;
         fill: steelblue;
         stroke: steelblue;
         stroke-width: 2px;
@@ -39,12 +40,13 @@
     </div>
     <div id="map"></div>
 
-    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+<!--     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
     <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
     <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
     <script src="https://d3js.org/d3-request.v1.min.js"></script>
-    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
 
+    <script src="../d3.v4.min.js"></script>
     <script src="../../dist/swiftmap.js"></script>
 
     <script>
@@ -61,9 +63,9 @@
       };
 
       // Create the bubble schemes.
-      var scheme = swiftmap.schemeBubble()
-        .radiusValues(f.growth)
-        .radiusRange([3, 30]);
+      var scheme = swiftmap.schemeContinuous()
+        .from(f.growth)
+        .to([3, 30]);
 
       d3.queue()
         .defer(d3.json, "india_state.json") // geospatial data
@@ -78,19 +80,24 @@
         // Add geospatial data to your map.
         // Then draw the map and bubbles.
         map
-          .polygons(geo, d => d.properties.ST_NM)
+          .layerPolygons(geo, d => d.properties.ST_NM)
             .draw()
-            .drawScheme(scheme);
+            .drawPoints();
+
+        map.layers[0].points
+            .attr("r", scheme);
 
         // When the dropdown changes...
         var sel = document.getElementById("select");
         sel.onchange = () => {
 
           // ...update the scheme with the appropriate value function...
-          scheme.radiusValues(f[sel.value]);
+          scheme.from(f[sel.value]);
 
-          // ...and redraw the bubbles, with a 750ms transition.
-          map.drawScheme(scheme, 750);
+          // ...and redraw the bubbles with transition.
+          map.layers[0].points
+            .transition()
+              .attr("r", scheme);
 
         }
 

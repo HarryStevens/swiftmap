@@ -1,14 +1,14 @@
-import * as d3 from "../../lib/swiftmap-d3-bundler";
+import * as d3 from "../../lib/d3";
 
-import points from "./points";
-import polygons from "./polygons";
+import layerPoints from "./layerPoints";
+import layerPolygons from "./layerPolygons";
 import projection from "./projection";
 
 import draw from "./draw";
 import drawBoundary from "./drawBoundary";
 import drawLabels from "./drawLabels";
 import drawPoints from "./drawPoints";
-import drawSubunits from "./drawSubunits";
+import drawPolygons from "./drawPolygons";
 import drawScheme from "./drawScheme";
 import fit from "./fit";
 import resize from "./resize";
@@ -51,8 +51,8 @@ export default function map(parent){
     this.svg = d3.select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
     // init functions
-    this.points = points;
-    this.polygons = polygons;
+    this.layerPoints = layerPoints;
+    this.layerPolygons = layerPolygons;
     this.projection = projection;
 
     // draw functions
@@ -60,7 +60,7 @@ export default function map(parent){
     this.drawBoundary = drawBoundary;
     this.drawLabels = drawLabels;
     this.drawPoints = drawPoints;
-    this.drawSubunits = drawSubunits;
+    this.drawPolygons = drawPolygons;
     this.drawScheme = drawScheme;
     this.fit = fit;
     this.resize = resize;

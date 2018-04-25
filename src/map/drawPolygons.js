@@ -1,8 +1,8 @@
 // modules
-import feature from "../../lib/swiftmap-topojson-bundler/feature";
+import feature from "../../lib/topojson/feature";
 
-// draws subunits
-export default function drawSubunits(layer) {
+// draws polygons
+export default function drawPolygons(layer) {
   
   // check for geospatial data
   if (Object.keys(this.layers).length === 0) {
@@ -20,20 +20,20 @@ export default function drawSubunits(layer) {
   var curr_layer = this.layers[draw_layer];
 
 
-  // only append if layer is new
-  if (!curr_layer.subunits) {
+  // Only append if the layer is new.
+  if (!curr_layer.polygons) {
 
-    this.layers[draw_layer].subunits = this.svg.selectAll(".subunit.subunit-" + draw_layer)
+    this.layers[draw_layer].polygons = this.svg.selectAll(".polygon.polygon-" + draw_layer)
         .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
       .enter().append("path")
-        .attr("class", "subunit subunit-" + draw_layer)
+        .attr("class", "polygon polygon-" + draw_layer)
         .attr("stroke", "#fff")
         .attr("stroke-width", "1px")
         .attr("fill", "#ccc")
         .attr("d", this.path);  
 
   } else {
-    this.layers[draw_layer].subunits
+    this.layers[draw_layer].polygons
         .attr("d", this.path);
   }
   

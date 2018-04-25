@@ -11,7 +11,7 @@
         height: 100vh;
         background: #1f78b4;
       }
-      #map .subunit.subunit-india {
+      #map .polygon.polygon-india {
         fill: #fff;
         stroke: #ddd;
         stroke-dasharray: 5, 5;
@@ -50,7 +50,7 @@
 
       function ready(error, karnataka, results2013, resultsRandom, india){
 
-        // MASSIVE AND BIZARRE BUG: Update pattern not working for drawSubunits
+        // MASSIVE AND BIZARRE BUG: Update pattern not working for drawPolygons
         
         // Update the scheme's data.
         scheme.data(parseResults(results2013), d => d.ac_no);

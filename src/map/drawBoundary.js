@@ -1,4 +1,4 @@
-import mesh from "../../lib/swiftmap-topojson-bundler/mesh";
+import mesh from "../../lib/topojson/mesh";
 
 // draws an outer boundary
 export default function drawBoundary(layer) {
