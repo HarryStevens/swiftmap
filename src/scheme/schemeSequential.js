@@ -12,7 +12,7 @@ export default function(){
       all_limits = [];
 
   function calcLimits(){
-    all_limits = isString(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : all_limits;
+    all_limits = isString(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : isArray(breaks) ? breaks : all_limits;
   }
 
   function schemeSequential(d, i, els){
@@ -23,7 +23,7 @@ export default function(){
       .map(from)[0] || undefined;
 
     var output = toOther;
-    
+        
     all_limits.forEach(function(limit, limit_index){
       if (match >= limit && match <= all_limits[limit_index + 1]) output = to[limit_index];
     });

@@ -9,7 +9,6 @@ import drawBoundary from "./drawBoundary";
 import drawLabels from "./drawLabels";
 import drawPoints from "./drawPoints";
 import drawPolygons from "./drawPolygons";
-import drawScheme from "./drawScheme";
 import fit from "./fit";
 import resize from "./resize";
 
@@ -61,7 +60,6 @@ export default function map(parent){
     this.drawLabels = drawLabels;
     this.drawPoints = drawPoints;
     this.drawPolygons = drawPolygons;
-    this.drawScheme = drawScheme;
     this.fit = fit;
     this.resize = resize;
 

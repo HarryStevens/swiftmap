@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.20. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.1.22. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7016,206 +7016,6 @@
     return this;
   }
 
-  // Returns the maximum value of an array.
-  function max$1(arr){
-    return arr.reduce(function(a, b) {
-      return Math.max(a, b);
-  	});
-  }
-
-  // Returns the minimum value of an array.
-  function min$1(arr){
-    return arr.reduce(function(a, b) {
-      return Math.min(a, b);
-  	});
-  }
-
-  // Returns ths minimum and maximum values of an array as the array [min, max].
-  // Depencencies: max, min
-  function extent$2(arr){
-    return [min$1(arr), max$1(arr)];
-  }
-
-  function keepNumber(x){
-    return x.replace(/[^\d.-]/g, "");
-  }
-
-  function drawScheme(scheme, duration, layer){
-
-    // Type checking
-    if (!scheme){
-    	console.error("You must pass a valid scheme to map.drawScheme().");
-    	return;
-    }
-    if (duration && !isNumber(duration)){
-    	console.warn("You must specify the duration passed to map.drawScheme() as a number.");
-    	duration = 0;
-    }
-    if (layer && !isString(layer) && !isNumber(layer)) {
-      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
-      layer = swiftmap.meta.last_layer;
-    }
-
-    var draw_layer = layer || this.meta.last_layer;
-
-    if (scheme.constructor.name == "SchemeChoropleth"){
-    	return drawChoropleth(scheme, duration, this);
-    } else if (scheme.constructor.name == "SchemeBubble") {
-  		return drawBubble(scheme, duration, this);
-  	} else {
-  		console.error("You must pass a valid scheme to map.drawScheme().");
-  		return;
-  	}
-
-  	function drawBubble(scheme, duration, swiftmap) {
-  	  // check for geospatial data
-  	  if (Object.keys(swiftmap.layers).length === 0) {
-  	    console.error("You must pass TopoJSON data to at least one layer before you can draw the map.");
-  	    return;
-  	  }
-
-  	  // store some data in variables
-  	  var curr_layer = swiftmap.layers[draw_layer];
-  	  var path = swiftmap.path;
-
-  	  swiftmap.layers[draw_layer].bubbles = swiftmap.svg.selectAll(".bubble")
-  	      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; });
-
-  	  // different behaviors if there's a colorKey
-  	  if (scheme.meta.colorKey){
-
-  	    swiftmap.layers[draw_layer].bubbles.transition().duration(duration)
-  		      .attr("cx", function(d){ return path.centroid(d)[0]; })
-  		      .attr("cy", function(d){ return path.centroid(d)[1]; })
-  		      .style("fill", fill)
-  		      .style("stroke", fill)
-  		      .attr("r", radius);
-
-  		  swiftmap.layers[draw_layer].bubbles.enter().append("circle")
-  		      .attr("fill-opacity", .75)
-  		      .attr("cx", function(d){ return path.centroid(d)[0]; })
-  		      .attr("cy", function(d){ return path.centroid(d)[1]; })
-  		      .attr("class", "bubble bubble-" + draw_layer)
-  		    .transition().duration(duration)
-  	        .style("fill", fill)
-  		      .style("stroke", fill)
-  		      .attr("r", radius);	
-  	  
-  	  } else {
-
-  	    swiftmap.layers[draw_layer].bubbles.transition().duration(duration)
-  		      .attr("cx", function(d){ return path.centroid(d)[0]; })
-  		      .attr("cy", function(d){ return path.centroid(d)[1]; })
-  		      .attr("r", radius);
-
-  		  swiftmap.layers[draw_layer].bubbles.enter().append("circle")
-  		      .attr("fill-opacity", .75)
-  		      .attr("cx", function(d){ return path.centroid(d)[0]; })
-  		      .attr("cy", function(d){ return path.centroid(d)[1]; })
-  		      .attr("class", "bubble bubble-" + draw_layer)
-  		      .attr("fill", "#000")
-  		      .attr("stroke", "#000")
-  		    .transition().duration(duration)
-  		      .attr("r", radius);	  	  	
-  	  }
-
-
-  	  function fill(d){
-  	    // get the matching datum
-  	    var match = scheme.meta.data
-  	      .filter(function(row){
-  	        return row.key == d.properties.swiftmap.key;
-  	      })
-  	      .map(scheme.meta.colorValues);
-
-  	    // if no match, no bubble
-  	    if (match.length == 0) return 0;
-
-  	    // different operations for categorical and sequential keys
-  	    if (Array.isArray(scheme.meta.colorKey)){
-  	    	// need to calc buckets
-  	    }
-
-  	    else {
-  	    	// the color to return
-  	    	var return_color = scheme.meta.colorOther;
-  	    	Object.keys(scheme.meta.colorKey).forEach(function(key){
-  	    		if (match[0] == key) {
-  	    			return_color = scheme.meta.colorKey[key];
-  	    		}
-  	    	});
-  	    	return return_color;
-  	    }
-  	  }
-
-  	  function radius(d){
-  	    // get the matching datum
-  	    var match = scheme.meta.data
-  	      .filter(function(row){
-  	        return row.key == d.properties.swiftmap.key;
-  	      })
-  	      .map(scheme.meta.radiusValues);
-
-  	    // if no match, no bubble
-  	    if (match.length == 0) return 0;
-
-  	    return scale(match[0]);    
-  	  }
-
-  	    // create a scale to calculate the appropriate radius
-  	  function scale(datum){
-  	    var scheme_domain_extent = extent$2(scheme.meta.data.map(scheme.meta.radiusValues));
-  	    var scheme_range_extent = scheme.meta.radiusRange;
-
-  	    // where does the datum fall in the extent?
-  	    var diff_from_bottom = datum - scheme_domain_extent[0];
-  	    var diff_pct = diff_from_bottom / (scheme_domain_extent[1] - scheme_domain_extent[0]);
-
-  	    var pct_in_range = (scheme_range_extent[1] - scheme_range_extent[0]) * diff_pct;
-  	    return scheme_range_extent[0] + pct_in_range;
-  	  }
-
-  	  return swiftmap;
-
-  	}
-
-  	function drawChoropleth(scheme, duration, swiftmap){
-
-  		// Check if there are polygons.
-  		if (!swiftmap.layers[draw_layer].polygons) {
-  			console.warn("You must draw polygons to the layer before drawing a choropleth scheme.");
-  		}
-
-  		scheme.meta.styles.forEach(function(item){
-
-  			// Select the layer's polygons.
-  			swiftmap.layers[draw_layer].polygons
-  				.style(item.attribute, function(polygon){ return getValue(polygon, item); });
-
-  		});
-
-  		scheme.meta.attrs.forEach(function(attr){
-
-  		});
-
-  		function getValue(polygon, item){
-  			// If there's a match, get the value
-  	    var match = scheme.meta.data
-  	      .filter(function(row){ return row.key == polygon.properties.swiftmap.key; })
-  	      .map(item.mapper);
-
-  	    console.log(match);
-
-  	    // Compute the buckets into which 
-  	    // var buckets = 
-  		}
-
-
-  		return swiftmap;
-  	}
-
-  }
-
   // centers and zooms a projection
   function fit$1(layer) {  
     
@@ -7259,6 +7059,10 @@
         .attr("cy", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
 
     return swiftmap;
+  }
+
+  function keepNumber(x){
+    return x.replace(/[^\d.-]/g, "");
   }
 
   // modules
@@ -7341,7 +7145,6 @@
       this.drawLabels = drawLabels;
       this.drawPoints = drawPoints;
       this.drawPolygons = drawPolygons;
-      this.drawScheme = drawScheme;
       this.fit = fit$1;
       this.resize = resize;
 
@@ -7413,6 +7216,26 @@
     };
 
     return schemeCategorical;
+  }
+
+  // Returns the maximum value of an array.
+  function max$1(arr){
+    return arr.reduce(function(a, b) {
+      return Math.max(a, b);
+  	});
+  }
+
+  // Returns the minimum value of an array.
+  function min$1(arr){
+    return arr.reduce(function(a, b) {
+      return Math.min(a, b);
+  	});
+  }
+
+  // Returns ths minimum and maximum values of an array as the array [min, max].
+  // Depencencies: max, min
+  function extent$2(arr){
+    return [min$1(arr), max$1(arr)];
   }
 
   function schemeContinuous(){
@@ -7662,7 +7485,7 @@
         all_limits = [];
 
     function calcLimits(){
-      all_limits = isString(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : all_limits;
+      all_limits = isString(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : isArray(breaks) ? breaks : all_limits;
     }
 
     function schemeSequential(d, i, els){
@@ -7673,7 +7496,7 @@
         .map(from)[0] || undefined;
 
       var output = toOther;
-      
+          
       all_limits.forEach(function(limit, limit_index){
         if (match >= limit && match <= all_limits[limit_index + 1]) output = to[limit_index];
       });
