@@ -63,7 +63,7 @@ var swiftmap = require("swiftmap");
   - [Points](#layerPoints)
 - [Schemes](#schemes)
   - [Categorical](#schemeCategorical)
-  - [Continuous](#schemeContinous)
+  - [Continuous](#schemeContinuous)
   - [Sequential](#schemeSequential)
 
 ### Maps
