@@ -28,8 +28,7 @@ export default function(){
       scale.interpolate(d3.interpolateLab);
     }
 
-    return match ? scale(match) : toOther;
-    
+    return match ? scale(match) : toOther;  
   }
 
 
