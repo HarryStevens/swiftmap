@@ -108,7 +108,7 @@ You can specify a <i>tilesource</i> as a string to determine the style of raster
 - `"cartoLightLabels"` Carto light tiles' labels. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
 - `"cartoLightNoLabels"` Carto light tiles without labels. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
 - `"mapboxNaturalEarth"` Mapbox Natural Earth II. Copyright: Map tiles by [MapBox](http://a.tiles.mapbox.com/v3/mapbox.natural-earth-2/page.html).
-- `"openStreetMap"` Open Street Map tiles. Copyright: Tiles copyright [OpenStreetMap contributors]((https://www.openstreetmap.org/copyright)).
+- `"openStreetMap"` Open Street Map tiles. Copyright: Tiles copyright [OpenStreetMap contributors](https://www.openstreetmap.org/copyright).
 - `"stamenToner"` Stamen toner tiles. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
 - `"stamenTerrain"` Stamen terrain tiles. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
 - `"stamenTerrainLabels"` Stamen terrain tiles' labels. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
