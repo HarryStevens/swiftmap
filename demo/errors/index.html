@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        /*font-family: "Helvetica Neue", sans-serif;*/
+      }
+      #map {
+        width: 100%;
+        height: 100vh;
+        background: #1f78b4;
+      }
+      #map .polygon.polygon-india {
+        fill: #fff;
+        stroke: #ddd;
+        stroke-dasharray: 5, 5;
+      }
+      #map .boundary.boundary-india {
+        stroke: none;
+      }
+      #map .boundary.boundary-karnataka {
+        stroke-width: 2px;
+      }
+      #map .label.label-cities {
+        text-shadow: 1px 1px 1px #fcfcfc, 1px 1px 1px #eee, 0 -1px 0 #fff, -1px 0 0 #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="../d3.v4.min.js"></script>
+    <script src="../../dist/swiftmap.js"></script>
+    <script>
+
+      var map = swiftmap.map("#map");
+
+      var scheme = swiftmap.schemeCategorical()
+        .from(d => d.winner)
+        .to({
+          "INC": "#b2df8a",
+        });
+
+      d3.queue()
+        .defer(d3.json, "karnataka_geodata.json")
+        .defer(d3.json, "karnataka_data_2013.json")
+        // .defer(d3.json, "karnataka_data_random.json")
+        .defer(d3.json, "india_state.json")
+        .await(ready);
+
+      function ready(error, karnataka, results2013, india){
+
+        // MASSIVE AND BIZARRE BUG: Update pattern not working for drawPolygons
+        
+        // Update the scheme's data.
+        scheme.data(parseResults(results2013), d => d.ac_no);
+
+        // Add three layers.
+        map
+          .layerPolygons(india, null, "india")
+            .draw()
+          .layerPolygons(karnataka, d => d.properties.ac_no, "karnataka")
+            .draw()
+          .layerPoints(karnataka, null, "cities")
+            .drawPoints()
+            .drawLabels(d => d.properties.name);
+
+        map.layers.karnataka.polygons.transition().duration(1000).style("fill", scheme);
+
+        // TODO
+        // Use flubber to allow for drawing transitions
+
+        setTimeout(() => {
+          
+          // Change the scheme's colors.
+          scheme.to({
+            "INC": "#b2df8a",
+            "BJP": "#fdbf6f",
+            "JD(S)": "#fb9a99"
+          });
+
+          // Update the "karnataka" layer, even though it was not drawn most recently.
+          map.layers.karnataka.polygons.transition().duration(1000).style("fill", scheme);
+
+        }, 1000);
+
+        setTimeout(() => {
+
+          // Update the size of the points.
+          map.layers.cities.points.transition().duration(1000).attr("r", 20);
+
+        }, 2000);
+
+        setTimeout(() => {
+
+          // Change the city labels.
+          map.layers.cities.labels.text("This is a city!");
+
+        }, 3000);
+
+
+        // Makes it easy to create resizable maps for responsive designs.
+        window.onresize = () => map.resize();
+
+      }
+
+      function parseResults(results){
+        return results.map(ac => {
+          ac.winner = ac.candidate_json[0].party;
+          ac.ac_no = ac.const_code;
+          ac.candidates = ac.candidate_json.length;
+          return ac;
+        });
+      }  
+    </script>
+  </body>
+</html>

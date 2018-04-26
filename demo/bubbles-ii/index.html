@@ -6,35 +6,24 @@
         margin: 0;
         font-family: "Helvetica Neue", sans-serif;
       }
-
-      #select-wrapper {
+      #legend {
         position: absolute;
-        padding: 5px;
-        background: rgba(255, 255, 255, .75);
+        background: rgba(255, 255, 255, .8);
+        padding: 10px;
       }
-      #select-wrapper .select-title {
-        font-size: .8em;
-      }
-
       #map {
         width: 100%;
         height: 100vh;
       }
-      #map .polygon {
-        fill: #fff;
-        stroke: #555;
-      }
     </style>
   </head>
   <body>
+    <div id="legend">
+      <b>Select</b><br />
+      <input type="radio" name="property" value="students" checked /> Total students<br />
+      <input type="radio" name="property" value="student_teacher_ratio" /> Students per teacher
+    </div>
     <div id="map"></div>
-
-<!--     <script src="https://d3js.org/d3-collection.v1.min.js"></script>
-    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
-    <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
-    <script src="https://d3js.org/d3-request.v1.min.js"></script>
-    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
-
     <script src="../d3.v4.min.js"></script>
     <script src="../../dist/swiftmap.js"></script>
 
@@ -45,8 +34,8 @@
 
       // Set up a scheme for each visual property.
       var schemeRadius = swiftmap.schemeContinuous()
-        .from(d => d.student_teacher_ratio)
-        .to([1, 30]);
+        .from(d => +d.students)
+        .to([1, 20]);
 
       var schemeFill = swiftmap.schemeCategorical()
         .from(d => d.most_urgent)
@@ -83,11 +72,13 @@
         schemeStroke.data(data, d => +d.edudel_code);
         schemeOpacity.data(data, d => +d.edudel_code);
 
-        // Add geospatial data to your map.
+        // Add tiles and geospatial data to your map.
         // Then draw the polygons and bubbles.
         map
+          .tiles("cartoLight")
           .layerPolygons(districts)
-            .draw()
+            .fit()
+            .drawBoundary()
           .layerPoints(schools, d => +d.properties.edudel_code)
             .drawPoints();
 
@@ -98,11 +89,15 @@
             .style("stroke", schemeStroke)
             .style("opacity", schemeOpacity);
 
+        // Update the radius scheme when the radio changes.
+        d3.selectAll("input[name='property']").on("change", () => {
+          schemeRadius.from(d => +d[d3.select("input[name='property']:checked").property("value")]);
+          map.layers[1].points.transition().duration(1500).attr("r", schemeRadius);
+        });
+
         // It's easy to resize a Swiftmap.
         window.onresize = () => map.resize();
-
       }
-      
     </script>
   </body>
 </html>

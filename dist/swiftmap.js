@@ -2691,6 +2691,20 @@
   var ascendingBisect = bisector(ascending$1);
   var bisectRight = ascendingBisect.right;
 
+  function range(start, stop, step) {
+    start = +start, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start, start = 0, 1) : n < 3 ? 1 : +step;
+
+    var i = -1,
+        n = Math.max(0, Math.ceil((stop - start) / step)) | 0,
+        range = new Array(n);
+
+    while (++i < n) {
+      range[i] = start + i * step;
+    }
+
+    return range;
+  }
+
   var e10 = Math.sqrt(50),
       e5 = Math.sqrt(10),
       e2 = Math.sqrt(2);
@@ -6375,6 +6389,78 @@
         .scale(152.63);
   }
 
+  function tile() {
+    var x0 = 0,
+        y0 = 0,
+        x1 = 960,
+        y1 = 500,
+        tx = (x0 + x1) / 2,
+        ty = (y0 + y1) / 2,
+        scale = 256,
+        zoomDelta = 0,
+        wrap = true;
+
+    function tile() {
+      var z = Math.max(Math.log(scale) / Math.LN2 - 8, 0),
+          z0 = Math.round(z + zoomDelta),
+          j = 1 << z0,
+          k = Math.pow(2, z - z0 + 8),
+          x = tx - scale / 2,
+          y = ty - scale / 2,
+          tiles = [],
+          cols = range(
+            Math.max(wrap ? -Infinity : 0, Math.floor((x0 - x) / k)),
+            Math.min(Math.ceil((x1 - x) / k), wrap ? Infinity : j)
+          ),
+          rows = range(
+            Math.max(0, Math.floor((y0 - y) / k)),
+            Math.min(Math.ceil((y1 - y) / k), j)
+          );
+
+      rows.forEach(function(y) {
+        cols.forEach(function(x) {
+          tiles.push({
+            x: (x % j + j) % j,
+            y: y,
+            z: z0,
+            tx: x * 256,
+            ty: y * 256
+          });
+        });
+      });
+
+      tiles.translate = [x / k, y / k];
+      tiles.scale = k;
+      return tiles;
+    }
+
+    tile.size = function(_) {
+      return arguments.length ? (x0 = y0 = 0, x1 = +_[0], y1 = +_[1], tile) : [x1 - x0, y1 - y0];
+    };
+
+    tile.extent = function(_) {
+      return arguments.length ? (x0 = +_[0][0], y0 = +_[0][1], x1 = +_[1][0], y1 = +_[1][1], tile) : [[x0, y0], [x1, y1]];
+    };
+
+    tile.scale = function(_) {
+      return arguments.length ? (scale = +_, tile) : scale;
+    };
+
+    tile.translate = function(_) {
+      return arguments.length ? (tx = +_[0], ty = +_[1], tile) : [tx, ty];
+    };
+
+    tile.zoomDelta = function(_) {
+      return arguments.length ? (zoomDelta = +_, tile) : zoomDelta;
+    };
+
+    tile.wrap = function(_) {
+      return arguments.length ? (wrap = _, tile) : wrap;
+    };
+
+    return tile;
+  }
+
   // Transforms a string into a slug.
   function toSlugCase(x) {
     return x.toString()
@@ -6445,7 +6531,7 @@
 
       // test if the data is even TopoJSON
       if (!isTopoJson(data)){
-        console.error("The geospatial data passed to map.points() must be formatted as TopoJSON.");
+        console.error("The geospatial data passed to map.layerPoints() must be formatted as TopoJSON.");
         return;
       }
 
@@ -6475,7 +6561,7 @@
       this.meta.last_layer = layer;
 
       // create the new layer
-      this.layers[layer] = {name: layer, type: "points", boundary: false, data: data, polygons: false, scheme: false, fit: false};
+      this.layers[layer] = {name: layer, type: "points", data: data, fit: false};
 
       // get the points object from the topojson
       this.layers[layer].object = getTopoObjectOfType(data, "points");
@@ -6542,7 +6628,7 @@
       this.meta.last_layer = layer;
 
       // create the new layer
-      this.layers[layer] = {name: layer, type: "polygons", boundary: false, data: data, polygons: false, scheme: false, fit: false};
+      this.layers[layer] = {name: layer, type: "polygons", data: data, fit: false};
 
       // get the polygons object from the topojson
       this.layers[layer].object = getTopoObjectOfType(data, "polygons");
@@ -6592,6 +6678,19 @@
       projectionName == "albersUsa" ? albersUsa() :
       equirectangular();
     this.path.projection(this.meta.projection.function);
+
+    return this;
+  }
+
+  function tiles(type){
+    // Test if the type is a string
+    if (type && !isString(type)){
+      console.warn("The type passed to map.layerTiles() must be specified as a string. The type will default to 'openStreetMap'.");
+      type = "openStreetMap";
+    }
+
+    // Update the type.
+    this.meta.tiles = type || "openStreetMap";
 
     return this;
   }
@@ -6975,30 +7074,26 @@
     return this;
   }
 
-  // modules
-
-  // draws polygons
+  // Draws polygons.
   function drawPolygons(layer) {
-    
-    // check for geospatial data
+    // Check for geospatial data.
     if (Object.keys(this.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
     }
-    // type check the layer
-    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+
+    // Check the type of the layer
+    if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
       layer = swiftmap.meta.last_layer;
     }
+
     // Determine which layer we are drawing on.
     var draw_layer = layer || this.meta.last_layer;
-
     var curr_layer = this.layers[draw_layer];
-
 
     // Only append if the layer is new.
     if (!curr_layer.polygons) {
-
       this.layers[draw_layer].polygons = this.svg.selectAll(".polygon.polygon-" + draw_layer)
           .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
         .enter().append("path")
@@ -7007,15 +7102,70 @@
           .attr("stroke-width", "1px")
           .attr("fill", "#ccc")
           .attr("d", this.path);  
+    }
 
-    } else {
+    else {
       this.layers[draw_layer].polygons
           .attr("d", this.path);
     }
     
-
-
     return this;
+  }
+
+  function drawTiles(swiftmap){
+    swiftmap = swiftmap || this;
+
+    var types = {
+      openStreetMap: function(d){ return "http://" + "abc"[d.y % 3] + ".tile.openstreetmap.org/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      stamenToner: function(d){ return "http://tile.stamen.com/toner/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      stamenTerrain: function(d){ return "http://tile.stamen.com/terrain/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      stamenTerrainLabels: function(d){ return "http://tile.stamen.com/terrain-labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      stamenTerrainNoLabels: function(d){ return "http://tile.stamen.com/terrain-background/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      stamenWatercolor: function(d){ return "http://tile.stamen.com/watercolor/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      mapboxNaturalEarth: function(d){return "https://a.tiles.mapbox.com/v3/mapbox.natural-earth-2/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      cartoLight: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/light_all/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      cartoDark: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_all/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      cartoLightNoLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/light_nolabels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      cartoLightLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/light_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      cartoDarkLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; }
+    };
+
+    var pi = Math.PI,
+      tau = 2 * pi;
+
+    var tiles = tile()
+      .size([swiftmap.width, swiftmap.height])
+      .scale(swiftmap.meta.projection.function.scale() * tau)
+      .translate(swiftmap.meta.projection.function([0, 0]))
+      .wrap(true)
+      .extent([[0, 0], [swiftmap.width, swiftmap.height]]);
+
+    var tiles_element = swiftmap.svg.selectAll(".tile")
+        .data(tiles(), function(d, i){ return i; });
+    
+    tiles_element.exit().remove();  
+
+    tiles_element.enter().append("image")
+        .attr("class", "tile")
+      .merge(tiles_element)
+        .attr("x", function(d) { return (d.x + tiles().translate[0]) * tiles().scale; })
+        .attr("y", function(d) { return (d.y + tiles().translate[1]) * tiles().scale; })
+        .attr("width", tiles().scale)
+        .attr("height", tiles().scale)
+        .attr("xlink:href", types[swiftmap.meta.tiles]);
+
+    tiles_element.moveToBack = function() {
+      return this.each(function() {
+        var firstChild = this.parentNode.firstChild;
+        if (firstChild) {
+          this.parentNode.insertBefore(this, firstChild);
+        }
+      });
+    };
+
+    tiles_element.moveToBack();
+
+    return swiftmap;
   }
 
   // centers and zooms a projection
@@ -7060,14 +7210,15 @@
         .attr("cx", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
         .attr("cy", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
 
+    // Fit the tiles, if any.
+    if (swiftmap.meta.tiles) drawTiles(swiftmap);
+
     return swiftmap;
   }
 
   function keepNumber(x){
     return x.replace(/[^\d.-]/g, "");
   }
-
-  // modules
 
   // resizes the map
   function resize() {
@@ -7089,15 +7240,18 @@
     if (fit_layer) swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(fit_layer.data, fit_layer.object));
 
     // scrope the projection and path
-    var projection = swiftmap.meta.projection.function;
+    var projection$$1 = swiftmap.meta.projection.function;
     var path = swiftmap.path;
 
     swiftmap.svg.selectAll("path").attr("d", path);
-    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection$$1(d.geometry.coordinates) + ")"; });
     swiftmap.svg.selectAll("circle.point")
-        .attr("cx", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
-        .attr("cy", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
-           
+        .attr("cx", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[0] : projection$$1(d.geometry.coordinates)[0]; })
+        .attr("cy", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[1] : projection$$1(d.geometry.coordinates)[1]; });
+    
+    // Resize the tiles, if any.
+    if (swiftmap.meta.tiles) drawTiles(swiftmap);
+
     return swiftmap;
   }
 
@@ -7118,6 +7272,7 @@
           function: mercator(),
           name: "mercator"
         },
+        tiles: false
       };
 
       // a layers object to store the geospatial layers
@@ -7140,6 +7295,7 @@
       this.layerPoints = layerPoints;
       this.layerPolygons = layerPolygons;
       this.projection = projection$1;
+      this.tiles = tiles;
 
       // draw functions
       this.draw = draw;
@@ -7147,6 +7303,7 @@
       this.drawLabels = drawLabels;
       this.drawPoints = drawPoints;
       this.drawPolygons = drawPolygons;
+      this.drawTiles = drawTiles;
       this.fit = fit$1;
       this.resize = resize;
 

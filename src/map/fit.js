@@ -1,6 +1,7 @@
 import feature from "../../lib/topojson/feature";
-import isString from "../utils/isString.js"
-import isNumber from "../utils/isNumber.js"
+import isString from "../utils/isString";
+import isNumber from "../utils/isNumber";
+import drawTiles from "./drawTiles";
 
 // centers and zooms a projection
 export default function fit(layer) {  
@@ -43,6 +44,9 @@ export default function fit(layer) {
   swiftmap.svg.selectAll("circle.point")
       .attr("cx", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
       .attr("cy", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
+
+  // Fit the tiles, if any.
+  if (swiftmap.meta.tiles) drawTiles(swiftmap);
 
   return swiftmap;
 }

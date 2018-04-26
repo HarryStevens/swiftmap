@@ -44,7 +44,7 @@ export default function layerPolygons(data, key, layer){
     this.meta.last_layer = layer;
 
     // create the new layer
-    this.layers[layer] = {name: layer, type: "polygons", boundary: false, data: data, polygons: false, scheme: false, fit: false};
+    this.layers[layer] = {name: layer, type: "polygons", data: data, fit: false};
 
     // get the polygons object from the topojson
     this.layers[layer].object = getTopoObjectOfType(data, "polygons");

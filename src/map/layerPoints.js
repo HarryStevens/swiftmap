@@ -16,7 +16,7 @@ export default function layerPoints(data, key, layer){
 
     // test if the data is even TopoJSON
     if (!isTopoJson(data)){
-      console.error("The geospatial data passed to map.points() must be formatted as TopoJSON.");
+      console.error("The geospatial data passed to map.layerPoints() must be formatted as TopoJSON.");
       return;
     }
 
@@ -46,7 +46,7 @@ export default function layerPoints(data, key, layer){
     this.meta.last_layer = layer;
 
     // create the new layer
-    this.layers[layer] = {name: layer, type: "points", boundary: false, data: data, polygons: false, scheme: false, fit: false};
+    this.layers[layer] = {name: layer, type: "points", data: data, fit: false};
 
     // get the points object from the topojson
     this.layers[layer].object = getTopoObjectOfType(data, "points");

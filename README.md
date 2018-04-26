@@ -95,6 +95,26 @@ If <i>projection</i> is not specified, returns the projection associated with th
 
 Resizes the map. This method is useful if your map must respond to window resizes.
 
+<a name="tiles" href="#tiles">#</a> <i>map</i>.<b>tiles</b>([<i>tilesource</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/tiles.js "Source")
+
+Adds raster tiles to the map's background and exposes the CSS class `tile`. If you use these raster tiles, please include a copyright notice with your map. 
+
+<i>tilesource</i>
+You can specify a <i>tilesource</i> as a string to determine the style of raster tiles. Defaults to `"openStreetMap"`. Your options are:
+
+- `"cartoDark"` Carto dark tiles. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
+- `"cartoDarkLabels"` Carto dark tiles' labels. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
+- `"cartoLight"` Carto light tiles. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
+- `"cartoLightLabels"` Carto light tiles' labels. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
+- `"cartoLightNoLabels"` Carto light tiles without labels. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
+- `"mapboxNaturalEarth"` Mapbox Natural Earth II. Copyright: Map tiles by [MapBox](http://a.tiles.mapbox.com/v3/mapbox.natural-earth-2/page.html).
+- `"openStreetMap"` Open Street Map tiles. Copyright: Tiles copyright [OpenStreetMap contributors]((https://www.openstreetmap.org/copyright)).
+- `"stamenToner"` Stamen toner tiles. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
+- `"stamenTerrain"` Stamen terrain tiles. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
+- `"stamenTerrainLabels"` Stamen terrain tiles' labels. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
+- `"stamenTerrainNoLabels"` Stamen terrain tiles without labels. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
+- `"stamenWatercolor"` Stamen watercolor tiles. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [CC BY SA](http://creativecommons.org/licenses/by-sa/3.0).
+
 <b>Map attributes</b>
 
 <a name="height" href="#height">#</a> <i>map</i>.<b>height</b><br />

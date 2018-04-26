@@ -1,9 +1,7 @@
-// modules
 import * as d3 from "../../lib/d3";
 import feature from "../../lib/topojson/feature";
-
-// utility functions
 import keepNumber from "../utils/keepNumber";
+import drawTiles from "./drawTiles";
 
 // resizes the map
 export default function resize() {
@@ -33,6 +31,9 @@ export default function resize() {
   swiftmap.svg.selectAll("circle.point")
       .attr("cx", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
       .attr("cy", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
-         
+  
+  // Resize the tiles, if any.
+  if (swiftmap.meta.tiles) drawTiles(swiftmap);
+
   return swiftmap;
 }

@@ -3,6 +3,7 @@ import * as d3 from "../../lib/d3";
 import layerPoints from "./layerPoints";
 import layerPolygons from "./layerPolygons";
 import projection from "./projection";
+import tiles from "./tiles";
 
 import draw from "./draw";
 import drawBoundary from "./drawBoundary";
@@ -16,7 +17,6 @@ import keepNumber from "../utils/keepNumber";
 
 // Initializes a swiftmap
 export default function map(parent){
-
   // errors
   if (parent && typeof parent !== "string") {
     throw TypeError("The argument passed to swiftmap.map() must be a string.");
@@ -31,6 +31,7 @@ export default function map(parent){
         function: d3.geoMercator(),
         name: "mercator"
       },
+      tiles: false
     };
 
     // a layers object to store the geospatial layers
@@ -53,6 +54,7 @@ export default function map(parent){
     this.layerPoints = layerPoints;
     this.layerPolygons = layerPolygons;
     this.projection = projection;
+    this.tiles = tiles;
 
     // draw functions
     this.draw = draw;
