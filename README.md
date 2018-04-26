@@ -374,16 +374,20 @@ var scheme = swiftmap.schemeContinuous()
 
 See [<i>categorical</i>.data()](#data-categorical).
 
-<a name="to" href="#to">#</a> <i>continuous</i>.<b>to</b>([<i>range</i>])
+<a name="from-continuous" href="#from-continuous">#</a> <i>continuous</i>.<b>from</b>(<i>function</i>)
+
+See [<i>categorical</i>.from()](#from-categorical).
+
+<a name="to-continuous" href="#to-continuous">#</a> <i>continuous</i>.<b>to</b>([<i>range</i>])
 
 Sets or gets the minimum and maximum values of a visual attribute associated with the scheme.
 
 <i>range</i><br />
 If a <i>range</i> is specified, sets the minimum and maximum values of the the visual attribute associate with the scheme. If a <i>range</i> is not specified, returns the range associated with the scheme, which defaults to `[0, 1]`.
 
-<a name="from" href="#from">#</a> <i>continuous</i>.<b>from</b>(<i>function</i>)
+<a name="toOther-continuous" href="#toOther-continuous">#</a> <i>continuous</i>.<b>toOther</b>([<i>value</i>])
 
-See [<i>sequential</i>.from()](#from-sequential).
+See [<i>categorical</i>.toOther()](#toOther-categorical).
 
 <a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
 
@@ -430,16 +434,7 @@ See [<i>categorical</i>.data()](#data-categorical).
 
 <a name="from-sequential" href="#from-sequential">#</a> <i>sequential</i>.<b>from</b>(<i>function</i>)
 
-Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data.
-
-<i>function</i><br />
-The <i>function</i> defaults to:
-
-```js
-d => d
-```
-
-When the scheme is passed to a style or attribute of a layer, the <i>function</i> will be called for each datum in the map's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. The default <i>function</i> assumes that each input datum is a single number. If your data are in a different format, or if you wish to transform the data before rendering, then you should specify a custom accessor. For example, if you want your scheme to be based on each polygon's population density:
+See [<i>categorical</i>.from()](#from-categorical). For example, if you want your scheme to be based on each polygon's population density:
 
 ```js
 var data = [
