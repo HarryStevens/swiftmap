@@ -63,7 +63,7 @@ var swiftmap = require("swiftmap");
   - [Points](#layerPoints)
 - [Schemes](#schemes)
   - [Categorical](#schemeCategorical)
-  - [Continous](#schemeContinous)
+  - [Continuous](#schemeContinous)
   - [Sequential](#schemeSequential)
 
 ### Maps
@@ -305,7 +305,7 @@ var scheme = swiftmap.schemeCategorical()
 
 <a name="data-categorical" href="#data-categorical">#</a> <i>categorical</i>.<b>data</b>([<i>data</i>][, <i>key</i>])
 
-Adds data to the <i>scheme</i>, where each datum corresponds to each polygon of a <i>map</i>.
+Adds data to a scheme, where each datum corresponds to each element of a layer.
 
 <i>data</i><br />
 The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the data associated with the <i>scheme</i>.
@@ -315,7 +315,7 @@ Each datum will be assigned a key value returned by an optional <i>key</i> funct
 
 <a name="from-categorical" href="#from-categorical">#</a> <i>categorical</i>.<b>from</b>(<i>function</i>)
 
-Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a map's data. 
+Sets the values accessor to the specified <i>function</i>, allowing the scheme to interact with a layer's data. 
 
 <i>function</i><br />
 When the scheme is passed to a style or attribute of a layer, the <i>function</i> will be called for each datum in the layer's data array, being passed the datum `d`, the index `i`, and the array `data` as three arguments. For example, if you want your scheme to be based on each polygon's party:
@@ -336,10 +336,10 @@ map.layers[0].polygons.style("fill", scheme);
 
 <a name="to-categorical" href="#to-categorical">#</a> <i>categorical</i>.<b>to</b>([<i>object</i>])
 
-Specifies how the scheme should render the values return by <i>categorical</i>.from().
+Specifies how the scheme should visually render the values returned by <i>categorical</i>.from().
 
 <i>object</i><br />
-If a <i>object</i> is specified, it must be specified as an object where each property is one of the scheme's categories – that is, a value returned by <i>categorical</i>.from() – and each value is the visual style or attribute associated with that category.
+If an <i>object</i> is specified, it must be specified as an object where each property is one of the scheme's categories – that is, a value returned by <i>categorical</i>.from() – and each value is the visual style or attribute associated with that category.
 
 ```js
 scheme.to({
@@ -356,6 +356,34 @@ Sets or gets an alternative value in the scheme.
 
 <i>value</i><br />
 If a <i>value</i> is specified, assigns values to those DOM elements whose category is not present among the properties of the object passed to <i>categorical</i>.to(). If <i>value</i> is not specified, returns the scheme's alternative value, which defaults to `null`.
+
+<a name="schemeContinuous" href="#schemeContinuous">#</a> swiftmap.<b>schemeContinuous</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeContinuous.js "Source")
+
+Continuous schemes are used to map values of data to corresponding visual attributes along a continuum. You can use a continuous scheme to make a [bubble map](https://bl.ocks.org/harrystevens/2fb3dce0b9f4930be9141bc6f418994f) where the radius of each bubbble corresponds to the magnitude of each datum. You can also use a continuous scheme to create [choropleth maps with a gradient scale](https://bl.ocks.org/harrystevens/4608d25b2f424a2e011d7ab9cc804f4e).
+
+```js
+var scheme = swiftmap.schemeContinuous()
+  .data(JSON)
+  .from(d => d.value)
+  .to([2, 20]);
+```
+
+[See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
+
+<a name="data-continuous" href="#data-continuous">#</a> <i>continuous</i>.<b>data</b>([<i>data</i>][, <i>key</i>])
+
+See [<i>categorical</i>.data()](#data-categorical).
+
+<a name="to" href="#to">#</a> <i>continuous</i>.<b>to</b>([<i>range</i>])
+
+Sets or gets the minimum and maximum values of a visual attribute associated with the scheme.
+
+<i>range</i><br />
+If a <i>range</i> is specified, sets the minimum and maximum values of the the visual attribute associate with the scheme. If a <i>range</i> is not specified, returns the range associated with the scheme, which defaults to `[0, 1]`.
+
+<a name="from" href="#from">#</a> <i>continuous</i>.<b>from</b>(<i>function</i>)
+
+See [<i>sequential</i>.from()](#from-sequential).
 
 <a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
 
@@ -439,34 +467,6 @@ The <i>array</i> will default to `[]` if this method is not called.
 <a name="toOther-sequential" href="#toOther-sequential">#</a> <i>sequential</i>.<b>toOther</b>([<i>value</i>])
 
 See [<i>categorical</i>.toOther()](#toOther-categorical).
-
-<a name="schemeContinuous" href="#schemeContinuous">#</a> swiftmap.<b>schemeContinuous</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeContinuous.js "Source")
-
-Continuous schemes are used to map values of data to corresponding visual attributes along a continuum. You can use a continuous scheme to make a [bubble map](https://bl.ocks.org/harrystevens/2fb3dce0b9f4930be9141bc6f418994f) where the radius of each bubbble corresponds to the magnitude of each datum. You can also use a continuous scheme to create [choropleth maps with a gradient scale](https://bl.ocks.org/harrystevens/4608d25b2f424a2e011d7ab9cc804f4e).
-
-```js
-var scheme = swiftmap.schemeContinuous()
-  .data(JSON)
-  .from(d => d.value)
-  .to([2, 20]);
-```
-
-[See it in action](https://bl.ocks.org/HarryStevens/ab09e52c2d513ae7e6aa783cbd9dc1c3).
-
-<a name="data-continuous" href="#data-continuous">#</a> <i>continuous</i>.<b>data</b>([<i>data</i>][, <i>key</i>])
-
-See [<i>categorical</i>.data()](#data-categorical).
-
-<a name="to" href="#to">#</a> <i>continuous</i>.<b>to</b>([<i>range</i>])
-
-Sets or gets the minimum and maximum values of a visual attribute associated with the scheme.
-
-<i>range</i><br />
-If a <i>range</i> is specified, sets the minimum and maximum values of the the visual attribute associate with the scheme. If a <i>range</i> is not specified, returns the range associated with the scheme, which defaults to `[0, 1]`.
-
-<a name="from" href="#from">#</a> <i>continuous</i>.<b>from</b>(<i>function</i>)
-
-See [<i>sequential</i>.from()](#from-sequential).
 
 ## Contributing
 
