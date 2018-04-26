@@ -203,21 +203,24 @@ If <i>layer</i> is not specified, the most recently added layer will be drawn by
 
 <a name="drawBoundary" href="#drawBoundary">#</a> <i>polygons</i>.<b>drawBoundary</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
 
-Draws a polygons layer's outer boundary.
+Draws a polygons layer's outer boundary. The boundary is rendered as an SVG `path` elements, can be accessed as a D3 selection as `map.layers.< layername >.boundary`, and can be styled with the CSS class `.boundary` or `.boundary-< layername >` or both.
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the boundary of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the boundary of the specified layer.
 
-<a name="drawPoints-polygons" href="#drawPoints-polygons">#</a> <i>polygons</i>.<b>drawPoints</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")
+<a name="drawPoints-polygons" href="#drawPoints-polygons">#</a> <i>polygons</i>.<b>drawPoints</b>([<i>radius</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")
 
-Draws circles at the centroid of each polygon in a polygons layer.
+Draws points at the centroid of each polygon in a polygons layer. Points are rendered as SVG `circle` elements, can be accessed as D3 selections via `map.layers.< layername >.points`, and can be styled with the CSS class `.point` or `.point-< layername >` or both.
+
+<i>radius</i><br />
+If <i>radius</i> is specified, sets each point's radius in pixels. Defaults to `2`.
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the points of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the polygons of the specified layer.
 
 <a name="drawPolygons" href="#drawPolygons">#</a> <i>polygons</i>.<b>drawPolygons</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPolygons.js "Source")
 
-Draws a polygons layer's polygons. For example, if the layer's TopoJSON contains states, the polygons are the states.
+Draws a polygons layer's polygons. For example, if the layer's TopoJSON contains states, the polygons are the states. Polygons are rendered as SVG `path` elements, can be accessed as D3 selections via `map.layers.< layername >.polygons`, and can be styled with the CSS class `.polygon` or `.polygon-< layername >` or both.
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the polygons of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the polygons of the specified layer.
@@ -229,30 +232,13 @@ Updates the projection so that a layer's outer boundary fits the map's parent el
 <i>layer</i><br />
 If <i>layer</i> is not specified, the most recently added layer will be fit the the boundary of the parent element. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will fit the specified layer's outer boundary to the parent element.
 
-<b>Polygons layer attributes</b>
-
-When drawn to the map, polygons layers will have D3 selections associated with them.
-
-<a name="boundary" href="#boundary">#</a> <i>map</i>.layers.< layername >.<b>boundary</b><br />
-<a name="polygons" href="#polygons">#</a> <i>map</i>.layers.< layername >.<b>polygons</b>
-
-[D3 selections](https://github.com/d3/d3-selection) of a polygons layer's boundary and polygons. These attributes are only available after calling <i>polygons</i>.drawBoundary(), <i>polygons</i>.drawPolygons(), or <i>polygons</i>.draw(), which makes both available.
-
-<a name="points" href="#points">#</a> <i>map</i>.layers.< layername >.<b>points</b>
-
-[D3 selection](https://github.com/d3/d3-selection) of a polygons layers's points after calling <i>polygons</i>.drawPoints().
-
-<b>Polygons layer styles</b>
-
-Maps rendered with Swiftmap can be styled with CSS. The boundary is exposed as the class `boundary`, and the polygons are exposed as the class `polygon`. If you add points to a polygons layer, the points are exposed as the class `point`.
-
 <a name="layerPoints" href="#layerPoints">#</a> <i>map</i>.<b>layerPoints</b>([<i>data</i>][, <i>key</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/layerPoints.js "Source")
 
 Sets or gets a points layer. See [<i>map</i>.polygons()](#polygons) for descriptions of the arguments.
 
 <a name="drawLabels" href="#drawLabels">#</a> <i>points</i>.<b>drawLabels</b>(<i>key</i>[, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawLabels.js "Source")
 
-Labels the points with text.
+Labels the points. Labels are rendered as SVG `text` elements, can be accessed as D3 selections via `map.layers.< layername >.labels`, and can be styled with the CSS class `.label` or `.label-< layername >` or both.
 
 <i>key</i><br />
 A <i>key</i> function tells Swiftmap how each datum should be labeled.
@@ -268,7 +254,7 @@ If <i>layer</i> is not specified, the labels of the most recently added layer wi
 
 <a name="drawPoints-points" href="#drawPoints-points">#</a> <i>points</i>.<b>drawPoints</b>([<i>radius</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")
 
-Draws circles, located at each point's coordinates, to a layer.
+Draws circles, located at each point's coordinates, to a layer. Points are rendered as SVG `circle` elements, can be accessed as D3 selections via `map.layers.< layername >.points`, and can be styled with the CSS class `.point` or `.point-< layername >` or both.
 
 <i>radius</i><br />
 If <i>radius</i> is specified, sets each point's radius in pixels. Defaults to `2`.
@@ -279,22 +265,6 @@ If <i>layer</i> is not specified, the points of the most recently added layer wi
 <a name="fit-points" href="#fit-points">#</a> <i>points</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
 
 See [<i>polygons</i>.fit()](#fit-polygons).
-
-<b>Points layer attributes</b>
-
-When drawn to the map, points layers will have D3 selections associated with them.
-
-<a name="labels" href="#labels">#</a> <i>map</i>.layers.< layername >.<b>labels</b><br />
-
-[D3 selections](https://github.com/d3/d3-selection) of a points layer's labels. This attribute is only available after calling <i>points</i>.drawLabels(); 
-
-<a name="points" href="#points">#</a> <i>map</i>.layers.< layername >.<b>points</b><br />
-
-[D3 selections](https://github.com/d3/d3-selection) of a points layer's points. This attribute is only available after calling <i>points</i>.drawPoints();
-
-<b>Points layer styles</b>
-
-Maps rendered with Swiftmap can be styled with CSS. The labels are exposed as the class `label`, and the points are exposed as the class `point`.
 
 ### Schemes
 
