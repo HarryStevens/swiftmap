@@ -288,7 +288,7 @@ map.layers[2].style("opacity", schemeCategorical);
 
 <a name="schemeCategorical" href="#schemeCategorical">#</a> swiftmap.<b>schemeCategorical</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeCategorical.js "Source")
 
-Categorical schemes are used to assign colors to non-numerical categories of data, such as political parties in an election.
+Categorical schemes are used to assign styles or attributes of layer elements, such as polygons' fill color, to non-numerical categories of data, such as political parties in an election.
 
 ```js
 var scheme = swiftmap.schemeCategorical()
@@ -391,7 +391,7 @@ See [<i>categorical</i>.toOther()](#toOther-categorical).
 
 <a name="schemeSequential" href="#schemeSequential">#</a> swiftmap.<b>schemeSequential</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeSequential.js "Source")
 
-Sequential schemes are used to assign styles or attributes of layer elements to discrete ranges in a series of values that progress from low to high.
+Sequential schemes are used to assign styles or attributes of layer elements, such as polygons' fill color, to discrete ranges in a series of values that progress from low to high.
 
 ```js
 var scheme = swiftmap.schemeSequential()
