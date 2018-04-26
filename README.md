@@ -77,7 +77,7 @@ Before drawing and styling a map, you can tell Swiftmap where on the DOM to plac
 Initializes a <i>map</i>.
 
 <i>parent</i><br />
-If <i>parent</i> is specified, the <i>map</i> will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent.
+If <i>parent</i> is specified, the map will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent. The map will inherit the dimensions of its parent.
 
 <a name="projection" href="#projection">#</a> <i>map</i>.<b>projection</b>([<i>projection</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/projection.js "Source")
 

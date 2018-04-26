@@ -30,22 +30,24 @@ export default function drawLabels(key, layer) {
   // TODO
   // Use the CSS selector of the labels to get the font size,
   // from which you can calculate the dy as fontSize * (3 / 8).
+  if (!this.layers[draw_layer].labels){
+    this.layers[draw_layer].labels = this.svg.selectAll(".label.label-" + draw_layer)
+        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+      .enter().append("text")
+        .attr("class", "label label-" + draw_layer)
+        .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
+        .attr("x", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? -6 : 6; })
+        .attr("font-size", ".8em")
+        .attr("dy", ".3em")
+        .attr("font-family", "sans-serif")
+        .style("text-anchor", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? "end" : "start"; })
+        .text(key);
+    }
 
-  this.layers[draw_layer].labels = this.svg.selectAll(".label.label-" + draw_layer)
-      .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+    else {
+      this.layers[draw_layer].labels.text(key);
+    }
   
-  this.layers[draw_layer].labels
-      .text(key);
-
-  this.layers[draw_layer].labels.enter().append("text")
-      .attr("class", "label label-" + draw_layer)
-      .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
-      .attr("x", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? -6 : 6; })
-      .attr("font-size", ".8em")
-      .attr("dy", ".3em")
-      .attr("font-family", "sans-serif")
-      .style("text-anchor", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? "end" : "start"; })
-      .text(key);
 
   return this;
 }
