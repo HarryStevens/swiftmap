@@ -281,7 +281,10 @@ Schemes provide an interface for mapping values of your data to visual attribute
 ```js
 map.layers[0].style("fill", schemeSequential);
 map.layers[1].attr("r", schemeContinuous);
+map.layers[2].style("opacity", schemeCategorical);
 ```
+
+[See it in action](https://bl.ocks.org/harrystevens/2fb3dce0b9f4930be9141bc6f418994f).
 
 <a name="schemeCategorical" href="#schemeCategorical">#</a> swiftmap.<b>schemeCategorical</b>() [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/scheme/schemeCategorical.js "Source")
 
