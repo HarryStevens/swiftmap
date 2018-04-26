@@ -33,8 +33,6 @@ var scheme = swiftmap.schemeSequential()
 map.layers[0].polygons.style("fill", scheme);
 ```
 
-[See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
-
 ## Installation
 
 ### Web browser
@@ -440,7 +438,7 @@ See [<i>categorical</i>.toOther()](#toOther-categorical).
 Continuous schemes are used to map values of data to corresponding visual attributes along a continuum. You can use a continuous scheme to make a [bubble map](https://bl.ocks.org/harrystevens/2fb3dce0b9f4930be9141bc6f418994f) where the radius of each bubbble corresponds to the magnitude of each datum. You can also use a continuous scheme to create [choropleth maps with a gradient scale](https://bl.ocks.org/harrystevens/4608d25b2f424a2e011d7ab9cc804f4e).
 
 ```js
-var scheme = swiftmap.schemeBubble()
+var scheme = swiftmap.schemeContinuous()
   .data(JSON)
   .from(d => d.value)
   .to([2, 20]);
