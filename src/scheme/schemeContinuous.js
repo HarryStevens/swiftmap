@@ -8,7 +8,7 @@ import isString from "../utils/isString";
 export default function(){
   var data = [],
       from = null,
-      to = [2, 20],
+      to = [0, 1],
       toOther = null;
       
   function schemeContinuous(d, i, els){

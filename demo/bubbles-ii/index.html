@@ -24,10 +24,6 @@
         fill: #fff;
         stroke: #555;
       }
-      /* Swiftmap exposes the .bubble class */
-      #map .bubble {
-        stroke-width: 2px;
-      }
     </style>
   </head>
   <body>
@@ -88,13 +84,14 @@
         schemeOpacity.data(data, d => +d.edudel_code);
 
         // Add geospatial data to your map.
-        // Then draw the map and bubbles.
+        // Then draw the polygons and bubbles.
         map
           .layerPolygons(districts)
             .draw()
           .layerPoints(schools, d => +d.properties.edudel_code)
             .drawPoints();
 
+        // Add the schemes to the bubbles for styling.
         map.layers[1].points
             .attr("r", schemeRadius)
             .style("fill", schemeFill)
