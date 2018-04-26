@@ -6,7 +6,9 @@ A simple API for making awesome maps. [See it in action](https://bl.ocks.org/har
 * Provides a simple API for making maps.
 
 ```js
-var map = swiftmap.map().layerPolygons(TopoJSONObject).draw();
+var map = swiftmap.map()
+  .layerPolygons(TopoJSONObject, d => d.id)
+    .draw();
 ```
 
 * Exposes DOM elements as D3 selections for styling.
@@ -26,7 +28,7 @@ window.onresize = () => map.resize();
 
 ```js
 var scheme = swiftmap.schemeSequential()
-  .data(JSON, d => d.polygon)
+  .data(JSON, d => d.id)
   .from(d => d.population)
   .to(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]);
 
