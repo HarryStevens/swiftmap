@@ -97,9 +97,9 @@ Resizes the map. This method is useful if your map must respond to window resize
 
 <a name="tiles" href="#tiles">#</a> <i>map</i>.<b>tiles</b>([<i>tilesource</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/tiles.js "Source")
 
-Adds raster tiles to the map's background and exposes the CSS class `tile`. If you use these raster tiles, please include a copyright notice with your map. 
+Adds raster tiles to the map's background and exposes the CSS class `tile`. If you use these raster tiles, please include a copyright notice with your map. [See it in action](https://bl.ocks.org/HarryStevens/e605a99d49878fac2e2117256608a3a4).
 
-<i>tilesource</i>
+<i>tilesource</i><br />
 You can specify a <i>tilesource</i> as a string to determine the style of raster tiles. Defaults to `"openStreetMap"`. Your options are:
 
 - `"cartoDark"` Carto dark tiles. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
