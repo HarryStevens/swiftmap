@@ -74,7 +74,7 @@ Before drawing and styling a map, you can tell Swiftmap where on the DOM to plac
 
 <a name="map" href="#map">#</a> swiftmap.<b>map</b>([<i>parent</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/map.js "Source")
 
-Initializes a <i>map</i>.
+Initializes a map.
 
 <i>parent</i><br />
 If <i>parent</i> is specified, the map will be placed in the DOM element referenced by the parent's selector. The <i>parent</i> must be specified as a string. If <i>parent</i> is not specified, `"body"` will be used as the parent. The map will inherit the dimensions of its parent.
@@ -112,7 +112,7 @@ A string of the map's parent element.
 
 ### Layers
 
-Layers let you add geospatial data to a <i>map</i>, as well as decide how that data should be drawn to the DOM. The recommended indenting pattern is to indent two spaces to declare a new layer, calling either <i>map</i>.layerPolygons() or <i>map</i>.layerPoints(), and to indent four spaces when calling drawing functions on the preceding layer.
+Layers let you add geospatial data to a map, as well as decide how that data should be drawn to the DOM. The recommended indenting pattern is to indent two spaces to declare a new layer, calling either <i>map</i>.layerPolygons() or <i>map</i>.layerPoints(), and to indent four spaces when calling drawing functions on the preceding layer.
 
 ```js
 swiftmap.map("#map")
@@ -204,7 +204,7 @@ If <i>layer</i> is not specified, the polygons of the most recently added layer 
 
 <a name="fit-polygons" href="#fit-polygons">#</a> <i>polygons</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
 
-Updates the projection so that a layer's outer boundary fits the <i>map</i>'s parent element. Overrides any previous invocations of <i>map</i>.fit(), as the map can only have one projection.
+Updates the projection so that a layer's outer boundary fits the map's parent element. Overrides any previous invocations of <i>map</i>.fit(), as the map can only have one projection.
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the most recently added layer will be fit the the boundary of the parent element. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will fit the specified layer's outer boundary to the parent element.
@@ -216,7 +216,7 @@ When drawn to the map, polygons layers will have D3 selections associated with t
 <a name="boundary" href="#boundary">#</a> <i>map</i>.layers.< layername >.<b>boundary</b><br />
 <a name="polygons" href="#polygons">#</a> <i>map</i>.layers.< layername >.<b>polygons</b>
 
-[D3 selections](https://github.com/d3/d3-selection) of a polygons layer's boundary and polygons. These attributes are only available after calling <i>map</i>.drawBoundary(), <i>map</i>.drawPolygons(), or <i>map</i>.draw(), which makes both available.
+[D3 selections](https://github.com/d3/d3-selection) of a polygons layer's boundary and polygons. These attributes are only available after calling <i>polygons</i>.drawBoundary(), <i>polygons</i>.drawPolygons(), or <i>polygons</i>.draw(), which makes both available.
 
 <a name="points" href="#points">#</a> <i>map</i>.layers.< layername >.<b>points</b>
 
@@ -310,7 +310,7 @@ var scheme = swiftmap.schemeCategorical()
 Adds data to a scheme, where each datum corresponds to each element of a layer.
 
 <i>data</i><br />
-The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the data associated with the <i>scheme</i>.
+The <i>data</i> must be specified as a JSON array. If no <i>data</i> is passed, returns the data associated with the scheme.
 
 <i>key</i><br />
 Each datum will be assigned a key value returned by an optional <i>key</i> function. This key will be used to match each datum of tabular data to a corresponding datum of geospatial data when the scheme is passed to a style or attribute of a layer. If no <i>key</i> is specified, each datum will be assigned a key according to its index.
