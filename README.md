@@ -186,7 +186,7 @@ Draws a polygons layer's outer boundary.
 <i>layer</i><br />
 If <i>layer</i> is not specified, the boundary of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the boundary of the specified layer.
 
-<a name="drawPoints" href="#drawPoints">#</a> <i>polygons</i>.<b>drawPoints</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")
+<a name="drawPoints-polygons" href="#drawPoints-polygons">#</a> <i>polygons</i>.<b>drawPoints</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")
 
 Draws circles at the centroid of each polygon in a polygons layer.
 
@@ -200,7 +200,7 @@ Draws a polygons layer's polygons. For example, if the layer's TopoJSON contains
 <i>layer</i><br />
 If <i>layer</i> is not specified, the polygons of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the polygons of the specified layer.
 
-<a name="fit" href="#fit">#</a> <i>polygons</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
+<a name="fit-polygons" href="#fit-polygons">#</a> <i>polygons</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
 
 Updates the projection so that a layer's outer boundary fits the <i>map</i>'s parent element. Overrides any previous invocations of <i>map</i>.fit(), as the map can only have one projection.
 
@@ -244,7 +244,7 @@ map.drawLabels(key);
 <i>layer</i><br />
 If <i>layer</i> is not specified, the labels of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the labels of the specified layer.
 
-<a name="drawPoints" href="#drawPoints">#</a> <i>points</i>.<b>drawPoints</b>([<i>radius</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")`
+<a name="drawPoints-points" href="#drawPoints-points">#</a> <i>points</i>.<b>drawPoints</b>([<i>radius</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")
 
 Draws circles, located at each point's coordinates, to a layer.
 
@@ -253,6 +253,10 @@ If <i>radius</i> is specified, sets each point's radius in pixels. Defaults to `
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the points of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the points of the specified layer.
+
+<a name="fit-points" href="#fit-points">#</a> <i>points</i>.<b>fit</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/fit.js "Source")
+
+See [<i>polygons</i>.fit()](#fit-polygons).
 
 <b>Points layer attributes</b>
 
