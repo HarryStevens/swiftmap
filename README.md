@@ -378,12 +378,12 @@ See [<i>categorical</i>.data()](#data-categorical).
 
 See [<i>categorical</i>.from()](#from-categorical).
 
-<a name="to-continuous" href="#to-continuous">#</a> <i>continuous</i>.<b>to</b>([<i>range</i>])
+<a name="to-continuous" href="#to-continuous">#</a> <i>continuous</i>.<b>to</b>([<i>array</i>])
 
 Sets or gets the minimum and maximum values of a visual attribute associated with the scheme.
 
-<i>range</i><br />
-If a <i>range</i> is specified, sets the minimum and maximum values of the the visual attribute associate with the scheme. If a <i>range</i> is not specified, returns the range associated with the scheme, which defaults to `[0, 1]`.
+<i>array</i><br />
+If a <i>array</i> is specified, sets the sequence of values of the the visual attribute associate with the scheme. The array can contain as many items as you like, and the scheme will map data values returned by <i>continuous</i>.from() to corresponding values in the <i>array</i>. If a <i>array</i> is not specified, returns the array associated with the scheme, which defaults to `[0, 1]`.
 
 <a name="toOther-continuous" href="#toOther-continuous">#</a> <i>continuous</i>.<b>toOther</b>([<i>value</i>])
 

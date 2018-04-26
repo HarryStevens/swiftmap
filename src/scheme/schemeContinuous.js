@@ -1,5 +1,5 @@
 import * as d3 from "../../lib/d3";
-import extent from "../utils/extent";
+import limits from "../../lib/chroma/limits";
 import isArray from "../utils/isArray";
 import isNumber from "../utils/isNumber";
 import isFunction from "../utils/isFunction";
@@ -20,7 +20,7 @@ export default function(){
 
     // A scale to calculate the appropriate output
     var scale = d3.scaleLinear()
-      .domain(extent(data.map(from)))
+      .domain(limits(data.map(from), "e", to.length - 1))
       .range(to);
 
     // Lab interpolation for colors.

@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.1.23. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.2.0. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7218,88 +7218,6 @@
     return schemeCategorical;
   }
 
-  // Returns the maximum value of an array.
-  function max$1(arr){
-    return arr.reduce(function(a, b) {
-      return Math.max(a, b);
-  	});
-  }
-
-  // Returns the minimum value of an array.
-  function min$1(arr){
-    return arr.reduce(function(a, b) {
-      return Math.min(a, b);
-  	});
-  }
-
-  // Returns ths minimum and maximum values of an array as the array [min, max].
-  // Depencencies: max, min
-  function extent$2(arr){
-    return [min$1(arr), max$1(arr)];
-  }
-
-  function schemeContinuous(){
-    var data = [],
-        from = null,
-        to = [0, 1],
-        toOther = null;
-        
-    function schemeContinuous(d, i, els){
-      var match = data
-        .filter(function(row){ 
-          return row.swiftmap.key == d.properties.swiftmap.key;
-        })
-        .map(from)[0] || undefined;
-
-      // A scale to calculate the appropriate output
-      var scale = linear$2()
-        .domain(extent$2(data.map(from)))
-        .range(to);
-
-      // Lab interpolation for colors.
-      if (isString(to[0])) {
-        scale.interpolate(lab$1);
-      }
-
-      return match ? scale(match) : toOther;
-      
-    }
-
-
-    schemeContinuous.data = function(array, key){
-      if (arguments.length){
-        if (isArray(array)){
-          array.forEach(function(d, i, data){
-            d.swiftmap = {};
-            d.swiftmap.key = isFunction(key) ? key(d, i, data) : i;
-            return d;
-          });
-          data = array;
-        }
-
-        return (schemeContinuous);
-      } 
-
-      else {
-        return data;
-      }
-    };
-
-    schemeContinuous.from = function(mapper){
-      return arguments.length ? (from = isFunction(mapper) ? mapper : from, schemeContinuous) : from;
-    };
-
-    schemeContinuous.to = function(arr){
-      return arguments.length ? (to = isArray(arr) ? arr : to, schemeContinuous) : to;
-    };
-
-    schemeContinuous.toOther = function(string){
-      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeContinuous) : toOther;
-    };
-
-    return schemeContinuous;
-  }
-
   function analyze(data) {
     var len, o, r, val;
     r = {
@@ -7474,6 +7392,68 @@
       }
     }
     return limits;
+  }
+
+  function schemeContinuous(){
+    var data = [],
+        from = null,
+        to = [0, 1],
+        toOther = null;
+        
+    function schemeContinuous(d, i, els){
+      var match = data
+        .filter(function(row){ 
+          return row.swiftmap.key == d.properties.swiftmap.key;
+        })
+        .map(from)[0] || undefined;
+
+      // A scale to calculate the appropriate output
+      var scale = linear$2()
+        .domain(limits(data.map(from), "e", to.length - 1))
+        .range(to);
+
+      // Lab interpolation for colors.
+      if (isString(to[0])) {
+        scale.interpolate(lab$1);
+      }
+
+      return match ? scale(match) : toOther;
+      
+    }
+
+
+    schemeContinuous.data = function(array, key){
+      if (arguments.length){
+        if (isArray(array)){
+          array.forEach(function(d, i, data){
+            d.swiftmap = {};
+            d.swiftmap.key = isFunction(key) ? key(d, i, data) : i;
+            return d;
+          });
+          data = array;
+        }
+
+        return (schemeContinuous);
+      } 
+
+      else {
+        return data;
+      }
+    };
+
+    schemeContinuous.from = function(mapper){
+      return arguments.length ? (from = isFunction(mapper) ? mapper : from, schemeContinuous) : from;
+    };
+
+    schemeContinuous.to = function(arr){
+      return arguments.length ? (to = isArray(arr) ? arr : to, schemeContinuous) : to;
+    };
+
+    schemeContinuous.toOther = function(string){
+      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeContinuous) : toOther;
+    };
+
+    return schemeContinuous;
   }
 
   function schemeSequential(){
