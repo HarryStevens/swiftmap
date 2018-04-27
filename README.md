@@ -230,7 +230,7 @@ If <i>layer</i> is not specified, the polygons of the most recently added layer 
 Updates the projection so that a layer's outer boundary fits the map's parent element. Overrides any previous invocations of <i>map</i>.fit(), as the map can only have one projection.
 
 <i>layer</i><br />
-If <i>layer</i> is not specified, the most recently added layer will be fit the the boundary of the parent element. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will fit the specified layer's outer boundary to the parent element.
+If <i>layer</i> is not specified, the most recently added layer will be fit to the boundary of the parent element. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will fit the specified layer's outer boundary to the parent element.
 
 <a name="layerPoints" href="#layerPoints">#</a> <i>map</i>.<b>layerPoints</b>([<i>data</i>][, <i>key</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/layerPoints.js "Source")
 
