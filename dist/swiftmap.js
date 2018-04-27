@@ -6695,26 +6695,26 @@
     return this;
   }
 
+  // Draws a polygons layer. This is a convenience method.
   function draw(layer){
-
-    // check for geospatial data
+    // Check for geospatial data
     if (Object.keys(this.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
       return;
     }
 
-    // type check the layer
-    if (layer && typeof layer !== "string"){
+    // Check the type of the optional layer parameter.
+    if (layer && !isString(layer)){
       console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
       layer = this.meta.last_layer;
     }
-    // Determine which layer we are drawing on.
-    var draw_layer = layer || this.meta.last_layer;
 
-    this.fit(draw_layer).drawPolygons(draw_layer).drawBoundary(draw_layer);
+    // Determine which layer we are drawing on.
+    var layer_name = layer || this.meta.last_layer;
+
+    this.fit(layer_name).drawPolygons(layer_name).drawBoundary(layer_name);
     
     return this;
-
   }
 
   function reverse(array, n) {
@@ -6936,82 +6936,78 @@
     return arcs;
   }
 
-  // draws an outer boundary
+  function isNumber(num){
+  	return !!num && typeof num === "number";
+  }
+
+  // Draws an outer boundary to a layer.
   function drawBoundary(layer) {
-    
-    // check for geospatial data
+    // Check for geospatial data.
     if (Object.keys(this.layers).length === 0) {
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+      console.error("You must pass TopoJSON data through swiftmap.layerolygons() before you can draw the layer's boundary.");
       return;
     }
-    // type check the layer
-    if (layer && typeof layer !== "string" && typeof layer !== "number") {
-      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
-      layer = swiftmap.meta.last_layer;
-    }
-    // Determine which layer we are drawing on.
-    var draw_layer = layer || this.meta.last_layer;
-    
-    var curr_layer = this.layers[draw_layer];
 
-    // only append the first time
-    if (!curr_layer.boundary){
-      
-      this.layers[draw_layer].boundary = this.svg.append("path")
-        .datum(mesh(curr_layer.data, curr_layer.object, function(a, b) { return a === b; }))
+    // Check the type of the optional layer parameter.
+    if (layer && !isString(layer) && !isNumber(layer)) {
+      console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+      layer = this.meta.last_layer;
+    }
+
+    var layer_name = layer || this.meta.last_layer,
+        layer = this.layers[layer_name];
+
+    // Only append the first time.
+    if (!layer.boundary){   
+      this.layers[layer_name].boundary = this.svg.append("path")
+        .datum(mesh(layer.data, layer.object, function(a, b) { return a === b; }))
         .attr("d", this.path)
-        .attr("class", "boundary boundary-" + draw_layer)
+        .attr("class", "boundary boundary-" + layer_name)
         .attr("stroke", "#000")
         .attr("fill", "none");
-
     } 
 
-    // otherwise, update the path subsequently
     else {
-
-      this.layers[draw_layer].boundary.attr("d", this.path);
-
+      this.layers[layer_name].boundary.attr("d", this.path);
     }
 
     return this;
   }
 
-  // modules
-
-  // draws polygons
+  // Draws text labels to a layer.
   function drawLabels(key, layer) {
-    
-    // check for geospatial data
+    // Check for geospatial data.
     if (Object.keys(this.layers).length === 0) {
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+      console.error("You must pass TopoJSON data through swiftmap.layerPoints() before you can draw labels.");
       return;
     }
-    // check for a key
+
+    // Check for a key.
     if (!key){
       console.error("You must pass a key to drawLabels() so it knows which property to take text from.");
     }
-    // type check the layer
-    if (layer && typeof layer !== "string" && typeof layer !== "number") {
+
+    // Check the type of the optional layer parameter.
+    if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
-      layer = swiftmap.meta.last_layer;
+      layer = this.meta.last_layer;
     }
-    // Determine which layer we are drawing on.
-    var draw_layer = layer || this.meta.last_layer;
 
-    // scope some variables
-    var projection = this.meta.projection.function;
-    var width = this.width;
-
-    var curr_layer = this.layers[draw_layer];
+    var width = this.width,
+        projection = this.meta.projection.function,
+        layer_name = layer || this.meta.last_layer,
+        layer = this.layers[layer_name];
 
     // TODO
     // Use the CSS selector of the labels to get the font size,
     // from which you can calculate the dy as fontSize * (3 / 8).
-    if (!this.layers[draw_layer].labels){
-      this.layers[draw_layer].labels = this.svg.selectAll(".label.label-" + draw_layer)
-          .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+
+    // Only append if the layer is new.
+    if (!this.layers[layer_name].labels){
+      this.layers[layer_name].labels = this.svg.selectAll(".label.label-" + layer_name)
+          .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
         .enter().append("text")
-          .attr("class", "label label-" + draw_layer)
+          .attr("class", "label label-" + layer_name)
           .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
           .attr("x", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? -6 : 6; })
           .attr("font-size", ".8em")
@@ -7019,39 +7015,38 @@
           .attr("font-family", "sans-serif")
           .style("text-anchor", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? "end" : "start"; })
           .text(key);
-      }
+    }
 
-      else {
-        this.layers[draw_layer].labels.text(key);
-      }
-    
+    else {
+      this.layers[layer_name].labels.text(key);
+    }
 
     return this;
   }
 
-  function isNumber(num){
-  	return !!num && typeof num === "number";
-  }
-
   // Draws point to a layer.
   function drawPoints(radius, layer) {
-    
     // Check for geospatial data.
     if (Object.keys(this.layers).length === 0) {
-      console.error("You must pass TopoJSON data through swiftmap.points() before you can draw the map.");
+      console.error("You must pass TopoJSON data through swiftmap.layerPoints() or swiftmap.layerPolygons() before you can draw polygons.");
       return;
     }
 
+    // Check the type of the optional radius parameter.
+    if (radius && !isNumber(radius)){
+      console.warn("You must specify the radius as a number. Radius will default to 2.");
+      radius = 2;
+    }
+
     // Check the type of the optional layer parameter.
-    if (layer && typeof !isString(layer) && !isNumber(layer)) {
+    if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
-      layer = swiftmap.meta.last_layer;
+      layer = this.meta.last_layer;
     }
 
     var r = radius || 2,
         projection = this.meta.projection.function,
         path = this.path,
-        width = this.width,
         layer_name = layer || this.meta.last_layer,
         layer = this.layers[layer_name];
 
@@ -7074,21 +7069,20 @@
     return this;
   }
 
-  // Draws polygons.
+  // Draws polygons to a layer.
   function drawPolygons(layer) {
     // Check for geospatial data.
     if (Object.keys(this.layers).length === 0) {
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+      console.error("You must pass TopoJSON data through swiftmap.layerPolygons() before you can draw points.");
       return;
     }
 
-    // Check the type of the layer
+    // Check the type of the optional layer parameter.
     if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
-      layer = swiftmap.meta.last_layer;
+      layer = this.meta.last_layer;
     }
 
-    // Determine which layer we are drawing on.
     var layer_name = layer || this.meta.last_layer,
         layer = this.layers[layer_name];
 
@@ -7129,7 +7123,7 @@
     };
 
     var pi = Math.PI,
-      tau = 2 * pi;
+        tau = 2 * pi;
 
     var tiles = tile()
       .size([swiftmap.width, swiftmap.height])
@@ -7166,12 +7160,11 @@
     return swiftmap;
   }
 
-  // centers and zooms a projection
+  // Sets a projection so a layer's outer boundary fits the dimensions of the map's parent.
   function fit$1(layer) {  
-    
-    // check for geospatial data
+    // Check for geospatial data.
     if (Object.keys(this.layers).length === 0) {
-      console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+      console.error("You must pass TopoJSON data through swiftmap.layerPolygons() or swiftmap.layerPonts() before you can fit the layer to the map's parent.");
       return;
     }
 
