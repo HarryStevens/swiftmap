@@ -18,7 +18,7 @@ export default function drawLabels(key, layer) {
 
   // Check the type of the optional layer parameter.
   if (layer && !isString(layer) && !isNumber(layer)) {
-    console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
+    console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
     layer = this.meta.last_layer;
   }
 
