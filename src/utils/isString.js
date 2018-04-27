@@ -1,3 +1,3 @@
 export default function isString(str){
-	return !!str && typeof str === "string";
+  return !!str && typeof str === "string";
 }

@@ -1,4 +1,4 @@
 // tests whether geospatial json is topojson
 export default function isTopoJson(json){
-	return json.type == "Topology" && !!json.arcs && !!json.objects;
+  return json.type == "Topology" && !!json.arcs && !!json.objects;
 }

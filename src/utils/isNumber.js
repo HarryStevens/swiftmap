@@ -1,3 +1,3 @@
 export default function isNumber(num){
-	return !!num && typeof num === "number";
+  return !!num && typeof num === "number";
 }
