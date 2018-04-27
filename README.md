@@ -203,7 +203,7 @@ If <i>layer</i> is not specified, the most recently added layer will be drawn by
 
 <a name="drawBoundary" href="#drawBoundary">#</a> <i>polygons</i>.<b>drawBoundary</b>([<i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawBoundary.js "Source")
 
-Draws a polygons layer's outer boundary. The boundary is rendered as an SVG `path` elements, can be accessed as a D3 selection as `map.layers.< layername >.boundary`, and can be styled with the CSS class `.boundary` or `.boundary-< layername >` or both.
+Draws a polygons layer's outer boundary. The boundary is rendered as an SVG `path` element, can be accessed as a D3 selection via `map.layers.< layername >.boundary`, and can be styled with the CSS class `.boundary` or `.boundary-< layername >` or both.
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the boundary of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the boundary of the specified layer.
