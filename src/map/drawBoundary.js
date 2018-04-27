@@ -1,40 +1,36 @@
 import mesh from "../../lib/topojson/mesh";
+import isString from "../utils/isString";
+import isNumber from "../utils/isNumber";
 
-// draws an outer boundary
+// Draws an outer boundary to a layer.
 export default function drawBoundary(layer) {
-  
-  // check for geospatial data
+  // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
-    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.")
+    console.error("You must pass TopoJSON data through swiftmap.layerolygons() before you can draw the layer's boundary.")
     return;
   }
-  // type check the layer
-  if (layer && typeof layer !== "string" && typeof layer !== "number") {
+
+  // Check the type of the optional layer parameter.
+  if (layer && !isString(layer) && !isNumber(layer)) {
     console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
     layer = swiftmap.meta.last_layer;
   }
-  // Determine which layer we are drawing on.
-  var draw_layer = layer || this.meta.last_layer;
-  
-  var curr_layer = this.layers[draw_layer];
 
-  // only append the first time
-  if (!curr_layer.boundary){
-    
-    this.layers[draw_layer].boundary = this.svg.append("path")
-      .datum(mesh(curr_layer.data, curr_layer.object, function(a, b) { return a === b; }))
+  var layer_name = layer || this.meta.last_layer,
+      layer = this.layers[layer_name];
+
+  // Only append the first time.
+  if (!layer.boundary){   
+    this.layers[layer_name].boundary = this.svg.append("path")
+      .datum(mesh(layer.data, layer.object, function(a, b) { return a === b; }))
       .attr("d", this.path)
-      .attr("class", "boundary boundary-" + draw_layer)
+      .attr("class", "boundary boundary-" + layer_name)
       .attr("stroke", "#000")
       .attr("fill", "none");
-
   } 
 
-  // otherwise, update the path subsequently
   else {
-
-    this.layers[draw_layer].boundary.attr("d", this.path);
-
+    this.layers[layer_name].boundary.attr("d", this.path);
   }
 
   return this;

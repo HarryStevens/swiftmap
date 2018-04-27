@@ -6,7 +6,7 @@ import isNumber from "../utils/isNumber";
 export default function drawLabels(key, layer) {
   // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
-    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.");
+    console.error("You must pass TopoJSON data through swiftmap.layerPoints() before you can draw labels.");
     return;
   }
 
