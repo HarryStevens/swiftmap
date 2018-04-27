@@ -2,7 +2,7 @@ import feature from "../../lib/topojson/feature";
 import isString from "../utils/isString";
 import isNumber from "../utils/isNumber";
 
-// Draws polygons.
+// Draws polygons to a layer.
 export default function drawPolygons(layer) {
   // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
@@ -10,13 +10,12 @@ export default function drawPolygons(layer) {
     return;
   }
 
-  // Check the type of the layer
+  // Check the type of the optional layer parameter.
   if (layer && !isString(layer) && !isNumber(layer)) {
     console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
     layer = swiftmap.meta.last_layer;
   }
 
-  // Determine which layer we are drawing on.
   var layer_name = layer || this.meta.last_layer,
       layer = this.layers[layer_name];
 

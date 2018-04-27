@@ -1,19 +1,23 @@
 import feature from "../../lib/topojson/feature";
-
 import isString from "../utils/isString";
 import isNumber from "../utils/isNumber";
 
 // Draws point to a layer.
 export default function drawPoints(radius, layer) {
-  
   // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
     console.error("You must pass TopoJSON data through swiftmap.layerPoints() or swiftmap.layerPolygons() before you can draw polygons.")
     return;
   }
 
+  // Check the type of the optional radius parameter.
+  if (radius && !isNumber(radius)){
+    console.warn("You must specify the radius as a number. Radius will default to 2.");
+    radius = 2;
+  }
+
   // Check the type of the optional layer parameter.
-  if (layer && typeof !isString(layer) && !isNumber(layer)) {
+  if (layer && !isString(layer) && !isNumber(layer)) {
     console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer);
     layer = swiftmap.meta.last_layer;
   }
@@ -21,7 +25,6 @@ export default function drawPoints(radius, layer) {
   var r = radius || 2,
       projection = this.meta.projection.function,
       path = this.path,
-      width = this.width,
       layer_name = layer || this.meta.last_layer,
       layer = this.layers[layer_name];
 
