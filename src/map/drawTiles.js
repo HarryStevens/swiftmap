@@ -19,7 +19,7 @@ export default function drawTiles(swiftmap){
   }
 
   var pi = Math.PI,
-    tau = 2 * pi;
+      tau = 2 * pi;
 
   var tiles = d3.tile()
     .size([swiftmap.width, swiftmap.height])

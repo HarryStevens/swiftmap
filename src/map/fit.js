@@ -3,12 +3,11 @@ import isString from "../utils/isString";
 import isNumber from "../utils/isNumber";
 import drawTiles from "./drawTiles";
 
-// centers and zooms a projection
+// Sets a projection so a layer's outer boundary fits the dimensions of the map's parent.
 export default function fit(layer) {  
-  
-  // check for geospatial data
+  // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
-    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.")
+    console.error("You must pass TopoJSON data through swiftmap.layerPolygons() or swiftmap.layerPonts() before you can fit the layer to the map's parent.")
     return;
   }
 
