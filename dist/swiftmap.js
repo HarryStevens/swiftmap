@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.2.1. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.2.2. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7052,22 +7052,22 @@
         projection = this.meta.projection.function,
         path = this.path,
         width = this.width,
-        draw_layer = layer || this.meta.last_layer,
-        curr_layer = this.layers[draw_layer];
+        layer_name = layer || this.meta.last_layer,
+        layer = this.layers[layer_name];
 
     // Only append if the layer is new.
-    if (!curr_layer.points) {
-      this.layers[draw_layer].points = this.svg.selectAll(".point.point-" + draw_layer)
-          .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+    if (!layer.points) {
+      this.layers[layer_name].points = this.svg.selectAll(".point.point-" + layer_name)
+          .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
         .enter().append("circle")
-          .attr("class", "point point-" + draw_layer)
+          .attr("class", "point point-" + layer_name)
           .attr("r", r + "px")
-          .attr("cx", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
-          .attr("cy", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
+          .attr("cx", function(d) { return layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
+          .attr("cy", function(d) { return layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
     }
 
     else {
-      this.layers[draw_layer].points
+      this.layers[layer_name].points
           .attr("r", r);
     }
 
@@ -7113,8 +7113,6 @@
   }
 
   function drawTiles(swiftmap){
-    swiftmap = swiftmap || this;
-
     var types = {
       openStreetMap: function(d){ return "http://" + "abc"[d.y % 3] + ".tile.openstreetmap.org/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
       stamenToner: function(d){ return "http://tile.stamen.com/toner/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
@@ -7257,7 +7255,6 @@
 
   // Initializes a swiftmap
   function map$3(parent){
-
     // errors
     if (parent && typeof parent !== "string") {
       throw TypeError("The argument passed to swiftmap.map() must be a string.");
@@ -7303,7 +7300,6 @@
       this.drawLabels = drawLabels;
       this.drawPoints = drawPoints;
       this.drawPolygons = drawPolygons;
-      this.drawTiles = drawTiles;
       this.fit = fit$1;
       this.resize = resize;
 
