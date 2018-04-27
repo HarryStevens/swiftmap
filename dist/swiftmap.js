@@ -6985,6 +6985,7 @@
     // Check for a key.
     if (!key){
       console.error("You must pass a key to drawLabels() so it knows which property to take text from.");
+      return;
     }
 
     // Check the type of the optional layer parameter.
