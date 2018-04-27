@@ -6,7 +6,7 @@ import isNumber from "../utils/isNumber";
 export default function drawPolygons(layer) {
   // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
-    console.error("You must pass TopoJSON data through swiftmap.polygons() before you can draw the map.")
+    console.error("You must pass TopoJSON data through swiftmap.layerPolygons() before you can draw points.")
     return;
   }
 
@@ -17,15 +17,15 @@ export default function drawPolygons(layer) {
   }
 
   // Determine which layer we are drawing on.
-  var draw_layer = layer || this.meta.last_layer;
-  var curr_layer = this.layers[draw_layer];
+  var layer_name = layer || this.meta.last_layer,
+      layer = this.layers[layer_name];
 
   // Only append if the layer is new.
-  if (!curr_layer.polygons) {
-    this.layers[draw_layer].polygons = this.svg.selectAll(".polygon.polygon-" + draw_layer)
-        .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+  if (!layer.polygons) {
+    this.layers[layer_name].polygons = this.svg.selectAll(".polygon.polygon-" + layer_name)
+        .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
       .enter().append("path")
-        .attr("class", "polygon polygon-" + draw_layer)
+        .attr("class", "polygon polygon-" + layer_name)
         .attr("stroke", "#fff")
         .attr("stroke-width", "1px")
         .attr("fill", "#ccc")
@@ -33,7 +33,7 @@ export default function drawPolygons(layer) {
   }
 
   else {
-    this.layers[draw_layer].polygons
+    this.layers[layer_name].polygons
         .attr("d", this.path);
   }
   

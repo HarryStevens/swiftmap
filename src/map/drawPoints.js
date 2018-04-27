@@ -8,7 +8,7 @@ export default function drawPoints(radius, layer) {
   
   // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
-    console.error("You must pass TopoJSON data through swiftmap.points() before you can draw the map.")
+    console.error("You must pass TopoJSON data through swiftmap.layerPoints() or swiftmap.layerPolygons() before you can draw polygons.")
     return;
   }
 

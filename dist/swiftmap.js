@@ -7089,15 +7089,15 @@
     }
 
     // Determine which layer we are drawing on.
-    var draw_layer = layer || this.meta.last_layer;
-    var curr_layer = this.layers[draw_layer];
+    var layer_name = layer || this.meta.last_layer,
+        layer = this.layers[layer_name];
 
     // Only append if the layer is new.
-    if (!curr_layer.polygons) {
-      this.layers[draw_layer].polygons = this.svg.selectAll(".polygon.polygon-" + draw_layer)
-          .data(feature(curr_layer.data, curr_layer.object).features, function(d){ return d.properties.swiftmap.key; })
+    if (!layer.polygons) {
+      this.layers[layer_name].polygons = this.svg.selectAll(".polygon.polygon-" + layer_name)
+          .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
         .enter().append("path")
-          .attr("class", "polygon polygon-" + draw_layer)
+          .attr("class", "polygon polygon-" + layer_name)
           .attr("stroke", "#fff")
           .attr("stroke-width", "1px")
           .attr("fill", "#ccc")
@@ -7105,7 +7105,7 @@
     }
 
     else {
-      this.layers[draw_layer].polygons
+      this.layers[layer_name].polygons
           .attr("d", this.path);
     }
     
