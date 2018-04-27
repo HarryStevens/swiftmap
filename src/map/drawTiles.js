@@ -3,8 +3,6 @@ import isNumber from "../utils/isNumber";
 import * as d3 from "../../lib/d3";
 
 export default function drawTiles(swiftmap){
-  swiftmap = swiftmap;
-
   var types = {
     openStreetMap: function(d){ return "http://" + "abc"[d.y % 3] + ".tile.openstreetmap.org/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
     stamenToner: function(d){ return "http://tile.stamen.com/toner/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
