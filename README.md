@@ -1,5 +1,5 @@
 # Swiftmap
-A simple API for making awesome maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
+A JavaScript library for making data-driven maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
 ## Features
 
@@ -7,7 +7,7 @@ A simple API for making awesome maps. [See it in action](https://bl.ocks.org/har
 
 ```js
 var map = swiftmap.map()
-  .layerPolygons(TopoJSONObject, d => d.id)
+  .layerPolygons(UsaStatesTopoJSON, d => d.stateName)
     .draw();
 ```
 
@@ -28,7 +28,7 @@ window.onresize = () => map.resize();
 
 ```js
 var scheme = swiftmap.schemeSequential()
-  .data(JSON, d => d.id)
+  .data(UsaStatesByPopulation, d => d.stateName)
   .from(d => d.population)
   .to(["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]);
 
