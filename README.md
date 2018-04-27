@@ -135,7 +135,7 @@ A string of the map's parent element.
 Layers let you add geospatial data to a map, as well as decide how that data should be drawn to the DOM. The recommended indenting pattern is to indent two spaces to declare a new layer, calling either <i>map</i>.layerPolygons() or <i>map</i>.layerPoints(), and to indent four spaces when calling drawing functions on the preceding layer.
 
 ```js
-swiftmap.map("#map")
+var map = swiftmap.map("#map")
   .layerPolygons(TopoJSON, d => d.state_name, "states")
     .drawPolygons()
     .drawBoundary()
