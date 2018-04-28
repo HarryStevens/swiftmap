@@ -19,7 +19,8 @@ export default function drawTiles(swiftmap){
     cartoDark: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_all/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
     cartoLightNoLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/light_nolabels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
     cartoLightLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/light_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
-    cartoDarkLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; }
+    cartoDarkLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+    wikimedia: function(d){ return "https://maps.wikimedia.org/osm-intl/" + d.z + "/" + d.x + "/" + d.y + ".png"; }
   }
 
   var pi = Math.PI,

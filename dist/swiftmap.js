@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.2.4. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.2.5. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7300,7 +7300,8 @@
       cartoDark: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_all/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
       cartoLightNoLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/light_nolabels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
       cartoLightLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/light_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
-      cartoDarkLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; }
+      cartoDarkLabels: function(d){ return "https://cartodb-basemaps-" + "abcd"[d.y % 4] + ".global.ssl.fastly.net/dark_only_labels/" + d.z + "/" + d.x + "/" + d.y + ".png"; },
+      wikimedia: function(d){ return "https://maps.wikimedia.org/osm-intl/" + d.z + "/" + d.x + "/" + d.y + ".png"; }
     };
 
     var pi = Math.PI,

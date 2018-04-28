@@ -95,8 +95,10 @@
 
         // Add tiles and geospatial data to your map.
         // Then draw the polygons and bubbles.
+        var tileGenerator = tile => "https://maps.wikimedia.org/osm-intl/" + tile.z + "/" + tile.x + "/" + tile.y + ".png"
+        var tileGenerator = tile => "http://www.openptmap.org/tiles/" + tile.z + "/" + tile.x + "/" + tile.y + ".png"
         map
-          .tiles("stamenTerrainNoLabels")
+          .tiles(tileGenerator)
           .layerPolygons(districts)
             .fit()
             .drawBoundary()
