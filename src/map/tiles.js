@@ -5,8 +5,8 @@ import getTopoObjectOfType from "../utils/getTopoObjectOfType";
 
 export default function tiles(type){
   // Test if the type is a string
-  if (type && !isString(type)){
-    console.warn("The type passed to map.layerTiles() must be specified as a string. The type will default to 'openStreetMap'.");
+  if (type && !isString(type) && !isFunction(type)){
+    console.warn("The type passed to map.layerTiles() must be specified as a string or a function. The type will default to 'openStreetMap'.");
     type = "openStreetMap";
   }
 

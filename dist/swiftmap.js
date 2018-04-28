@@ -6861,8 +6861,8 @@
 
   function tiles(type){
     // Test if the type is a string
-    if (type && !isString(type)){
-      console.warn("The type passed to map.layerTiles() must be specified as a string. The type will default to 'openStreetMap'.");
+    if (type && !isString(type) && !isFunction(type)){
+      console.warn("The type passed to map.layerTiles() must be specified as a string or a function. The type will default to 'openStreetMap'.");
       type = "openStreetMap";
     }
 
@@ -7337,7 +7337,7 @@
         .attr("y", function(d) { return (d.y + tiles().translate[1]) * tiles().scale; })
         .attr("width", tiles().scale)
         .attr("height", tiles().scale)
-        .attr("xlink:href", types[swiftmap.meta.tiles])
+        .attr("xlink:href", isFunction(swiftmap.meta.tiles) ? swiftmap.meta.tiles : types[swiftmap.meta.tiles])
         .moveToBack();
 
     return swiftmap;

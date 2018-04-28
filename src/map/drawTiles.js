@@ -1,6 +1,7 @@
-import isString from "../utils/isString";
-import isNumber from "../utils/isNumber";
 import * as d3 from "../../lib/d3";
+import isFunction from "../utils/isFunction";
+import isNumber from "../utils/isNumber";
+import isString from "../utils/isString";
 
 // Draws raster tiles to a map's background.
 export default function drawTiles(swiftmap){
@@ -55,7 +56,7 @@ export default function drawTiles(swiftmap){
       .attr("y", function(d) { return (d.y + tiles().translate[1]) * tiles().scale; })
       .attr("width", tiles().scale)
       .attr("height", tiles().scale)
-      .attr("xlink:href", types[swiftmap.meta.tiles])
+      .attr("xlink:href", isFunction(swiftmap.meta.tiles) ? swiftmap.meta.tiles : types[swiftmap.meta.tiles])
       .moveToBack();
 
   return swiftmap;
