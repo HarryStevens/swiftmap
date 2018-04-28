@@ -10,17 +10,27 @@ export default function(){
       from = null;
 
   function schemeCategorical(d, i, els){
-    var match = data
-      .filter(function(row){ 
-        return row.swiftmap.key == d.properties.swiftmap.key;
-      })
-      .map(from)[0] || undefined;
+    var output;
 
-    var output = toOther;
+    // Use in maps.
+    if (isObject(d)){
+      var match = data
+        .filter(function(row){ 
+          return row.swiftmap.key == d.properties.swiftmap.key;
+        })
+        .map(from)[0] || undefined;
+
+      output = toOther;
     
-    Object.keys(to).forEach(function(key){
-      if (match == key) output = to[key];
-    });
+      Object.keys(to).forEach(function(key){
+        if (match == key) output = to[key];
+      });
+    }
+
+    // Use in legends.
+    else {
+      output = to[Object.keys(to).filter(function(f){ return f == d; })[0]] || toOther;
+    }
     
     return output;
   }

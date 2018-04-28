@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.2.3. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.2.4. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2652,6 +2652,58 @@
   selection.prototype.interrupt = selection_interrupt;
   selection.prototype.transition = selection_transition;
 
+  function attrsFunction(selection$$1, map) {
+    return selection$$1.each(function() {
+      var x = map.apply(this, arguments), s = select(this);
+      for (var name in x) s.attr(name, x[name]);
+    });
+  }
+
+  function attrsObject(selection$$1, map) {
+    for (var name in map) selection$$1.attr(name, map[name]);
+    return selection$$1;
+  }
+
+  function selection_attrs(map) {
+    return (typeof map === "function" ? attrsFunction : attrsObject)(this, map);
+  }
+
+  function stylesFunction(selection$$1, map, priority) {
+    return selection$$1.each(function() {
+      var x = map.apply(this, arguments), s = select(this);
+      for (var name in x) s.style(name, x[name], priority);
+    });
+  }
+
+  function stylesObject(selection$$1, map, priority) {
+    for (var name in map) selection$$1.style(name, map[name], priority);
+    return selection$$1;
+  }
+
+  function selection_styles(map, priority) {
+    return (typeof map === "function" ? stylesFunction : stylesObject)(this, map, priority == null ? "" : priority);
+  }
+
+  function propertiesFunction(selection$$1, map) {
+    return selection$$1.each(function() {
+      var x = map.apply(this, arguments), s = select(this);
+      for (var name in x) s.property(name, x[name]);
+    });
+  }
+
+  function propertiesObject(selection$$1, map) {
+    for (var name in map) selection$$1.property(name, map[name]);
+    return selection$$1;
+  }
+
+  function selection_properties(map) {
+    return (typeof map === "function" ? propertiesFunction : propertiesObject)(this, map);
+  }
+
+  selection.prototype.attrs = selection_attrs;
+  selection.prototype.styles = selection_styles;
+  selection.prototype.properties = selection_properties;
+
   function ascending$1(a, b) {
     return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
   }
@@ -2893,6 +2945,131 @@
 
   var map$2 = array$2.map;
   var slice$1 = array$2.slice;
+
+  var implicit = {name: "implicit"};
+
+  function ordinal(range) {
+    var index = map$1(),
+        domain = [],
+        unknown = implicit;
+
+    range = range == null ? [] : slice$1.call(range);
+
+    function scale(d) {
+      var key = d + "", i = index.get(key);
+      if (!i) {
+        if (unknown !== implicit) return unknown;
+        index.set(key, i = domain.push(d));
+      }
+      return range[(i - 1) % range.length];
+    }
+
+    scale.domain = function(_) {
+      if (!arguments.length) return domain.slice();
+      domain = [], index = map$1();
+      var i = -1, n = _.length, d, key;
+      while (++i < n) if (!index.has(key = (d = _[i]) + "")) index.set(key, domain.push(d));
+      return scale;
+    };
+
+    scale.range = function(_) {
+      return arguments.length ? (range = slice$1.call(_), scale) : range.slice();
+    };
+
+    scale.unknown = function(_) {
+      return arguments.length ? (unknown = _, scale) : unknown;
+    };
+
+    scale.copy = function() {
+      return ordinal()
+          .domain(domain)
+          .range(range)
+          .unknown(unknown);
+    };
+
+    return scale;
+  }
+
+  function band() {
+    var scale = ordinal().unknown(undefined),
+        domain = scale.domain,
+        ordinalRange = scale.range,
+        range$$1 = [0, 1],
+        step,
+        bandwidth,
+        round = false,
+        paddingInner = 0,
+        paddingOuter = 0,
+        align = 0.5;
+
+    delete scale.unknown;
+
+    function rescale() {
+      var n = domain().length,
+          reverse = range$$1[1] < range$$1[0],
+          start = range$$1[reverse - 0],
+          stop = range$$1[1 - reverse];
+      step = (stop - start) / Math.max(1, n - paddingInner + paddingOuter * 2);
+      if (round) step = Math.floor(step);
+      start += (stop - start - step * (n - paddingInner)) * align;
+      bandwidth = step * (1 - paddingInner);
+      if (round) start = Math.round(start), bandwidth = Math.round(bandwidth);
+      var values = range(n).map(function(i) { return start + step * i; });
+      return ordinalRange(reverse ? values.reverse() : values);
+    }
+
+    scale.domain = function(_) {
+      return arguments.length ? (domain(_), rescale()) : domain();
+    };
+
+    scale.range = function(_) {
+      return arguments.length ? (range$$1 = [+_[0], +_[1]], rescale()) : range$$1.slice();
+    };
+
+    scale.rangeRound = function(_) {
+      return range$$1 = [+_[0], +_[1]], round = true, rescale();
+    };
+
+    scale.bandwidth = function() {
+      return bandwidth;
+    };
+
+    scale.step = function() {
+      return step;
+    };
+
+    scale.round = function(_) {
+      return arguments.length ? (round = !!_, rescale()) : round;
+    };
+
+    scale.padding = function(_) {
+      return arguments.length ? (paddingInner = paddingOuter = Math.max(0, Math.min(1, _)), rescale()) : paddingInner;
+    };
+
+    scale.paddingInner = function(_) {
+      return arguments.length ? (paddingInner = Math.max(0, Math.min(1, _)), rescale()) : paddingInner;
+    };
+
+    scale.paddingOuter = function(_) {
+      return arguments.length ? (paddingOuter = Math.max(0, Math.min(1, _)), rescale()) : paddingOuter;
+    };
+
+    scale.align = function(_) {
+      return arguments.length ? (align = Math.max(0, Math.min(1, _)), rescale()) : align;
+    };
+
+    scale.copy = function() {
+      return band()
+          .domain(domain())
+          .range(range$$1)
+          .round(round)
+          .paddingInner(paddingInner)
+          .paddingOuter(paddingOuter)
+          .align(align);
+    };
+
+    return rescale();
+  }
 
   function constant$3(x) {
     return function() {
@@ -7312,6 +7489,181 @@
     return !!arr && Array.isArray(arr);
   }
 
+  var keyCircle = (function(){
+  	var marginTop = 0,
+        marginBottom = 0,
+        marginLeft = 0,
+        marginRight = 0,
+        parent = null,
+        selection$$1 = null,
+        width = null,
+        height = null,
+        svg = null,
+        orientation = "horizontal",
+        circles = null,
+        labelLeft = 5,
+        labelTop = 0,
+        data = [],
+        styles = [],
+        attrs = [],
+        radius = 5,
+        labelText = [],
+        scale = band().rangeRound([0, orientation == "horizontal" ? width : height]).domain(data);
+
+    function keyCircle(str, arr){
+      parent = isString(str) ? str : "body";
+      selection$$1 = select(parent);
+      width = +jz.str.keepNumber(selection$$1.style("width")) - marginLeft - marginRight;
+      height = +jz.str.keepNumber(selection$$1.style("height")) - marginTop - marginBottom;
+      return arguments.length ? (keyCircle) : parent;
+    }
+
+    keyCircle.orientation = function(str){
+      orientation = isString(str) && (str.toLowerCase() == "horizontal" || str.toLowerCase() == "vertical") ? str : orientation;
+      scale.rangeRound([0, orientation == "horizontal" ? width : height]);
+      return arguments.length ? (keyCircle) : orientation;
+    };
+
+    keyCircle.marginTop = function(num){
+      marginTop = isNumber(num) ? num : marginTop;
+      keyCircle.height();
+      return arguments.length ? (keyCircle) : marginTop;
+    };
+
+    keyCircle.marginBottom = function(num){
+      marginBottom = isNumber(num) ? num : marginBottom;
+      keyCircle.height();
+      return arguments.length ? (keyCircle) : marginBottom;
+    };
+
+    keyCircle.height = function(num){
+      height = isNumber(num) ? num - marginTop - marginBottom : height;
+      scale.rangeRound([0, orientation == "horizontal" ? width : height]);
+      return arguments.length ? (keyCircle) : height;
+    };
+
+    keyCircle.marginLeft = function(num){
+      marginLeft = isNumber(num) ? num : marginLeft;
+      keyCircle.width();
+      return arguments.length ? (keyCircle) : marginLeft;
+    };
+
+    keyCircle.marginRight = function(num){
+      marginRight = isNumber(num) ? num : marginRight;
+      keyCircle.width();
+      return arguments.length ? (keyCircle) : marginRight;
+    };
+
+    keyCircle.width = function(num){
+      width = isNumber(num) ? num - marginLeft - marginRight : width;
+      scale.rangeRound([0, orientation == "horizontal" ? width : height]);
+      return arguments.length ? (keyCircle) : width;
+    };
+
+    keyCircle.radius = function(num){
+      radius = isNumber(num) ? num : radius;
+      return arguments.length ? (keyCircle) : radius;
+    };
+
+    keyCircle.data = function(arr){
+      data = isArray(arr) ? arr : data;
+      labelText = data;
+      scale.domain(data);
+      return arguments.length ? (keyCircle) : data;
+    };
+
+    keyCircle.circles = function(){
+      return circles;
+    };
+
+    keyCircle.labelText = function(arr){
+      labelText = isArray(arr) ? arr : labelText;
+      return arguments.length ? (keyCircle) : labelText;
+    };
+
+    keyCircle.labelLeft = function(num){
+      labelLeft = isNumber(num) ? num : labelLeft;
+      return arguments.length ? (keyCircle) : labelLeft;
+    };
+
+    keyCircle.labelTop = function(num){
+      labelTop = isNumber(num) ? num : labelTop;
+      return arguments.length ? (keyCircle) : labelTop;
+    };
+
+    keyCircle.style = function(str, val){
+      styles.push({
+        style: isString(str) ? str : null,
+        value: val
+      });
+
+      return keyCircle;
+    };
+
+    keyCircle.attr = function(str, val){
+      if (str == "r") radius = val;
+      attrs.push({
+        attr: isString(str) ? str : null,
+        value: val
+      });
+
+      return keyCircle;
+    };
+
+    keyCircle.styles = function(){
+      return styles;
+    };
+
+    keyCircle.draw = function(){
+      if (!svg){
+        svg = selection$$1.append("svg")
+            .attr("width", width + marginLeft + marginRight)
+            .attr("height", height + marginTop + marginBottom)
+          .append("g")
+            .attr("transform", "translate(" + marginLeft + ", " + marginTop + ")");
+      }
+
+      var styles_obj = {};
+      styles.forEach(function(style){
+        styles_obj[style.style] = style.value;
+      });
+
+      var attrs_obj = {};
+      attrs.forEach(function(attr){
+        attrs_obj[attr.attr] = attr.value;
+      });
+      attrs_obj.r = radius;
+
+      var stroke = Object.keys(styles_obj).indexOf("stroke") === -1 ? 0 : Object.keys(styles_obj).indexOf("stroke-width") === -1 ? 1 : styles_obj["stroke-width"];
+      attrs_obj.cx = orientation == "vertical" ? radius + stroke : function(d){ return scale(d) + radius + stroke; };
+      attrs_obj.cy = orientation == "vertical" ? function(d){ return scale(d) + radius + stroke; } : radius + stroke;
+
+      circles = svg.selectAll(".key-circle")
+          .data(data, function(d, i){ return i; });
+
+      circles.enter().append("circle")
+          .attr("class", function(d, i){ return "key-circle key-circle-" + i; })
+        .merge(circles)
+          .attrs(attrs_obj)
+          .styles(styles_obj);
+
+      var txt = svg.selectAll(".key-label")
+          .data(data, function(d, i){ return i; });
+
+      txt.enter().append("text")
+          .attr("class", function(d, i){ return "key-label key-label-" + i; })
+        .merge(txt)
+          .attr("x", orientation == "vertical" ? (radius * 2) + (stroke * 2) + labelLeft : function(d){ return scale(d) + (radius * 2) + (stroke * 2) + labelLeft; })
+          .attr("y", orientation == "vertical" ? function(d){ return scale(d) + radius + stroke + labelTop; } : radius + stroke + labelTop)
+          .attr("dy", ".3em")
+          .text(function(d, i){ return labelText[i]; });
+
+      return keyCircle;
+    };
+
+    return keyCircle;
+  })();
+
   function isObject(obj) {
     return !!obj && typeof obj == "object" && !Array.isArray(obj);
   }
@@ -7323,17 +7675,27 @@
         from = null;
 
     function schemeCategorical(d, i, els){
-      var match = data
-        .filter(function(row){ 
-          return row.swiftmap.key == d.properties.swiftmap.key;
-        })
-        .map(from)[0] || undefined;
+      var output;
 
-      var output = toOther;
+      // Use in maps.
+      if (isObject(d)){
+        var match = data
+          .filter(function(row){ 
+            return row.swiftmap.key == d.properties.swiftmap.key;
+          })
+          .map(from)[0] || undefined;
+
+        output = toOther;
       
-      Object.keys(to).forEach(function(key){
-        if (match == key) output = to[key];
-      });
+        Object.keys(to).forEach(function(key){
+          if (match == key) output = to[key];
+        });
+      }
+
+      // Use in legends.
+      else {
+        output = to[Object.keys(to).filter(function(f){ return f == d; })[0]] || toOther;
+      }
       
       return output;
     }
@@ -7702,6 +8064,7 @@
   }
 
   exports.map = map$3;
+  exports.keyCircle = keyCircle;
   exports.schemeCategorical = schemeCategorical;
   exports.schemeContinuous = schemeContinuous;
   exports.schemeSequential = schemeSequential;

@@ -6,10 +6,15 @@
         margin: 0;
         font-family: "Helvetica Neue", sans-serif;
       }
-      #legend {
+      #key {
         position: absolute;
         background: rgba(255, 255, 255, .8);
         padding: 10px;
+        font-size: .8em;
+      }
+      #key .key-title {
+        font-weight: bold;
+        margin-bottom: 10px;
       }
       #map {
         width: 100%;
@@ -18,16 +23,19 @@
     </style>
   </head>
   <body>
-    <div id="legend">
-      <b>Select</b><br />
+    <div id="key">
+      <div class="key-title">Key</div>
+      <div id="key-circle"></div>
       <input type="radio" name="property" value="students" checked /> Total students<br />
       <input type="radio" name="property" value="student_teacher_ratio" /> Students per teacher
+      
     </div>
     <div id="map"></div>
 
     <script src="../d3.v4.min.js"></script>
+    <script src="../d3-selection-multi.v1.min.js"></script>
+    <script src="../jeezy.min.js"></script>
     <script src="../../dist/swiftmap.js"></script>
-
     <script>
       // Create the map.
       var map = swiftmap.map("#map");
@@ -58,6 +66,19 @@
           "FALSE": .4
         });
 
+      swiftmap.keyCircle("#key-circle")
+        .data(["TRUE", "FALSE"])
+        .labelText(["Urgent", "Not urgent"])
+        .labelTop(1)
+        .marginLeft(2)
+        .marginBottom(5)
+        .height(40)
+        .orientation("vertical")
+        .attr("r", 6)
+        .style("stroke", schemeStroke)
+        .style("fill", schemeFill)
+        .draw();
+
       d3.queue()
         .defer(d3.json, "delhi_1997-2012_district.json") // polygons data
         .defer(d3.json, "new_schools.json") // points data
@@ -75,7 +96,7 @@
         // Add tiles and geospatial data to your map.
         // Then draw the polygons and bubbles.
         map
-          .tiles("cartoLight")
+          .tiles("stamenTerrainNoLabels")
           .layerPolygons(districts)
             .fit()
             .drawBoundary()

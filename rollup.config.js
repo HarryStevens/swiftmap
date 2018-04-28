@@ -18,6 +18,7 @@ export default {
       "d3-interpolate": "d3",
       "d3-scale": "d3",
       "d3-selection": "d3",
+      "d3-selection-multi": "d3",
       "d3-tile": "d3",
       "d3-time": "d3",
       "d3-time-format": "d3",
@@ -27,7 +28,7 @@ export default {
   },
   plugins: [
     resolve({
-    	only: ["d3-array", "d3-collection", "d3-color", "d3-dispatch", "d3-ease", "d3-format", "d3-geo", "d3-interpolate", "d3-scale", "d3-selection", "d3-tile", "d3-time", "d3-time-format", "d3-timer", "d3-transition"]
+    	only: ["d3-array", "d3-collection", "d3-color", "d3-dispatch", "d3-ease", "d3-format", "d3-geo", "d3-interpolate", "d3-scale", "d3-selection", "d3-selection-multi", "d3-tile", "d3-time", "d3-time-format", "d3-timer", "d3-transition"]
     }),
     commonjs({
     	include: "node_modules/**"
