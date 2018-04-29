@@ -27,7 +27,16 @@ export default function resize() {
   var path = swiftmap.path;
 
   swiftmap.svg.selectAll("path").attr("d", path);
-  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; });
+  function getCoordinates(d){
+    return projection(d.geometry.coordinates);
+  }
+  function getCentroid(d){
+    return path.centroid(d);
+  }
+  function getPoints(d){
+    return fit_layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
+  }
   swiftmap.svg.selectAll("circle.point")
       .attr("cx", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
       .attr("cy", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });

@@ -36,10 +36,20 @@ export default function fit(layer) {
 
   // make sure all classes are updated
   var projection = swiftmap.meta.projection.function;
-  var path = swiftmap.path.projection(swiftmap.meta.projection.function);
+  swiftmap.path.projection(swiftmap.meta.projection.function);
+  var path = swiftmap.path;
   
   swiftmap.svg.selectAll("path").attr("d", path);
-  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; });
+  function getCoordinates(d){
+    return projection(d.geometry.coordinates);
+  }
+  function getCentroid(d){
+    return path.centroid(d);
+  }
+  function getPoints(d){
+    return curr_layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
+  }
   swiftmap.svg.selectAll("circle.point")
       .attr("cx", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
       .attr("cy", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });

@@ -21,7 +21,10 @@
       #map .boundary.boundary-1 {
         stroke-width: 2px;
       }
-      #map .label {
+      #map .label.label-0 {
+        fill: #888;
+      }
+      #map .label.label-2 {
         text-shadow: 1px 1px 1px #fcfcfc, 1px 1px 1px #eee, 0 -1px 0 #fff, -1px 0 0 #fff;
       }
       #map .label, #map .point {
@@ -33,12 +36,6 @@
     <div id="map"></div>
 
     <!-- D3 modules for d3-request and d3-queue -->
-    <!-- <script src="https://d3js.org/d3-collection.v1.min.js"></script>
-    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
-    <script src="https://d3js.org/d3-dsv.v1.min.js"></script>
-    <script src="https://d3js.org/d3-request.v1.min.js"></script>
-    <script src="https://d3js.org/d3-queue.v3.min.js"></script> -->
-
     <script src="../d3.v4.min.js"></script>
     <script src="../../dist/swiftmap.js"></script>
     <script>
@@ -69,11 +66,12 @@
           .layerPolygons(india)
             .drawPolygons()
             .drawBoundary()
+            .drawLabels(d => d.properties.ST_NM.toUpperCase())
           .layerPolygons(karnataka, d => d.properties.ac_no)
             .draw()
           .layerPoints(karnataka)
             .drawPoints()
-            .drawLabels(d => d.properties.name);
+            .drawLabels(d => d.properties.name, true);
 
         map.layers[1].polygons
             .style("fill", scheme);

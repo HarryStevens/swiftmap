@@ -1,4 +1,4 @@
-// https://github.com/HarryStevens/swiftmap#readme Version 0.2.5. Copyright 2018 Harry Stevens.
+// https://github.com/HarryStevens/swiftmap#readme Version 0.2.6. Copyright 2018 Harry Stevens.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -4598,7 +4598,7 @@
   var atan2 = Math.atan2;
   var cos = Math.cos;
   var exp = Math.exp;
-  var log$2 = Math.log;
+  var log$1 = Math.log;
   var sin = Math.sin;
   var sign = Math.sign || function(x) { return x > 0 ? 1 : x < 0 ? -1 : 0; };
   var sqrt$1 = Math.sqrt;
@@ -6507,7 +6507,7 @@
   }
 
   function mercatorRaw(lambda, phi) {
-    return [lambda, log$2(tan((halfPi$1 + phi) / 2))];
+    return [lambda, log$1(tan((halfPi$1 + phi) / 2))];
   }
 
   mercatorRaw.invert = function(x, y) {
@@ -7151,8 +7151,16 @@
     return this;
   }
 
+  function isBoolean(bool){
+    return !!bool && typeof(bool) == typeof(true);
+  }
+
+  function isObject(obj) {
+    return !!obj && typeof obj == "object" && !Array.isArray(obj);
+  }
+
   // Draws text labels to a layer.
-  function drawLabels(key, layer) {
+  function drawLabels(key, offset, layer) {
     // Check for geospatial data.
     if (Object.keys(this.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.layerPoints() before you can draw labels.");
@@ -7172,9 +7180,13 @@
     }
 
     var width = this.width,
+        path = this.path,
         projection = this.meta.projection.function,
         layer_name = layer || this.meta.last_layer,
         layer = this.layers[layer_name];
+
+    // Determine the offset.
+    offset = !isBoolean(offset) ? false : offset;
 
     // TODO
     // Use the CSS selector of the labels to get the font size,
@@ -7186,13 +7198,23 @@
           .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
         .enter().append("text")
           .attr("class", "label label-" + layer_name)
-          .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
-          .attr("x", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? -6 : 6; })
+          .attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; })
+          .attr("x", function(d) { return offset ? getPoints(d)[0] <= width / 2 ? -6 : 6 : 0; })
           .attr("font-size", ".8em")
           .attr("dy", ".3em")
           .attr("font-family", "sans-serif")
-          .style("text-anchor", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? "end" : "start"; })
+          .style("text-anchor", function(d) { return offset ? getPoints(d)[0] <= width / 2 ? "end" : "start" : "middle"; })
           .text(key);
+
+      function getCoordinates(d){
+        return projection(d.geometry.coordinates);
+      }
+      function getCentroid(d){
+        return path.centroid(d);
+      }
+      function getPoints(d){
+        return layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
+      }
     }
 
     else {
@@ -7329,7 +7351,7 @@
     var tiles_element = swiftmap.svg.selectAll(".tile")
         .data(tiles(), function(d, i){ return i; });
     
-    tiles_element.exit().remove();  
+    tiles_element.exit().remove();
 
     tiles_element.enter().append("image")
         .attr("class", "tile")
@@ -7377,10 +7399,20 @@
 
     // make sure all classes are updated
     var projection = swiftmap.meta.projection.function;
-    var path = swiftmap.path.projection(swiftmap.meta.projection.function);
+    swiftmap.path.projection(swiftmap.meta.projection.function);
+    var path = swiftmap.path;
     
     swiftmap.svg.selectAll("path").attr("d", path);
-    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; });
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; });
+    function getCoordinates(d){
+      return projection(d.geometry.coordinates);
+    }
+    function getCentroid(d){
+      return path.centroid(d);
+    }
+    function getPoints(d){
+      return curr_layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
+    }
     swiftmap.svg.selectAll("circle.point")
         .attr("cx", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
         .attr("cy", function(d) { return curr_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
@@ -7419,7 +7451,16 @@
     var path = swiftmap.path;
 
     swiftmap.svg.selectAll("path").attr("d", path);
-    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + projection$$1(d.geometry.coordinates) + ")"; });
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; });
+    function getCoordinates(d){
+      return projection$$1(d.geometry.coordinates);
+    }
+    function getCentroid(d){
+      return path.centroid(d);
+    }
+    function getPoints(d){
+      return fit_layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
+    }
     swiftmap.svg.selectAll("circle.point")
         .attr("cx", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[0] : projection$$1(d.geometry.coordinates)[0]; })
         .attr("cy", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[1] : projection$$1(d.geometry.coordinates)[1]; });
@@ -7490,7 +7531,7 @@
     return !!arr && Array.isArray(arr);
   }
 
-  var keyCircle = (function(){
+  var keyCategorical = (function(){
   	var marginTop = 0,
         marginBottom = 0,
         marginLeft = 0,
@@ -7503,119 +7544,137 @@
         orientation = "horizontal",
         circles = null,
         labelLeft = 5,
-        labelTop = 0,
+        labelTop = 1,
         data = [],
         styles = [],
         attrs = [],
-        radius = 5,
+        radius = 6,
         labelText = [],
+        labelFormat = function(d){ return d; },
+        shape = "rect",
         scale = band().rangeRound([0, orientation == "horizontal" ? width : height]).domain(data);
 
-    function keyCircle(str, arr){
+    function keyCategorical(str){
       parent = isString(str) ? str : "body";
       selection$$1 = select(parent);
       width = +jz.str.keepNumber(selection$$1.style("width")) - marginLeft - marginRight;
       height = +jz.str.keepNumber(selection$$1.style("height")) - marginTop - marginBottom;
-      return arguments.length ? (keyCircle) : parent;
+      return keyCategorical;
     }
 
-    keyCircle.orientation = function(str){
+    keyCategorical.shape = function(str){
+      return arguments.length ? (shape = isString(str) ? str : shape, keyCategorical) : shape;
+    };
+
+    keyCategorical.orientation = function(str){
       orientation = isString(str) && (str.toLowerCase() == "horizontal" || str.toLowerCase() == "vertical") ? str : orientation;
       scale.rangeRound([0, orientation == "horizontal" ? width : height]);
-      return arguments.length ? (keyCircle) : orientation;
+      return arguments.length ? keyCategorical : orientation;
     };
 
-    keyCircle.marginTop = function(num){
+    keyCategorical.marginTop = function(num){
       marginTop = isNumber(num) ? num : marginTop;
-      keyCircle.height();
-      return arguments.length ? (keyCircle) : marginTop;
+      keyCategorical.height();
+      return arguments.length ? keyCategorical : marginTop;
     };
 
-    keyCircle.marginBottom = function(num){
+    keyCategorical.marginBottom = function(num){
       marginBottom = isNumber(num) ? num : marginBottom;
-      keyCircle.height();
-      return arguments.length ? (keyCircle) : marginBottom;
+      keyCategorical.height();
+      return arguments.length ? keyCategorical : marginBottom;
     };
 
-    keyCircle.height = function(num){
+    keyCategorical.height = function(num){
       height = isNumber(num) ? num - marginTop - marginBottom : height;
       scale.rangeRound([0, orientation == "horizontal" ? width : height]);
-      return arguments.length ? (keyCircle) : height;
+      return arguments.length ? keyCategorical : height;
     };
 
-    keyCircle.marginLeft = function(num){
+    keyCategorical.marginLeft = function(num){
       marginLeft = isNumber(num) ? num : marginLeft;
-      keyCircle.width();
-      return arguments.length ? (keyCircle) : marginLeft;
+      keyCategorical.width();
+      return arguments.length ? keyCategorical : marginLeft;
     };
 
-    keyCircle.marginRight = function(num){
+    keyCategorical.marginRight = function(num){
       marginRight = isNumber(num) ? num : marginRight;
-      keyCircle.width();
-      return arguments.length ? (keyCircle) : marginRight;
+      keyCategorical.width();
+      return arguments.length ? keyCategorical : marginRight;
     };
 
-    keyCircle.width = function(num){
+    keyCategorical.width = function(num){
       width = isNumber(num) ? num - marginLeft - marginRight : width;
       scale.rangeRound([0, orientation == "horizontal" ? width : height]);
-      return arguments.length ? (keyCircle) : width;
+      return arguments.length ? keyCategorical : width;
     };
 
-    keyCircle.radius = function(num){
-      radius = isNumber(num) ? num : radius;
-      return arguments.length ? (keyCircle) : radius;
+    keyCategorical.radius = function(num){
+      return arguments.length ? (radius = isNumber(num) ? num : radius, keyCategorical) : radius;
     };
 
-    keyCircle.data = function(arr){
+    keyCategorical.data = function(arr){
       data = isArray(arr) ? arr : data;
       labelText = data;
       scale.domain(data);
-      return arguments.length ? (keyCircle) : data;
+      return arguments.length ? (keyCategorical) : data;
     };
 
-    keyCircle.circles = function(){
+    keyCategorical.circles = function(){
       return circles;
     };
 
-    keyCircle.labelText = function(arr){
-      labelText = isArray(arr) ? arr : labelText;
-      return arguments.length ? (keyCircle) : labelText;
+    keyCategorical.labelText = function(arr){
+      return arguments.length ? (labelText = isArray(arr) ? arr : labelText, keyCategorical) : labelText;
     };
 
-    keyCircle.labelLeft = function(num){
-      labelLeft = isNumber(num) ? num : labelLeft;
-      return arguments.length ? (keyCircle) : labelLeft;
+    keyCategorical.labelText = function(arr){
+      return arguments.length ? (labelText = isArray(arr) ? arr : labelText, keyCategorical) : labelText;
     };
 
-    keyCircle.labelTop = function(num){
-      labelTop = isNumber(num) ? num : labelTop;
-      return arguments.length ? (keyCircle) : labelTop;
+    keyCategorical.labelFormat = function(fn){
+      return arguments.length ? (labelFormat = isFunction(fn) ? fn : labelFormat, keyCategorical) : labelFormat;
     };
 
-    keyCircle.style = function(str, val){
+    keyCategorical.labelLeft = function(num){
+      return arguments.length ? (labelLeft = isNumber(num) ? num : labelLeft, keyCategorical) : labelLeft;
+    };
+
+    keyCategorical.labelTop = function(num){
+      return arguments.length ? (labelTop = isNumber(num) ? num : labelTop, keyCategorical) : labelTop;
+    };
+
+    keyCategorical.parent = function(){
+      return parent;
+    };
+
+    keyCategorical.svg = function(){
+      return svg;
+    };
+
+    keyCategorical.style = function(str, val){
       styles.push({
         style: isString(str) ? str : null,
         value: val
       });
 
-      return keyCircle;
+      return keyCategorical;
     };
 
-    keyCircle.attr = function(str, val){
+    keyCategorical.attr = function(str, val){
       if (str == "r") radius = val;
       attrs.push({
         attr: isString(str) ? str : null,
         value: val
       });
 
-      return keyCircle;
+      return keyCategorical;
     };
 
-    keyCircle.styles = function(){
+    keyCategorical.styles = function(){
       return styles;
     };
 
-    keyCircle.draw = function(){
+    keyCategorical.draw = function(){
       if (!svg){
         svg = selection$$1.append("svg")
             .attr("width", width + marginLeft + marginRight)
@@ -7642,7 +7701,7 @@
       circles = svg.selectAll(".key-circle")
           .data(data, function(d, i){ return i; });
 
-      circles.enter().append("circle")
+      circles.enter().append(shape)
           .attr("class", function(d, i){ return "key-circle key-circle-" + i; })
         .merge(circles)
           .attrs(attrs_obj)
@@ -7657,82 +7716,16 @@
           .attr("x", orientation == "vertical" ? (radius * 2) + (stroke * 2) + labelLeft : function(d){ return scale(d) + (radius * 2) + (stroke * 2) + labelLeft; })
           .attr("y", orientation == "vertical" ? function(d){ return scale(d) + radius + stroke + labelTop; } : radius + stroke + labelTop)
           .attr("dy", ".3em")
-          .text(function(d, i){ return labelText[i]; });
+          .text(labelFormat);
 
-      return keyCircle;
+      return keyCategorical;
     };
 
-    return keyCircle;
+    return keyCategorical;
   })();
 
-  function isObject(obj) {
-    return !!obj && typeof obj == "object" && !Array.isArray(obj);
-  }
-
-  function schemeCategorical(){
-    var data = [],
-        to = null,
-        toOther = null,
-        from = null;
-
-    function schemeCategorical(d, i, els){
-      var output;
-
-      // Use in maps.
-      if (isObject(d)){
-        var match = data
-          .filter(function(row){ 
-            return row.swiftmap.key == d.properties.swiftmap.key;
-          })
-          .map(from)[0] || undefined;
-
-        output = toOther;
-      
-        Object.keys(to).forEach(function(key){
-          if (match == key) output = to[key];
-        });
-      }
-
-      // Use in legends.
-      else {
-        output = to[Object.keys(to).filter(function(f){ return f == d; })[0]] || toOther;
-      }
-      
-      return output;
-    }
-
-    schemeCategorical.data = function(array, key){
-      if (arguments.length){
-        if (isArray(array)){
-          array.forEach(function(d, i, data){
-            d.swiftmap = {};
-            d.swiftmap.key = isFunction(key) ? key(d, i, data) : i;
-            return d;
-          });
-          data = array;
-        }
-
-        return (schemeCategorical);
-      } 
-
-      else {
-        return data;
-      }
-    };
-
-    schemeCategorical.from = function(mapper){
-      return arguments.length ? (from = isFunction(mapper) ? mapper : from, schemeCategorical) : from;
-    };
-
-    schemeCategorical.to = function(obj){
-      return arguments.length ? (to = isObject(obj) ? obj : to, schemeCategorical) : to;
-    };
-
-    schemeCategorical.toOther = function(string){
-      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeCategorical) : toOther;
-    };
-
-    return schemeCategorical;
+  function isScheme(scheme){
+    return isFunction(scheme) && scheme.name == "schemeCategorical" || scheme.name == "schemeContinuous" || scheme.name == "schemeSequential";
   }
 
   function analyze(data) {
@@ -7800,11 +7793,11 @@
       if (min <= 0) {
         throw 'Logarithmic scales are only possible for values > 0';
       }
-      min_log = Math.LOG10E * log(min);
-      max_log = Math.LOG10E * log(max);
+      min_log = Math.LOG10E * Math.log(min);
+      max_log = Math.LOG10E * Math.log(max);
       limits.push(min);
       for (i = w = 1, ref1 = num - 1; 1 <= ref1 ? w <= ref1 : w >= ref1; i = 1 <= ref1 ? ++w : --w) {
-        limits.push(pow(10, min_log + (i / num) * (max_log - min_log)));
+        limits.push(Math.pow(10, min_log + (i / num) * (max_log - min_log)));
       }
       limits.push(max);
     } else if (mode.substr(0, 1) === 'q') {
@@ -7909,6 +7902,202 @@
       }
     }
     return limits;
+  }
+
+  var keyNested = (function(){
+    var marginTop = 5,
+        marginBottom = 0,
+        marginLeft = 0,
+        marginRight = 0,
+        scheme = null,
+        parent = null,
+        selection$$1 = null,
+        width = null,
+        height = null,
+        svg = null,
+        circleCount = 3,
+        labelFormat = function(d){ return d; };
+    
+    function keyNested(str){
+      parent = isString(str) ? str : "body";
+      selection$$1 = select(parent);
+      width = +jz.str.keepNumber(selection$$1.style("width")) - marginLeft - marginRight;
+      height = +jz.str.keepNumber(selection$$1.style("height")) - marginTop - marginBottom;
+      return keyNested;
+    }
+
+    keyNested.marginTop = function(num){
+      marginTop = isNumber(num) ? num : marginTop;
+      keyNested.height();
+      return arguments.length ? keyNested : marginTop;
+    };
+
+    keyNested.marginBottom = function(num){
+      marginBottom = isNumber(num) ? num : marginBottom;
+      keyNested.height();
+      return arguments.length ? keyNested : marginBottom;
+    };
+
+    keyNested.height = function(num){
+      return arguments.length ? (height = isNumber(num) ? num - marginTop - marginBottom : height, keyNested) : height;
+    };
+
+    keyNested.marginLeft = function(num){
+      marginLeft = isNumber(num) ? num : marginLeft;
+      keyNested.width();
+      return arguments.length ? keyNested : marginLeft;
+    };
+
+    keyNested.marginRight = function(num){
+      marginRight = isNumber(num) ? num : marginRight;
+      keyNested.width();
+      return arguments.length ? keyNested : marginRight;
+    };
+
+    keyNested.width = function(num){
+      return arguments.length ? (width = isNumber(num) ? num - marginLeft - marginRight : width, keyNested) : width;
+    };        
+
+    keyNested.scheme = function(sch){
+      return arguments.length ? (scheme = isScheme(sch) ? sch : scheme, keyNested) : scheme;
+    };
+
+    keyNested.circleCount = function(num){
+      return arguments.length ? (circleCount = isNumber(num) ? num : circleCount, keyNested) : circleCount;
+    };
+
+    keyNested.labelFormat = function(fn){
+      return arguments.length ? (labelFormat = isFunction(fn) ? fn : labelFormat, keyNested) : labelFormat;
+    };
+
+    keyNested.parent = function(){
+      return parent;
+    };
+
+    keyNested.svg = function(){
+      return svg;
+    };
+
+    keyNested.draw = function(){
+      if (!svg){
+        svg = selection$$1.append("svg")
+            .attr("width", width + marginLeft + marginRight)
+            .attr("height", height + marginTop + marginBottom)
+          .append("g")
+            .attr("transform", "translate(" + marginLeft + ", " + marginTop + ")");
+      }
+
+      var dataBreaks = limits(scheme.data().map(scheme.from()), "q", circleCount - 1);
+      var circleBreaks = limits(scheme.to(), "q", circleCount - 1);
+      var maxData = dataBreaks[dataBreaks.length - 1];
+      var scale = linear$2()
+          .range(circleBreaks)
+          .domain(dataBreaks);
+
+      var legend_text_left_pad = 8;
+      
+      var legend_circle = svg.selectAll(".legend-circle")
+          .data(dataBreaks)
+        .enter().append("circle")
+          .attr("class", "legend-circle")
+          .attr("cy", function(d){ return scale(d) + 1; })
+          .attr("cx", scale(maxData) + 1)
+          .attr("r", function(d){ return scale(d); });
+
+      var legend_dotted_line = svg.selectAll(".legend-dotted-line")
+          .data(dataBreaks)
+        .enter().append("line")
+          .attr("class", "legend-dotted-line")
+          .attr("x1", scale(maxData) + 1)
+          .attr("x2", scale(maxData) * 2 + legend_text_left_pad)
+          .attr("y1", function(d){ return scale(d) * 2 + 1; })
+          .attr("y2", function(d){ return scale(d) * 2 + 1; });
+
+      var legend_number = svg.selectAll(".legend-number")
+          .data(dataBreaks);
+      
+      legend_number.enter().append("text")
+          .attr("class", "legend-number")
+          .attr("x", scale(maxData) * 2 + legend_text_left_pad)
+          .attr("y", function(d){ return scale(d) * 2; })
+          .attr("dy", ".38em")
+        .merge(legend_number)
+          .text(labelFormat);
+
+      return keyNested;
+    };
+
+    return keyNested;
+  })();
+
+  function schemeCategorical(){
+    var data = [],
+        to = null,
+        toOther = null,
+        from = null;
+
+    function schemeCategorical(d, i, els){
+      var output;
+
+      // Use in maps.
+      if (isObject(d)){
+        // Should I use this?
+        if (!d.properties.swiftmap.schemes) d.properties.swiftmap.schemes = [];
+        d.properties.swiftmap.schemes.push(schemeCategorical);
+          
+        var match = data
+          .filter(function(row){ 
+            return row.swiftmap.key == d.properties.swiftmap.key;
+          })
+          .map(from)[0] || undefined;
+
+        output = toOther;
+      
+        Object.keys(to).forEach(function(key){
+          if (match == key) output = to[key];
+        });
+      }
+
+      // Use in legends.
+      else {
+        output = to[Object.keys(to).filter(function(f){ return f == d; })[0]] || toOther;
+      }
+      
+      return output;
+    }
+
+    schemeCategorical.data = function(array, key){
+      if (arguments.length){
+        if (isArray(array)){
+          array.forEach(function(d, i, data){
+            d.swiftmap = {};
+            d.swiftmap.key = isFunction(key) ? key(d, i, data) : i;
+            return d;
+          });
+          data = array;
+        }
+
+        return (schemeCategorical);
+      } 
+
+      else {
+        return data;
+      }
+    };
+
+    schemeCategorical.from = function(mapper){
+      return arguments.length ? (from = isFunction(mapper) ? mapper : from, schemeCategorical) : from;
+    };
+
+    schemeCategorical.to = function(obj){
+      return arguments.length ? (to = isObject(obj) ? obj : to, schemeCategorical) : to;
+    };
+
+    schemeCategorical.toOther = function(string){
+      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeCategorical) : toOther;
+    };
+
+    return schemeCategorical;
   }
 
   function schemeContinuous(){
@@ -8065,7 +8254,8 @@
   }
 
   exports.map = map$3;
-  exports.keyCircle = keyCircle;
+  exports.keyCategorical = keyCategorical;
+  exports.keyNested = keyNested;
   exports.schemeCategorical = schemeCategorical;
   exports.schemeContinuous = schemeContinuous;
   exports.schemeSequential = schemeSequential;

@@ -18,120 +18,138 @@ export default (function(){
       circles = null,
       labels = null,
       labelLeft = 5,
-      labelTop = 0,
+      labelTop = 1,
       data = [],
       styles = [],
       attrs = [],
-      radius = 5,
+      radius = 6,
       labelText = [],
+      labelFormat = function(d){ return d; },
       text = null,
+      shape = "rect",
       scale = d3.scaleBand().rangeRound([0, orientation == "horizontal" ? width : height]).domain(data);
 
-  function keyCircle(str, arr){
+  function keyCategorical(str){
     parent = isString(str) ? str : "body";
     selection = d3.select(parent);
     width = +jz.str.keepNumber(selection.style("width")) - marginLeft - marginRight;
     height = +jz.str.keepNumber(selection.style("height")) - marginTop - marginBottom;
-    return arguments.length ? (parent, keyCircle) : parent;
+    return keyCategorical;
   }
 
-  keyCircle.orientation = function(str){
+  keyCategorical.shape = function(str){
+    return arguments.length ? (shape = isString(str) ? str : shape, keyCategorical) : shape;
+  }
+
+  keyCategorical.orientation = function(str){
     orientation = isString(str) && (str.toLowerCase() == "horizontal" || str.toLowerCase() == "vertical") ? str : orientation;
     scale.rangeRound([0, orientation == "horizontal" ? width : height]);
-    return arguments.length ? (orientation, keyCircle) : orientation;
+    return arguments.length ? keyCategorical : orientation;
   }
 
-  keyCircle.marginTop = function(num){
+  keyCategorical.marginTop = function(num){
     marginTop = isNumber(num) ? num : marginTop;
-    keyCircle.height();
-    return arguments.length ? (marginTop, keyCircle) : marginTop;
+    keyCategorical.height();
+    return arguments.length ? keyCategorical : marginTop;
   }
 
-  keyCircle.marginBottom = function(num){
+  keyCategorical.marginBottom = function(num){
     marginBottom = isNumber(num) ? num : marginBottom;
-    keyCircle.height();
-    return arguments.length ? (marginBottom, keyCircle) : marginBottom;
+    keyCategorical.height();
+    return arguments.length ? keyCategorical : marginBottom;
   }
 
-  keyCircle.height = function(num){
+  keyCategorical.height = function(num){
     height = isNumber(num) ? num - marginTop - marginBottom : height;
     scale.rangeRound([0, orientation == "horizontal" ? width : height]);
-    return arguments.length ? (height, keyCircle) : height;
+    return arguments.length ? keyCategorical : height;
   }
 
-  keyCircle.marginLeft = function(num){
+  keyCategorical.marginLeft = function(num){
     marginLeft = isNumber(num) ? num : marginLeft;
-    keyCircle.width();
-    return arguments.length ? (marginLeft, keyCircle) : marginLeft;
+    keyCategorical.width();
+    return arguments.length ? keyCategorical : marginLeft;
   }
 
-  keyCircle.marginRight = function(num){
+  keyCategorical.marginRight = function(num){
     marginRight = isNumber(num) ? num : marginRight;
-    keyCircle.width();
-    return arguments.length ? (marginRight, keyCircle) : marginRight;
+    keyCategorical.width();
+    return arguments.length ? keyCategorical : marginRight;
   }
 
-  keyCircle.width = function(num){
+  keyCategorical.width = function(num){
     width = isNumber(num) ? num - marginLeft - marginRight : width;
     scale.rangeRound([0, orientation == "horizontal" ? width : height]);
-    return arguments.length ? (width, keyCircle) : width;
+    return arguments.length ? keyCategorical : width;
   }
 
-  keyCircle.radius = function(num){
-    radius = isNumber(num) ? num : radius;
-    return arguments.length ? (radius, keyCircle) : radius;
+  keyCategorical.radius = function(num){
+    return arguments.length ? (radius = isNumber(num) ? num : radius, keyCategorical) : radius;
   }
 
-  keyCircle.data = function(arr){
+  keyCategorical.data = function(arr){
     data = isArray(arr) ? arr : data;
     labelText = data;
     scale.domain(data);
-    return arguments.length ? (data, keyCircle) : data;
+    return arguments.length ? (data, keyCategorical) : data;
   }
 
-  keyCircle.circles = function(){
+  keyCategorical.circles = function(){
     return circles;
   }
 
-  keyCircle.labelText = function(arr){
-    labelText = isArray(arr) ? arr : labelText;
-    return arguments.length ? (labelText, keyCircle) : labelText;
+  keyCategorical.labelText = function(arr){
+    return arguments.length ? (labelText = isArray(arr) ? arr : labelText, keyCategorical) : labelText;
   }
 
-  keyCircle.labelLeft = function(num){
-    labelLeft = isNumber(num) ? num : labelLeft;
-    return arguments.length ? (labelLeft, keyCircle) : labelLeft;
+  keyCategorical.labelText = function(arr){
+    return arguments.length ? (labelText = isArray(arr) ? arr : labelText, keyCategorical) : labelText;
   }
 
-  keyCircle.labelTop = function(num){
-    labelTop = isNumber(num) ? num : labelTop;
-    return arguments.length ? (labelTop, keyCircle) : labelTop;
+  keyCategorical.labelFormat = function(fn){
+    return arguments.length ? (labelFormat = isFunction(fn) ? fn : labelFormat, keyCategorical) : labelFormat;
   }
 
-  keyCircle.style = function(str, val){
+  keyCategorical.labelLeft = function(num){
+    return arguments.length ? (labelLeft = isNumber(num) ? num : labelLeft, keyCategorical) : labelLeft;
+  }
+
+  keyCategorical.labelTop = function(num){
+    return arguments.length ? (labelTop = isNumber(num) ? num : labelTop, keyCategorical) : labelTop;
+  }
+
+  keyCategorical.parent = function(){
+    return parent;
+  }
+
+  keyCategorical.svg = function(){
+    return svg;
+  }
+
+  keyCategorical.style = function(str, val){
     styles.push({
       style: isString(str) ? str : null,
       value: val
     });
 
-    return keyCircle;
+    return keyCategorical;
   }
 
-  keyCircle.attr = function(str, val){
+  keyCategorical.attr = function(str, val){
     if (str == "r") radius = val;
     attrs.push({
       attr: isString(str) ? str : null,
       value: val
     });
 
-    return keyCircle;
+    return keyCategorical;
   }
 
-  keyCircle.styles = function(){
+  keyCategorical.styles = function(){
     return styles;
   }
 
-  keyCircle.draw = function(){
+  keyCategorical.draw = function(){
     if (!svg){
       svg = selection.append("svg")
           .attr("width", width + marginLeft + marginRight)
@@ -158,7 +176,7 @@ export default (function(){
     circles = svg.selectAll(".key-circle")
         .data(data, function(d, i){ return i; });
 
-    circles.enter().append("circle")
+    circles.enter().append(shape)
         .attr("class", function(d, i){ return "key-circle key-circle-" + i; })
       .merge(circles)
         .attrs(attrs_obj)
@@ -173,10 +191,10 @@ export default (function(){
         .attr("x", orientation == "vertical" ? (radius * 2) + (stroke * 2) + labelLeft : function(d){ return scale(d) + (radius * 2) + (stroke * 2) + labelLeft; })
         .attr("y", orientation == "vertical" ? function(d){ return scale(d) + radius + stroke + labelTop; } : radius + stroke + labelTop)
         .attr("dy", ".3em")
-        .text(function(d, i){ return labelText[i]; });
+        .text(labelFormat);
 
-    return keyCircle;
+    return keyCategorical;
   }
 
-  return keyCircle;
+  return keyCategorical;
 })();

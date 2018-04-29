@@ -1,9 +1,11 @@
 import feature from "../../lib/topojson/feature";
-import isString from "../utils/isString";
+import isBoolean from "../utils/isBoolean";
 import isNumber from "../utils/isNumber";
+import isObject from "../utils/isObject";
+import isString from "../utils/isString";
 
 // Draws text labels to a layer.
-export default function drawLabels(key, layer) {
+export default function drawLabels(key, offset, layer) {
   // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
     console.error("You must pass TopoJSON data through swiftmap.layerPoints() before you can draw labels.");
@@ -23,9 +25,13 @@ export default function drawLabels(key, layer) {
   }
 
   var width = this.width,
+      path = this.path,
       projection = this.meta.projection.function,
       layer_name = layer || this.meta.last_layer,
       layer = this.layers[layer_name];
+
+  // Determine the offset.
+  offset = !isBoolean(offset) ? false : offset;
 
   // TODO
   // Use the CSS selector of the labels to get the font size,
@@ -37,13 +43,23 @@ export default function drawLabels(key, layer) {
         .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
       .enter().append("text")
         .attr("class", "label label-" + layer_name)
-        .attr("transform", function(d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
-        .attr("x", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? -6 : 6; })
+        .attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; })
+        .attr("x", function(d) { return offset ? getPoints(d)[0] <= width / 2 ? -6 : 6 : 0; })
         .attr("font-size", ".8em")
         .attr("dy", ".3em")
         .attr("font-family", "sans-serif")
-        .style("text-anchor", function(d) { return projection(d.geometry.coordinates)[0] <= width / 2 ? "end" : "start"; })
+        .style("text-anchor", function(d) { return offset ? getPoints(d)[0] <= width / 2 ? "end" : "start" : "middle"; })
         .text(key);
+
+    function getCoordinates(d){
+      return projection(d.geometry.coordinates);
+    }
+    function getCentroid(d){
+      return path.centroid(d);
+    }
+    function getPoints(d){
+      return layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
+    }
   }
 
   else {

@@ -108,7 +108,7 @@ You can specify a <i>tilesource</i> as a string to determine the style of raster
 - `"cartoLightLabels"` Carto light tiles' labels. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
 - `"cartoLightNoLabels"` Carto light tiles without labels. Copyright: Map tiles by [Carto](https://carto.com/location-data-services/basemaps/).
 - `"mapboxNaturalEarth"` Mapbox Natural Earth II. Copyright: Map tiles by [MapBox](http://a.tiles.mapbox.com/v3/mapbox.natural-earth-2/page.html).
-- `"openStreetMap"` Open Street Map tiles. Copyright: Tiles copyright [OpenStreetMap contributors](https://www.openstreetmap.org/copyright).
+- `"openStreetMap"` Open Street Map tiles. Copyright: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright).
 - `"stamenToner"` Stamen toner tiles. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
 - `"stamenTerrain"` Stamen terrain tiles. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
 - `"stamenTerrainLabels"` Stamen terrain tiles' labels. Copyright: Map tiles by [Stamen Design](http://stamen.com/), under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0). Data by [OpenStreetMap](http://openstreetmap.org/), under [ODbL](http://www.openstreetmap.org/copyright).
@@ -217,6 +217,29 @@ Draws a polygons layer's outer boundary. The boundary is rendered as an SVG `pat
 <i>layer</i><br />
 If <i>layer</i> is not specified, the boundary of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the boundary of the specified layer.
 
+<a name="layerPoints" href="#layerPoints">#</a> <i>map</i>.<b>layerPoints</b>([<i>data</i>][, <i>key</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/layerPoints.js "Source")
+
+Sets or gets a points layer. See [<i>map</i>.polygons()](#polygons) for descriptions of the arguments.
+
+<a name="drawLabels-polygons" href="#drawLabels-polygons">#</a> <i>polygons</i>.<b>drawLabels</b>(<i>key</i>[,<i>offset</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawLabels.js "Source")
+
+Labels the polygons at their centroid. Labels are rendered as SVG `text` elements, can be accessed as D3 selections via `map.layers.< layername >.labels`, and can be styled with the CSS class `.label` or `.label-< layername >` or both.
+
+<i>key</i><br />
+A <i>key</i> function tells Swiftmap how each datum should be labeled.
+
+```js
+var key = d => d.properties.name;
+
+map.drawLabels(key);
+```
+
+<i>offset</i><br />
+By default, labels are centered on the coordinates of the polygons' centroid. To offset the labels, you may specify the <i>offset</i> as `true`. If the polygons's centroid is on the left half of the map, the label will be placed to the left side of the point. If the polygons's centroid is on the right half of the map, the label will be placed to the right side of the point.
+
+<i>layer</i><br />
+If <i>layer</i> is not specified, the labels of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the labels of the specified layer.
+
 <a name="drawPoints-polygons" href="#drawPoints-polygons">#</a> <i>polygons</i>.<b>drawPoints</b>([<i>radius</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawPoints.js "Source")
 
 Draws points at the centroid of each polygon in a polygons layer. Points are rendered as SVG `circle` elements, can be accessed as D3 selections via `map.layers.< layername >.points`, and can be styled with the CSS class `.point` or `.point-< layername >` or both.
@@ -245,7 +268,7 @@ If <i>layer</i> is not specified, the most recently added layer will be fit to t
 
 Sets or gets a points layer. See [<i>map</i>.polygons()](#polygons) for descriptions of the arguments.
 
-<a name="drawLabels" href="#drawLabels">#</a> <i>points</i>.<b>drawLabels</b>(<i>key</i>[, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawLabels.js "Source")
+<a name="drawLabels-points" href="#drawLabels-points">#</a> <i>points</i>.<b>drawLabels</b>(<i>key</i>[,<i>offset</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawLabels.js "Source")
 
 Labels the points. Labels are rendered as SVG `text` elements, can be accessed as D3 selections via `map.layers.< layername >.labels`, and can be styled with the CSS class `.label` or `.label-< layername >` or both.
 
@@ -257,6 +280,9 @@ var key = d => d.properties.name;
 
 map.drawLabels(key);
 ```
+
+<i>offset</i><br />
+By default, labels are centered on the coordinates of the point. To offset the labels, you may specify the <i>offset</i> as `true`. If the label's point is on the left half of the map, the label will be placed to the left side of the point. If the label's point is on the right half of the map, the label will be placed to the right side of the point.
 
 <i>layer</i><br />
 If <i>layer</i> is not specified, the labels of the most recently added layer will be drawn by default. If you wish to change the default behavior, you may specify a <i>layer</i> as a string or a number corresponding to a layer that has already been added to the map, and Swiftmap will draw or redraw the labels of the specified layer.

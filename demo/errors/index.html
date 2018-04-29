@@ -4,114 +4,198 @@
     <style>
       body {
         margin: 0;
-        /*font-family: "Helvetica Neue", sans-serif;*/
+        font-family: "Helvetica Neue", sans-serif;
+      }
+      #key {
+        position: absolute;
+        background: rgba(255, 255, 255, .8);
+        padding: 10px;
+        font-size: .8em;
+        border-right: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+      }
+      #key .key-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      #key-nested {
+        margin: 8px auto 0px;
+        display: table;
       }
       #map {
         width: 100%;
         height: 100vh;
-        background: #1f78b4;
       }
-      #map .polygon.polygon-india {
-        fill: #fff;
-        stroke: #ddd;
-        stroke-dasharray: 5, 5;
+      .legend-circle {
+        fill: none;
+        stroke: #000;
       }
-      #map .boundary.boundary-india {
-        stroke: none;
-      }
-      #map .boundary.boundary-karnataka {
-        stroke-width: 2px;
-      }
-      #map .label.label-cities {
-        text-shadow: 1px 1px 1px #fcfcfc, 1px 1px 1px #eee, 0 -1px 0 #fff, -1px 0 0 #fff;
+      .legend-dotted-line {
+        stroke: #000;
+        stroke-dasharray: 2, 2;
+        shape-rendering: crispEdges;
       }
     </style>
   </head>
   <body>
+    <div id="key">
+      <div class="key-title">Key</div>
+      <div id="key-circle"></div>
+      <input type="radio" name="property" value="students" checked /> Total students<br />
+      <input type="radio" name="property" value="student_teacher_ratio" /> Students per teacher
+      <div id="key-nested"></div>
+    </div>
     <div id="map"></div>
-    <script src="../d3.v4.min.js"></script>
-    <script src="../../dist/swiftmap.js"></script>
-    <script>
 
+    <script src="../d3.v4.min.js"></script>
+    <script src="../d3-selection-multi.v1.min.js"></script>
+    <script src="../jeezy.min.js"></script>
+    <script src="../chroma.min.js"></script>
+    <script src="../../dist/swiftmap.js"></script>
+    
+    <script>
+      // Create the map.
       var map = swiftmap.map("#map");
 
-      var scheme = swiftmap.schemeCategorical()
-        .from(d => d.winner)
+      // Set up a scheme for each visual property.
+      var schemeRadius = swiftmap.schemeContinuous()
+        .from(d => +d.students)
+        .to([1, 20]);
+
+      var schemeFill = swiftmap.schemeCategorical()
+        .from(d => d.most_urgent)
         .to({
-          "INC": "#b2df8a",
+          "TRUE": "#e74c3c",
+          "FALSE": "rgb(119, 119, 119)"          
+        });
+
+      var schemeStroke = swiftmap.schemeCategorical()
+        .from(d => d.most_urgent)
+        .to({
+          "TRUE": "rgb(191, 39, 24)",
+          "FALSE": "rgb(51, 51, 51)"        
+        });
+
+      var schemeOpacity = swiftmap.schemeCategorical()
+        .from(d => d.most_urgent)
+        .to({
+          "TRUE": .9,
+          "FALSE": .4
         });
 
       d3.queue()
-        .defer(d3.json, "karnataka_geodata.json")
-        .defer(d3.json, "karnataka_data_2013.json")
-        // .defer(d3.json, "karnataka_data_random.json")
-        .defer(d3.json, "india_state.json")
+        .defer(d3.json, "delhi_1997-2012_district.json") // polygons data
+        .defer(d3.json, "new_schools.json") // points data
+        .defer(d3.csv, "schools.csv") // tabular data
         .await(ready);
 
-      function ready(error, karnataka, results2013, india){
+      function ready(error, districts, schools, data){
 
-        // MASSIVE AND BIZARRE BUG: Update pattern not working for drawPolygons
-        
-        // Update the scheme's data.
-        scheme.data(parseResults(results2013), d => d.ac_no);
+        // Add data to each scheme.
+        schemeRadius.data(data, d => +d.edudel_code);
+        schemeFill.data(data, d => +d.edudel_code);
+        schemeStroke.data(data, d => +d.edudel_code);
+        schemeOpacity.data(data, d => +d.edudel_code);
 
-        // Add three layers.
+        // Add tiles and geospatial data to your map.
+        // Then draw the polygons and bubbles.
         map
-          .layerPolygons(india, null, "india")
-            .draw()
-          .layerPolygons(karnataka, d => d.properties.ac_no, "karnataka")
-            .draw()
-          .layerPoints(karnataka, null, "cities")
-            .drawPoints()
-            .drawLabels(d => d.properties.name);
+          .tiles("cartoLight")
+          .layerPolygons(districts)
+            .fit()
+            .drawBoundary()
+          .layerPoints(schools, d => +d.properties.edudel_code)
+            .drawPoints();
 
-        map.layers.karnataka.polygons.transition().duration(1000).style("fill", scheme);
+        // Add the schemes to the bubbles for styling.
+        map.layers[1].points
+            .attr("r", schemeRadius)
+            .style("fill", schemeFill)
+            .style("stroke", schemeStroke)
+            .style("opacity", schemeOpacity);
 
-        // TODO
-        // Use flubber to allow for drawing transitions
+        // swiftmap.keyCategorical("#key-circle")
+          // .marks();
 
-        setTimeout(() => {
-          
-          // Change the scheme's colors.
-          scheme.to({
-            "INC": "#b2df8a",
-            "BJP": "#fdbf6f",
-            "JD(S)": "#fb9a99"
-          });
+        console.log(makeMarks(map.layers[1].points, ["fill", "stroke"]))
 
-          // Update the "karnataka" layer, even though it was not drawn most recently.
-          map.layers.karnataka.polygons.transition().duration(1000).style("fill", scheme);
+        function makeMarks(el, attrs){
+          var nodeList = el._groups[0],
+              shape = nodeList[0].nodeName,
+              uniqueNodes = [];
 
-        }, 1000);
+          for (var i0 = 0, l0 = nodeList.length; i0 < l0; i0++){
+            var node = nodeList[i0],
+                obj = {},
+                nodeStyles = node.style,
+                nodeAttrs = node.attributes;
 
-        setTimeout(() => {
+            for (var i1 = 0, l1 = attrs.length; i1 < l1; i1++){
+              var d = attrs[i1],
+                  style = nodeStyles[d],
+                  attr = nodeAttrs[d] ? nodeAttrs[d].nodeValue : undefined;
+              
+              obj[d] = style || attr;
+            }
 
-          // Update the size of the points.
-          map.layers.cities.points.transition().duration(1000).attr("r", 20);
+            if (uniqueNodes.every(function(d){ return !isEquivalent(d, obj); })) uniqueNodes.push(obj);
+          }
 
-        }, 2000);
+          return {
+            shape: shape,
+            nodes: uniqueNodes,
+            data: nodeList.map(function(d){ return d.__data__.properties; }),
+            schemes: nodeList[0].__data__.properties.swiftmap.schemes
+          };
+        }
 
-        setTimeout(() => {
+        // Update the points' radii when the radio input changes.
+        var inputs = document.getElementsByName("property");
+        for (var i = 0, l = inputs.length; i < l; i++) {
+          inputs[i].onchange = function() {
+            var val = this.value;
+            schemeRadius
+              .from(d => +d[val]);
+            
+            kn
+              .scheme(schemeRadius)
+              .labelFormat(d => val == "students" ? jz.str.numberCommas(d) : d.toFixed(2))
+              .draw();
 
-          // Change the city labels.
-          map.layers.cities.labels.text("This is a city!");
+            map.layers[1].points.transition().duration(1500).attr("r", schemeRadius);
+          }
+        }
 
-        }, 3000);
-
-
-        // Makes it easy to create resizable maps for responsive designs.
+        // It's easy to resize a Swiftmap.
         window.onresize = () => map.resize();
-
       }
 
-      function parseResults(results){
-        return results.map(ac => {
-          ac.winner = ac.candidate_json[0].party;
-          ac.ac_no = ac.const_code;
-          ac.candidates = ac.candidate_json.length;
-          return ac;
-        });
-      }  
+      function isEquivalent(a, b) {
+        // Create arrays of property names
+        var aProps = Object.getOwnPropertyNames(a);
+        var bProps = Object.getOwnPropertyNames(b);
+
+        // If number of properties is different,
+        // objects are not equivalent
+        if (aProps.length != bProps.length) {
+          return false;
+        }
+
+        for (var i = 0; i < aProps.length; i++) {
+          var propName = aProps[i];
+
+          // If values of same property are not equal,
+          // objects are not equivalent
+          if (a[propName] !== b[propName]) {
+            return false;
+          }
+        }
+
+        // If we made it this far, objects
+        // are considered equivalent
+        return true;
+      }
+
     </script>
   </body>
 </html>

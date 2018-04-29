@@ -57,7 +57,8 @@
         // Then draw the map and fill it based on your color scheme.
         map
           .layerPolygons(geo, function(d){ return d.properties.AC_NO; })
-            .draw();
+            .draw()
+            .drawLabels(d => d.properties.AC_NO)
 
         map.layers[0].polygons
           .transition().duration(1000)

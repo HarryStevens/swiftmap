@@ -48,7 +48,7 @@ export default function drawTiles(swiftmap){
   var tiles_element = swiftmap.svg.selectAll(".tile")
       .data(tiles(), function(d, i){ return i; });
   
-  tiles_element.exit().remove();  
+  tiles_element.exit().remove();
 
   tiles_element.enter().append("image")
       .attr("class", "tile")

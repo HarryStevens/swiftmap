@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0;
+			}
+			#map {
+				width: 100%;
+				height: 100vh;
+			}
+			#map .boundary {
+				stroke-width: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="map"></div>
+    
+    <!-- CDNs for d3-request and topojson -->
+		<script src="https://d3js.org/d3-collection.v1.min.js"></script>
+		<script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+		<script src="https://d3js.org/d3-dsv.v1.min.js"></script>
+		<script src="https://d3js.org/d3-request.v1.min.js"></script>
+		<script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+    
+		<script src="https://unpkg.com/swiftmap@0.2.6/dist/swiftmap.min.js"></script>
+		<script>
+			var map = swiftmap.map("#map");
+
+			var scheme = swiftmap.schemeContinuous()
+          .from(d => {
+          	var c = map.path.centroid(d);
+          	return c[0] * -c[1];
+          })
+					.to(["#f7f4f9", "#e7e1ef", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#980043", "#67001f"]);
+
+			d3.json("cb_2017_texas_county_20m.json", (error, data) => {
+				map
+					.layerPolygons(data)
+						.draw();
+
+				scheme
+					.data(topojson.feature(map.layers[0].data, map.layers[0].object).features);
+				
+				map.layers[0].polygons.style("fill", scheme).style("stroke", scheme);
+
+				window.onresize = () => map.resize();
+			});
+		</script>
+	</body>
+</html>

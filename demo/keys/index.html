@@ -60,7 +60,7 @@
       // Set up a scheme for each visual property.
       var schemeRadius = swiftmap.schemeContinuous()
         .from(d => +d.students)
-        .to([1, 20]);
+        .to([3, 30]);
 
       var schemeFill = swiftmap.schemeCategorical()
         .from(d => d.most_urgent)
@@ -114,86 +114,51 @@
             .style("stroke", schemeStroke)
             .style("opacity", schemeOpacity);
 
+        swiftmap.keyCategorical("#key-circle")
+          .shape("circle")
+          .data(["TRUE", "FALSE"])
+          .labelFormat((d, i) => i == 0 ? "Urgent" : "Not urgent")
+          .marginLeft(2)
+          .marginBottom(5)
+          .height(40)
+          .orientation("vertical")
+          .style("stroke", schemeStroke)
+          .style("fill", schemeFill)
+          .draw();
+
+        var keyNested = swiftmap.keyNested("#key-nested")
+          .height(72)
+          .width(105)
+          .scheme(schemeRadius)
+          .labelFormat(d => jz.str.numberCommas(d))
+          .draw();
+
         // swiftmap.keyCategorical("#key-circle")
-          // .marks();
+        //   .mark(map.layers[1].points, ["stroke", "fill"])
+        //   .labelFormat((d, i) => i == 0 ? "Urgent" : "Not urgent")
+        //   .marginLeft(2)
+        //   .marginBottom(5)
+        //   .orientation("vertical")
+        //   .draw();
 
-        console.log(makeMarks(map.layers[1].points, ["fill", "stroke"]))
-
-        function makeMarks(el, attrs){
-          var nodeList = el._groups[0],
-              shape = nodeList[0].nodeName,
-              uniqueNodes = [];
-
-          for (var i0 = 0, l0 = nodeList.length; i0 < l0; i0++){
-            var node = nodeList[i0],
-                obj = {},
-                nodeStyles = node.style,
-                nodeAttrs = node.attributes;
-
-            for (var i1 = 0, l1 = attrs.length; i1 < l1; i1++){
-              var d = attrs[i1],
-                  style = nodeStyles[d],
-                  attr = nodeAttrs[d] ? nodeAttrs[d].nodeValue : undefined;
-              
-              obj[d] = style || attr;
-            }
-
-            if (uniqueNodes.every(function(d){ return !isEquivalent(d, obj); })) uniqueNodes.push(obj);
-          }
-
-          return {
-            shape: shape,
-            nodes: uniqueNodes,
-            data: nodeList.map(function(d){ return d.__data__.properties; }),
-            schemes: nodeList[0].__data__.properties.swiftmap.schemes
-          };
-        }
+        // var keyNested = swiftmap.keyNested("#key-nested")
+        //   .mark(map.layers[1].points, ["r"])
+        //   .labelFormat(d => jz.str.numberCommas(d))
+        //   .draw();
 
         // Update the points' radii when the radio input changes.
         var inputs = document.getElementsByName("property");
         for (var i = 0, l = inputs.length; i < l; i++) {
           inputs[i].onchange = function() {
             var val = this.value;
-            schemeRadius
-              .from(d => +d[val]);
-            
-            kn
-              .scheme(schemeRadius)
-              .labelFormat(d => val == "students" ? jz.str.numberCommas(d) : d.toFixed(2))
-              .draw();
-
+            schemeRadius.from(d => +d[val]);
+            keyNested.scheme(schemeRadius).labelFormat(d => val == "students" ? jz.str.numberCommas(d) : d.toFixed(2)).draw()
             map.layers[1].points.transition().duration(1500).attr("r", schemeRadius);
           }
         }
 
         // It's easy to resize a Swiftmap.
         window.onresize = () => map.resize();
-      }
-
-      function isEquivalent(a, b) {
-        // Create arrays of property names
-        var aProps = Object.getOwnPropertyNames(a);
-        var bProps = Object.getOwnPropertyNames(b);
-
-        // If number of properties is different,
-        // objects are not equivalent
-        if (aProps.length != bProps.length) {
-          return false;
-        }
-
-        for (var i = 0; i < aProps.length; i++) {
-          var propName = aProps[i];
-
-          // If values of same property are not equal,
-          // objects are not equivalent
-          if (a[propName] !== b[propName]) {
-            return false;
-          }
-        }
-
-        // If we made it this far, objects
-        // are considered equivalent
-        return true;
       }
 
     </script>

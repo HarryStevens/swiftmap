@@ -2,6 +2,7 @@ import isArray from "../utils/isArray";
 import isObject from "../utils/isObject";
 import isFunction from "../utils/isFunction";
 import isString from "../utils/isString";
+import * as d3 from "../../lib/d3";
 
 export default function(){
   var data = [],
@@ -14,6 +15,10 @@ export default function(){
 
     // Use in maps.
     if (isObject(d)){
+      // Should I use this?
+      if (!d.properties.swiftmap.schemes) d.properties.swiftmap.schemes = [];
+      d.properties.swiftmap.schemes.push(schemeCategorical);
+        
       var match = data
         .filter(function(row){ 
           return row.swiftmap.key == d.properties.swiftmap.key;
