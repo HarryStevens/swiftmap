@@ -1,48 +1,27 @@
-import * as d3 from "../../lib/d3";
 import feature from "../../lib/topojson/feature";
+import * as d3 from "../../lib/d3";
 import keepNumber from "../utils/keepNumber";
-import drawTiles from "./drawTiles";
+import redraw from "./redraw";
 
-// resizes the map
+// Resizes all map layers according to the dimensions of the parent.
 export default function resize() {
-
-  // scoping issues
-  var swiftmap = this;
-
-  // size attributes
-  swiftmap.width = swiftmap.parent == "body" ? window.innerWidth :
-    +keepNumber(d3.select(swiftmap.parent).style("width"));
-  swiftmap.height = swiftmap.parent == "body" ? window.innerHeight :
-    +keepNumber(d3.select(swiftmap.parent).style("height"));
-  swiftmap.svg.attr("width", swiftmap.width).attr("height", swiftmap.height);
+  // Set the dimensions.
+  this.width = this.parent == "body" ? window.innerWidth :
+    +keepNumber(d3.select(this.parent).style("width"));
+  this.height = this.parent == "body" ? window.innerHeight :
+    +keepNumber(d3.select(this.parent).style("height"));
+  this.svg.attr("width", this.width).attr("height", this.height);
   
-  // find the most recently fitted layer
-
-  var layers = Object.keys(swiftmap.layers).map(function(d){ return swiftmap.layers[d]; });
-  var fit_layer = layers.filter(function(d){ return d.fit; })[0];
-  if (fit_layer) swiftmap.meta.projection.function.fitSize([swiftmap.width, swiftmap.height], feature(fit_layer.data, fit_layer.object));
-
-  // scrope the projection and path
-  var projection = swiftmap.meta.projection.function;
-  var path = swiftmap.path;
-
-  swiftmap.svg.selectAll("path").attr("d", path);
-  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; });
-  function getCoordinates(d){
-    return projection(d.geometry.coordinates);
+  // Find the most recently fitted layer.
+  var layer;
+  for (var l in this.layers) {
+    var l0 = this.layers[l];
+    if (l0.fit) layer = l0;
   }
-  function getCentroid(d){
-    return path.centroid(d);
-  }
-  function getPoints(d){
-    return fit_layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
-  }
-  swiftmap.svg.selectAll("circle.point")
-      .attr("cx", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
-      .attr("cy", function(d) { return fit_layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
+  if (layer) this.meta.projection.function.fitSize([this.width, this.height], feature(layer.data, layer.object));
   
-  // Resize the tiles, if any.
-  if (swiftmap.meta.tiles) drawTiles(swiftmap);
+  // Redraw everything.
+  redraw(this);
 
-  return swiftmap;
+  return this;
 }

@@ -6,7 +6,7 @@ import isNumber from "../utils/isNumber";
 export default function drawBoundary(layer) {
   // Check for geospatial data.
   if (Object.keys(this.layers).length === 0) {
-    console.error("You must pass TopoJSON data through swiftmap.layerolygons() before you can draw the layer's boundary.")
+    console.error("You must pass TopoJSON data through swiftmap.layerPolygons() before you can draw the layer's boundary.")
     return;
   }
 

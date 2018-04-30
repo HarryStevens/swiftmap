@@ -6,45 +6,13 @@
         margin: 0;
         font-family: "Helvetica Neue", sans-serif;
       }
-      #key {
-        position: absolute;
-        background: rgba(255, 255, 255, .8);
-        padding: 10px;
-        font-size: .8em;
-        border-right: 1px solid #ddd;
-        border-bottom: 1px solid #ddd;
-      }
-      #key .key-title {
-        font-weight: bold;
-        margin-bottom: 10px;
-      }
-      #key-nested {
-        margin: 8px auto 0px;
-        display: table;
-      }
       #map {
         width: 100%;
         height: 100vh;
       }
-      .legend-circle {
-        fill: none;
-        stroke: #000;
-      }
-      .legend-dotted-line {
-        stroke: #000;
-        stroke-dasharray: 2, 2;
-        shape-rendering: crispEdges;
-      }
     </style>
   </head>
   <body>
-    <div id="key">
-      <div class="key-title">Key</div>
-      <div id="key-circle"></div>
-      <input type="radio" name="property" value="students" checked /> Total students<br />
-      <input type="radio" name="property" value="student_teacher_ratio" /> Students per teacher
-      <div id="key-nested"></div>
-    </div>
     <div id="map"></div>
 
     <script src="../d3.v4.min.js"></script>
@@ -57,143 +25,20 @@
       // Create the map.
       var map = swiftmap.map("#map");
 
-      // Set up a scheme for each visual property.
-      var schemeRadius = swiftmap.schemeContinuous()
-        .from(d => +d.students)
-        .to([1, 20]);
-
-      var schemeFill = swiftmap.schemeCategorical()
-        .from(d => d.most_urgent)
-        .to({
-          "TRUE": "#e74c3c",
-          "FALSE": "rgb(119, 119, 119)"          
-        });
-
-      var schemeStroke = swiftmap.schemeCategorical()
-        .from(d => d.most_urgent)
-        .to({
-          "TRUE": "rgb(191, 39, 24)",
-          "FALSE": "rgb(51, 51, 51)"        
-        });
-
-      var schemeOpacity = swiftmap.schemeCategorical()
-        .from(d => d.most_urgent)
-        .to({
-          "TRUE": .9,
-          "FALSE": .4
-        });
-
       d3.queue()
         .defer(d3.json, "delhi_1997-2012_district.json") // polygons data
-        .defer(d3.json, "new_schools.json") // points data
-        .defer(d3.csv, "schools.csv") // tabular data
         .await(ready);
 
       function ready(error, districts, schools, data){
 
-        // Add data to each scheme.
-        schemeRadius.data(data, d => +d.edudel_code);
-        schemeFill.data(data, d => +d.edudel_code);
-        schemeStroke.data(data, d => +d.edudel_code);
-        schemeOpacity.data(data, d => +d.edudel_code);
-
-        // Add tiles and geospatial data to your map.
-        // Then draw the polygons and bubbles.
         map
-          .tiles("cartoLight")
           .layerPolygons(districts)
-            .fit()
-            .drawBoundary()
-          .layerPoints(schools, d => +d.properties.edudel_code)
-            .drawPoints();
-
-        // Add the schemes to the bubbles for styling.
-        map.layers[1].points
-            .attr("r", schemeRadius)
-            .style("fill", schemeFill)
-            .style("stroke", schemeStroke)
-            .style("opacity", schemeOpacity);
-
-        // swiftmap.keyCategorical("#key-circle")
-          // .marks();
-
-        console.log(makeMarks(map.layers[1].points, ["fill", "stroke"]))
-
-        function makeMarks(el, attrs){
-          var nodeList = el._groups[0],
-              shape = nodeList[0].nodeName,
-              uniqueNodes = [];
-
-          for (var i0 = 0, l0 = nodeList.length; i0 < l0; i0++){
-            var node = nodeList[i0],
-                obj = {},
-                nodeStyles = node.style,
-                nodeAttrs = node.attributes;
-
-            for (var i1 = 0, l1 = attrs.length; i1 < l1; i1++){
-              var d = attrs[i1],
-                  style = nodeStyles[d],
-                  attr = nodeAttrs[d] ? nodeAttrs[d].nodeValue : undefined;
-              
-              obj[d] = style || attr;
-            }
-
-            if (uniqueNodes.every(function(d){ return !isEquivalent(d, obj); })) uniqueNodes.push(obj);
-          }
-
-          return {
-            shape: shape,
-            nodes: uniqueNodes,
-            data: nodeList.map(function(d){ return d.__data__.properties; }),
-            schemes: nodeList[0].__data__.properties.swiftmap.schemes
-          };
-        }
-
-        // Update the points' radii when the radio input changes.
-        var inputs = document.getElementsByName("property");
-        for (var i = 0, l = inputs.length; i < l; i++) {
-          inputs[i].onchange = function() {
-            var val = this.value;
-            schemeRadius
-              .from(d => +d[val]);
-            
-            kn
-              .scheme(schemeRadius)
-              .labelFormat(d => val == "students" ? jz.str.numberCommas(d) : d.toFixed(2))
-              .draw();
-
-            map.layers[1].points.transition().duration(1500).attr("r", schemeRadius);
-          }
-        }
+            .draw()
+            .drawPoints()
+            .drawLabels(d => d.properties.DISTRICT, true);
 
         // It's easy to resize a Swiftmap.
         window.onresize = () => map.resize();
-      }
-
-      function isEquivalent(a, b) {
-        // Create arrays of property names
-        var aProps = Object.getOwnPropertyNames(a);
-        var bProps = Object.getOwnPropertyNames(b);
-
-        // If number of properties is different,
-        // objects are not equivalent
-        if (aProps.length != bProps.length) {
-          return false;
-        }
-
-        for (var i = 0; i < aProps.length; i++) {
-          var propName = aProps[i];
-
-          // If values of same property are not equal,
-          // objects are not equivalent
-          if (a[propName] !== b[propName]) {
-            return false;
-          }
-        }
-
-        // If we made it this far, objects
-        // are considered equivalent
-        return true;
       }
 
     </script>
