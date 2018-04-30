@@ -6653,7 +6653,7 @@
     return json.type == "Topology" && !!json.arcs && !!json.objects;
   }
 
-  function isString(str){
+  function isString$1(str){
     return !!str && typeof str === "string";
   }
 
@@ -6721,7 +6721,7 @@
 
       // If the layer was passed but is not a string, set it to the layer index.
       // Also warn the user.
-      else if (layer && !isString(layer)){
+      else if (layer && !isString$1(layer)){
         console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + swiftmap.meta.layer_index + ".");
         layer = swiftmap.meta.layer_index;
       }
@@ -6770,25 +6770,22 @@
     return layerUtil(this, data, key, layer, "polygons"); 
   }
 
-  // modules
-
   function projection$1(projectionName){
-    // if no data is passed, then this is a getter function
+    // If no data is passed, then this is a getter function.
     if (!projectionName) {
       return this.meta.projection.function;
     }
 
     var available_projections = ["mercator", "albersUsa", "equirectangular"];
 
-    // if the key is not a function, set the key property of each datum matches its index
-    if (typeof projectionName !== "string") {
+    // If the projectionName is not a string, warn the user.
+    if (!isString$1(projectionName)) {
       console.warn("The projectionName must be specified as a string. The projectionName will default to 'mercator'.");
     }
-    if (available_projections.indexOf(projectionName) == -1){
+    if (available_projections.indexOf(projectionName) === -1){
       console.warn("You must pass either 'mercator', 'albersUsa', or 'equirectangular' as the projectionName. The projectionName will default to 'mercator'.");
     }
 
-    // if data is passed, then this is a setter function
     this.meta.projection.name = projectionName;
     this.meta.projection.function =
       projectionName == "mercator" ? mercator() :
@@ -6801,7 +6798,7 @@
 
   function tiles(type){
     // Test if the type is a string
-    if (type && !isString(type) && !isFunction(type)){
+    if (type && !isString$1(type) && !isFunction(type)){
       console.warn("The type passed to map.layerTiles() must be specified as a string or a function. The type will default to 'openStreetMap'.");
       type = "openStreetMap";
     }
@@ -6821,7 +6818,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString(layer)){
+    if (layer && !isString$1(layer)){
       console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
       layer = this.meta.last_layer;
     }
@@ -7066,7 +7063,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString(layer) && !isNumber(layer)) {
+    if (layer && !isString$1(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
       layer = this.meta.last_layer;
     }
@@ -7114,7 +7111,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString(layer) && !isNumber(layer)) {
+    if (layer && !isString$1(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
       layer = this.meta.last_layer;
     }
@@ -7179,7 +7176,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString(layer) && !isNumber(layer)) {
+    if (layer && !isString$1(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
       layer = this.meta.last_layer;
     }
@@ -7218,7 +7215,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString(layer) && !isNumber(layer)) {
+    if (layer && !isString$1(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
       layer = this.meta.last_layer;
     }
@@ -7329,7 +7326,7 @@
   // Sets a projection so a layer's outer boundary fits the dimensions of the map's parent.
   function fit$1(layer) {  
     // If a layer is passed, make sure it is a string or a number.
-    var layer_name = layer && (isString(layer) || isNumber(layer)) ? layer : this.meta.last_layer;
+    var layer_name = layer && (isString$1(layer) || isNumber(layer)) ? layer : this.meta.last_layer;
         layer = this.layers[layer_name];
 
     // Update the fit property in the layer, setting the fit property in all other to false.
@@ -7375,13 +7372,14 @@
 
   // Initializes a swiftmap
   function map$3(parent){
-    // errors
-    if (parent && typeof parent !== "string") {
-      throw TypeError("The argument passed to swiftmap.map() must be a string.");
+    // Make sure the parent passed is a string.
+    if (parent && !isString(parent)) {
+      console.error("The argument passed to swiftmap.map() must be a string.");
+      return;
     }
 
     function Swiftmap(parent){
-      // meta object for storing data
+      // Create a meta object for storing information about the map.
       this.meta = {
         layer_index: -1,
         last_layer: "",
@@ -7392,29 +7390,29 @@
         tiles: false
       };
 
-      // a layers object to store the geospatial layers
+      // A layers object to store the geospatial layers.
       this.layers = {};
 
-      // parent
+      // Set the parent.
       this.parent = parent || "body";
 
-      // size
+      // Set the dimensions.
       this.width = this.parent == "body" ? window.innerWidth :
         +keepNumber(select(this.parent).style("width"));
       this.height = this.parent == "body" ? window.innerHeight :
         +keepNumber(select(this.parent).style("height"));
 
-      // derived attributes
+      // Set the path and append the SVG.
       this.path = index().projection(this.meta.projection.function);
       this.svg = select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
-      // init functions
+      // Map functions.
       this.layerPoints = layerPoints;
       this.layerPolygons = layerPolygons;
       this.projection = projection$1;
       this.tiles = tiles;
 
-      // draw functions
+      // Layer functions.
       this.draw = draw;
       this.drawBoundary = drawBoundary;
       this.drawLabels = drawLabels;
@@ -7422,11 +7420,9 @@
       this.drawPolygons = drawPolygons;
       this.fit = fit$1;
       this.resize = resize;
-
     }
 
     return (new Swiftmap(parent));
-
   }
 
   function isArray(arr){
@@ -7457,7 +7453,7 @@
         scale = band().rangeRound([0, orientation == "horizontal" ? width : height]).domain(data);
 
     function keyCategorical(str){
-      parent = isString(str) ? str : "body";
+      parent = isString$1(str) ? str : "body";
       selection$$1 = select(parent);
       width = +jz.str.keepNumber(selection$$1.style("width")) - marginLeft - marginRight;
       height = +jz.str.keepNumber(selection$$1.style("height")) - marginTop - marginBottom;
@@ -7465,11 +7461,11 @@
     }
 
     keyCategorical.shape = function(str){
-      return arguments.length ? (shape = isString(str) ? str : shape, keyCategorical) : shape;
+      return arguments.length ? (shape = isString$1(str) ? str : shape, keyCategorical) : shape;
     };
 
     keyCategorical.orientation = function(str){
-      orientation = isString(str) && (str.toLowerCase() == "horizontal" || str.toLowerCase() == "vertical") ? str : orientation;
+      orientation = isString$1(str) && (str.toLowerCase() == "horizontal" || str.toLowerCase() == "vertical") ? str : orientation;
       scale.rangeRound([0, orientation == "horizontal" ? width : height]);
       return arguments.length ? keyCategorical : orientation;
     };
@@ -7555,7 +7551,7 @@
 
     keyCategorical.style = function(str, val){
       styles.push({
-        style: isString(str) ? str : null,
+        style: isString$1(str) ? str : null,
         value: val
       });
 
@@ -7565,7 +7561,7 @@
     keyCategorical.attr = function(str, val){
       if (str == "r") radius = val;
       attrs.push({
-        attr: isString(str) ? str : null,
+        attr: isString$1(str) ? str : null,
         value: val
       });
 
@@ -7821,7 +7817,7 @@
         labelFormat = function(d){ return d; };
     
     function keyNested(str){
-      parent = isString(str) ? str : "body";
+      parent = isString$1(str) ? str : "body";
       selection$$1 = select(parent);
       width = +jz.str.keepNumber(selection$$1.style("width")) - marginLeft - marginRight;
       height = +jz.str.keepNumber(selection$$1.style("height")) - marginTop - marginBottom;
@@ -7996,7 +7992,7 @@
     };
 
     schemeCategorical.toOther = function(string){
-      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeCategorical) : toOther;
+      return arguments.length ? (toOther = isString$1(string) ? string : toOther, schemeCategorical) : toOther;
     };
 
     return schemeCategorical;
@@ -8021,7 +8017,7 @@
         .range(to);
 
       // Lab interpolation for colors.
-      if (isString(to[0])) {
+      if (isString$1(to[0])) {
         scale.interpolate(lab$1);
       }
 
@@ -8057,7 +8053,7 @@
     };
 
     schemeContinuous.toOther = function(string){
-      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeContinuous) : toOther;
+      return arguments.length ? (toOther = isString$1(string) ? string : toOther, schemeContinuous) : toOther;
     };
 
     return schemeContinuous;
@@ -8072,7 +8068,7 @@
         all_limits = [];
 
     function calcLimits(){
-      all_limits = isString(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : isArray(breaks) ? breaks : all_limits;
+      all_limits = isString$1(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : isArray(breaks) ? breaks : all_limits;
     }
 
     function schemeSequential(d, i, els){
@@ -8093,7 +8089,7 @@
 
     schemeSequential.breaks = function(breaktype){
       if (arguments.length){
-        breaks = isString(breaktype) || isArray(breaktype) ? breaktype : "e";
+        breaks = isString$1(breaktype) || isArray(breaktype) ? breaktype : "e";
         calcLimits();
         return (schemeSequential);
       }
@@ -8149,7 +8145,7 @@
     };
 
     schemeSequential.toOther = function(string){
-      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeSequential) : toOther;
+      return arguments.length ? (toOther = isString$1(string) ? string : toOther, schemeSequential) : toOther;
     };
 
     return schemeSequential;

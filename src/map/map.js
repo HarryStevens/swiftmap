@@ -14,16 +14,18 @@ import fit from "./fit";
 import resize from "./resize";
 
 import keepNumber from "../utils/keepNumber";
+import isStrig from "../utils/isString";
 
 // Initializes a swiftmap
 export default function map(parent){
-  // errors
-  if (parent && typeof parent !== "string") {
-    throw TypeError("The argument passed to swiftmap.map() must be a string.");
+  // Make sure the parent passed is a string.
+  if (parent && !isString(parent)) {
+    console.error("The argument passed to swiftmap.map() must be a string.");
+    return;
   }
 
   function Swiftmap(parent){
-    // meta object for storing data
+    // Create a meta object for storing information about the map.
     this.meta = {
       layer_index: -1,
       last_layer: "",
@@ -34,29 +36,29 @@ export default function map(parent){
       tiles: false
     };
 
-    // a layers object to store the geospatial layers
+    // A layers object to store the geospatial layers.
     this.layers = {};
 
-    // parent
+    // Set the parent.
     this.parent = parent || "body";
 
-    // size
+    // Set the dimensions.
     this.width = this.parent == "body" ? window.innerWidth :
       +keepNumber(d3.select(this.parent).style("width"));
     this.height = this.parent == "body" ? window.innerHeight :
       +keepNumber(d3.select(this.parent).style("height"));
 
-    // derived attributes
+    // Set the path and append the SVG.
     this.path = d3.geoPath().projection(this.meta.projection.function);
     this.svg = d3.select(this.parent).append("svg").attr("width", this.width).attr("height", this.height);
 
-    // init functions
+    // Map functions.
     this.layerPoints = layerPoints;
     this.layerPolygons = layerPolygons;
     this.projection = projection;
     this.tiles = tiles;
 
-    // draw functions
+    // Layer functions.
     this.draw = draw;
     this.drawBoundary = drawBoundary;
     this.drawLabels = drawLabels;
@@ -64,9 +66,7 @@ export default function map(parent){
     this.drawPolygons = drawPolygons;
     this.fit = fit;
     this.resize = resize;
-
   }
 
   return (new Swiftmap(parent));
-
 }
