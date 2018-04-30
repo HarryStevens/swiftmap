@@ -1,6 +1,8 @@
 # Swiftmap
 A JavaScript library for making data-driven maps. [See it in action](https://bl.ocks.org/harrystevens/5b705c13618e20706675135fd412b6d1).
 
+Swiftmap is still in development mode (v0.x). This is not a stable release. The API is subject to breaking changes.
+
 ## Features
 
 * Provides a simple API for making maps.
