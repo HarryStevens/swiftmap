@@ -14,7 +14,7 @@ import fit from "./fit";
 import resize from "./resize";
 
 import keepNumber from "../utils/keepNumber";
-import isStrig from "../utils/isString";
+import isString from "../utils/isString";
 
 // Initializes a swiftmap
 export default function map(parent){

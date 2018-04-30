@@ -6653,7 +6653,7 @@
     return json.type == "Topology" && !!json.arcs && !!json.objects;
   }
 
-  function isString$1(str){
+  function isString(str){
     return !!str && typeof str === "string";
   }
 
@@ -6721,7 +6721,7 @@
 
       // If the layer was passed but is not a string, set it to the layer index.
       // Also warn the user.
-      else if (layer && !isString$1(layer)){
+      else if (layer && !isString(layer)){
         console.warn("You must specify the polygon layer's name as a string. The layer name will default to the layer's index, which is currently " + swiftmap.meta.layer_index + ".");
         layer = swiftmap.meta.layer_index;
       }
@@ -6779,7 +6779,7 @@
     var available_projections = ["mercator", "albersUsa", "equirectangular"];
 
     // If the projectionName is not a string, warn the user.
-    if (!isString$1(projectionName)) {
+    if (!isString(projectionName)) {
       console.warn("The projectionName must be specified as a string. The projectionName will default to 'mercator'.");
     }
     if (available_projections.indexOf(projectionName) === -1){
@@ -6798,7 +6798,7 @@
 
   function tiles(type){
     // Test if the type is a string
-    if (type && !isString$1(type) && !isFunction(type)){
+    if (type && !isString(type) && !isFunction(type)){
       console.warn("The type passed to map.layerTiles() must be specified as a string or a function. The type will default to 'openStreetMap'.");
       type = "openStreetMap";
     }
@@ -6818,7 +6818,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString$1(layer)){
+    if (layer && !isString(layer)){
       console.warn("You must specify the layer as a string. The layer will default to " + this.meta.last_layer);
       layer = this.meta.last_layer;
     }
@@ -7063,7 +7063,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString$1(layer) && !isNumber(layer)) {
+    if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
       layer = this.meta.last_layer;
     }
@@ -7096,10 +7096,282 @@
     return !!obj && typeof obj == "object" && !Array.isArray(obj);
   }
 
+  // ISC License
+
+  function TinyQueue(data, compare) {
+    if (!(this instanceof TinyQueue)) return new TinyQueue(data, compare);
+
+    this.data = data || [];
+    this.length = this.data.length;
+    this.compare = compare || defaultCompare;
+
+    if (this.length > 0) {
+      for (var i = (this.length >> 1) - 1; i >= 0; i--) this._down(i);
+    }
+  }
+
+  function defaultCompare(a, b) {
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+
+  TinyQueue.prototype = {
+
+    push: function (item) {
+      this.data.push(item);
+      this.length++;
+      this._up(this.length - 1);
+    },
+
+    pop: function () {
+      if (this.length === 0) return undefined;
+
+      var top = this.data[0];
+      this.length--;
+
+      if (this.length > 0) {
+        this.data[0] = this.data[this.length];
+        this._down(0);
+      }
+      this.data.pop();
+
+      return top;
+    },
+
+    peek: function () {
+      return this.data[0];
+    },
+
+    _up: function (pos) {
+      var data = this.data;
+      var compare = this.compare;
+      var item = data[pos];
+
+      while (pos > 0) {
+        var parent = (pos - 1) >> 1;
+        var current = data[parent];
+        if (compare(item, current) >= 0) break;
+        data[pos] = current;
+        pos = parent;
+      }
+
+      data[pos] = item;
+    },
+
+    _down: function (pos) {
+      var data = this.data;
+      var compare = this.compare;
+      var halfLength = this.length >> 1;
+      var item = data[pos];
+
+      while (pos < halfLength) {
+        var left = (pos << 1) + 1;
+        var right = left + 1;
+        var best = data[left];
+
+        if (right < this.length && compare(data[right], best) < 0) {
+          left = right;
+          best = data[right];
+        }
+        if (compare(best, item) >= 0) break;
+
+        data[pos] = best;
+        pos = left;
+      }
+
+      data[pos] = item;
+    }
+  };
+
+  // ISC License
+
+  function polylabel(polygon, precision, debug) {
+    precision = precision || 1.0;
+
+    // find the bounding box of the outer ring
+    var minX, minY, maxX, maxY;
+    for (var i = 0; i < polygon[0].length; i++) {
+      var p = polygon[0][i];
+      if (!i || p[0] < minX) minX = p[0];
+      if (!i || p[1] < minY) minY = p[1];
+      if (!i || p[0] > maxX) maxX = p[0];
+      if (!i || p[1] > maxY) maxY = p[1];
+    }
+
+    var width = maxX - minX;
+    var height = maxY - minY;
+    var cellSize = Math.min(width, height);
+    var h = cellSize / 2;
+
+    // a priority queue of cells in order of their "potential" (max distance to polygon)
+    var cellQueue = new TinyQueue(null, compareMax);
+
+    if (cellSize === 0) return [minX, minY];
+
+    // cover polygon with initial cells
+    for (var x = minX; x < maxX; x += cellSize) {
+      for (var y = minY; y < maxY; y += cellSize) {
+        cellQueue.push(new Cell(x + h, y + h, h, polygon));
+      }
+    }
+
+    // take centroid as the first best guess
+    var bestCell = getCentroidCell(polygon);
+
+    // special case for rectangular polygons
+    var bboxCell = new Cell(minX + width / 2, minY + height / 2, 0, polygon);
+    if (bboxCell.d > bestCell.d) bestCell = bboxCell;
+
+    var numProbes = cellQueue.length;
+
+    while (cellQueue.length) {
+      // pick the most promising cell from the queue
+      var cell = cellQueue.pop();
+
+      // update the best cell if we found a better one
+      if (cell.d > bestCell.d) {
+        bestCell = cell;
+        if (debug) console.log('found best %d after %d probes', Math.round(1e4 * cell.d) / 1e4, numProbes);
+      }
+
+      // do not drill down further if there's no chance of a better solution
+      if (cell.max - bestCell.d <= precision) continue;
+
+      // split the cell into four cells
+      h = cell.h / 2;
+      cellQueue.push(new Cell(cell.x - h, cell.y - h, h, polygon));
+      cellQueue.push(new Cell(cell.x + h, cell.y - h, h, polygon));
+      cellQueue.push(new Cell(cell.x - h, cell.y + h, h, polygon));
+      cellQueue.push(new Cell(cell.x + h, cell.y + h, h, polygon));
+      numProbes += 4;
+    }
+
+    if (debug) {
+      console.log('num probes: ' + numProbes);
+      console.log('best distance: ' + bestCell.d);
+    }
+
+    return [bestCell.x, bestCell.y];
+  }
+
+  function compareMax(a, b) {
+    return b.max - a.max;
+  }
+
+  function Cell(x, y, h, polygon) {
+    this.x = x; // cell center x
+    this.y = y; // cell center y
+    this.h = h; // half the cell size
+    this.d = pointToPolygonDist(x, y, polygon); // distance from cell center to polygon
+    this.max = this.d + this.h * Math.SQRT2; // max distance to polygon within a cell
+  }
+
+  // signed distance from point to polygon outline (negative if point is outside)
+  function pointToPolygonDist(x, y, polygon) {
+    var inside = false;
+    var minDistSq = Infinity;
+
+    for (var k = 0; k < polygon.length; k++) {
+      var ring = polygon[k];
+
+      for (var i = 0, len = ring.length, j = len - 1; i < len; j = i++) {
+        var a = ring[i];
+        var b = ring[j];
+
+        if ((a[1] > y !== b[1] > y) &&
+          (x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0])) inside = !inside;
+
+        minDistSq = Math.min(minDistSq, getSegDistSq(x, y, a, b));
+      }
+    }
+
+    return (inside ? 1 : -1) * Math.sqrt(minDistSq);
+  }
+
+  // get polygon centroid
+  function getCentroidCell(polygon) {
+    var area = 0;
+    var x = 0;
+    var y = 0;
+    var points = polygon[0];
+
+    for (var i = 0, len = points.length, j = len - 1; i < len; j = i++) {
+      var a = points[i];
+      var b = points[j];
+      var f = a[0] * b[1] - b[0] * a[1];
+      x += (a[0] + b[0]) * f;
+      y += (a[1] + b[1]) * f;
+      area += f * 3;
+    }
+    if (area === 0) return new Cell(points[0][0], points[0][1], 0, polygon);
+    return new Cell(x / area, y / area, 0, polygon);
+  }
+
+  // get squared distance from a point to a segment
+  function getSegDistSq(px, py, a, b) {
+
+    var x = a[0];
+    var y = a[1];
+    var dx = b[0] - x;
+    var dy = b[1] - y;
+
+    if (dx !== 0 || dy !== 0) {
+
+      var t = ((px - x) * dx + (py - y) * dy) / (dx * dx + dy * dy);
+
+      if (t > 1) {
+        x = b[0];
+        y = b[1];
+
+      } else if (t > 0) {
+        x += dx * t;
+        y += dy * t;
+      }
+    }
+
+    dx = px - x;
+    dy = py - y;
+
+    return dx * dx + dy * dy;
+  }
+
+  // Determines the coordinates of text or points, depending on if the layer is polygons or points.
+  function pointsUtility(swiftmap, d){
+  	// In geometries of type MultiPolygon,
+  	// get the polylabel that is closest to centroid.
+  	var closest;
+
+  	if (d.geometry.type == "MultiPolygon"){	
+  		var min = Infinity,
+          c = swiftmap.path.centroid(d);
+
+  		for (var i = 0, l = d.geometry.coordinates.length; i < l; i++){
+
+  			var p = swiftmap.meta.projection.function(polylabel(d.geometry.coordinates[i], .01)),
+  					dist = Math.sqrt(Math.pow(p[0] - c[0], 2) + Math.pow(p[1] - c[1], 2));
+
+  			if (Number.isFinite(dist) && dist < min){
+  				min = dist;
+  				closest = p;
+  			}
+  		}
+  	}
+
+  	// TODO: Find a good labeling algorithm.
+    return d.properties.swiftmap.layer == "polygons" ?
+  	  d.geometry.type === "MultiPolygon" ? closest || swiftmap.path.centroid(d) :
+  	  swiftmap.meta.projection.function(polylabel(d.geometry.coordinates, .01)) :
+  	  swiftmap.meta.projection.function(d.geometry.coordinates);
+  }
+
   // Draws text labels to a layer.
   function drawLabels(key, offset, layer) {
+    var swiftmap = this,
+      width = swiftmap.width,
+      path = swiftmap.path,
+      projection = swiftmap.meta.projection.function;
+
     // Check for geospatial data.
-    if (Object.keys(this.layers).length === 0) {
+    if (Object.keys(swiftmap.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.layerPoints() before you can draw labels.");
       return;
     }
@@ -7111,16 +7383,12 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString$1(layer) && !isNumber(layer)) {
+    if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
-      layer = this.meta.last_layer;
+      layer = swiftmap.meta.last_layer;
     }
-
-    var width = this.width,
-        path = this.path,
-        projection = this.meta.projection.function,
-        layer_name = layer || this.meta.last_layer,
-        layer = this.layers[layer_name];
+    var layer_name = layer || swiftmap.meta.last_layer,
+      layer = swiftmap.layers[layer_name];
 
     // Determine the offset.
     offset = !isBoolean(offset) ? false : offset;
@@ -7130,41 +7398,35 @@
     // from which you can calculate the dy as fontSize * (3 / 8).
 
     // Only append if the layer is new.
-    if (!this.layers[layer_name].labels){
-      this.layers[layer_name].labels = this.svg.selectAll(".label.label-" + layer_name)
+    if (!swiftmap.layers[layer_name].labels){
+      swiftmap.layers[layer_name].labels = swiftmap.svg.selectAll(".label.label-" + layer_name)
           .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
         .enter().append("text")
           .attr("class", "label label-" + layer_name)
-          .attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; })
-          .attr("x", function(d) { return offset ? getPoints(d)[0] <= width / 2 ? -6 : 6 : 0; })
+          .attr("transform", function(d) { return "translate(" + pointsUtility(swiftmap, d) + ")"; })
+          .attr("x", function(d) { return offset ? pointsUtility(swiftmap, d)[0] <= width / 2 ? -6 : 6 : 0; })
           .attr("font-size", ".8em")
           .attr("dy", ".3em")
           .attr("font-family", "sans-serif")
-          .style("text-anchor", function(d) { return offset ? getPoints(d)[0] <= width / 2 ? "end" : "start" : "middle"; })
+          .style("text-anchor", function(d) { return offset ? pointsUtility(swiftmap, d)[0] <= width / 2 ? "end" : "start" : "middle"; })
           .text(key);
-
-      function getCoordinates(d){
-        return projection(d.geometry.coordinates);
-      }
-      function getCentroid(d){
-        return path.centroid(d);
-      }
-      function getPoints(d){
-        return layer.type == "polygons" ? getCentroid(d) : getCoordinates(d);
-      }
     }
 
     else {
-      this.layers[layer_name].labels.text(key);
+      swiftmap.layers[layer_name].labels.text(key);
     }
 
-    return this;
+    return swiftmap;
   }
 
-  // Draws point to a layer.
+  // Draws points to a layer.
   function drawPoints(radius, layer) {
+    var swiftmap = this,
+        projection = swiftmap.meta.projection.function,
+        path = swiftmap.path;
+
     // Check for geospatial data.
-    if (Object.keys(this.layers).length === 0) {
+    if (Object.keys(swiftmap.layers).length === 0) {
       console.error("You must pass TopoJSON data through swiftmap.layerPoints() or swiftmap.layerPolygons() before you can draw polygons.");
       return;
     }
@@ -7174,36 +7436,33 @@
       console.warn("You must specify the radius as a number. Radius will default to 2.");
       radius = 2;
     }
+    var r = radius || 2;
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString$1(layer) && !isNumber(layer)) {
+    if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
-      layer = this.meta.last_layer;
+      layer = swiftmap.meta.last_layer;
     }
-
-    var r = radius || 2,
-        projection = this.meta.projection.function,
-        path = this.path,
-        layer_name = layer || this.meta.last_layer,
-        layer = this.layers[layer_name];
+    var layer_name = layer || swiftmap.meta.last_layer,
+        layer = swiftmap.layers[layer_name];
 
     // Only append if the layer is new.
     if (!layer.points) {
-      this.layers[layer_name].points = this.svg.selectAll(".point.point-" + layer_name)
+      swiftmap.layers[layer_name].points = swiftmap.svg.selectAll(".point.point-" + layer_name)
           .data(feature(layer.data, layer.object).features, function(d){ return d.properties.swiftmap.key; })
         .enter().append("circle")
           .attr("class", "point point-" + layer_name)
           .attr("r", r + "px")
-          .attr("cx", function(d) { return layer.type == "polygons" ? path.centroid(d)[0] : projection(d.geometry.coordinates)[0]; })
-          .attr("cy", function(d) { return layer.type == "polygons" ? path.centroid(d)[1] : projection(d.geometry.coordinates)[1]; });
+          .attr("cx", function(d) { return pointsUtility(swiftmap, d)[0]; })
+          .attr("cy", function(d) { return pointsUtility(swiftmap, d)[1]; });
     }
 
     else {
-      this.layers[layer_name].points
+      swiftmap.layers[layer_name].points
           .attr("r", r);
     }
 
-    return this;
+    return swiftmap;
   }
 
   // Draws polygons to a layer.
@@ -7215,7 +7474,7 @@
     }
 
     // Check the type of the optional layer parameter.
-    if (layer && !isString$1(layer) && !isNumber(layer)) {
+    if (layer && !isString(layer) && !isNumber(layer)) {
       console.warn("You must specify the layer as a string or a number. Layer will default to " + swiftmap.meta.last_layer + ".");
       layer = this.meta.last_layer;
     }
@@ -7309,15 +7568,10 @@
     swiftmap.svg.selectAll("path").attr("d", swiftmap.path);
 
     // Redraw the text and points.
-    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; });
+    swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + pointsUtility(swiftmap, d) + ")"; });
     swiftmap.svg.selectAll("circle.point")
-        .attr("cx", function(d) { return getPoints(d)[0]; })
-        .attr("cy", function(d) { return getPoints(d)[1]; });
-    
-    // Determines the coordinates of text or points, depending on if the layer is polygons or points.
-    function getPoints(d){
-      return d.properties.swiftmap.layer == "polygons" ? swiftmap.path.centroid(d) : swiftmap.meta.projection.function(d.geometry.coordinates);
-    }
+        .attr("cx", function(d) { return pointsUtility(swiftmap, d)[0]; })
+        .attr("cy", function(d) { return pointsUtility(swiftmap, d)[1]; });
 
     // Redraw the tiles, if any.
     if (swiftmap.meta.tiles) drawTiles(swiftmap);
@@ -7326,7 +7580,7 @@
   // Sets a projection so a layer's outer boundary fits the dimensions of the map's parent.
   function fit$1(layer) {  
     // If a layer is passed, make sure it is a string or a number.
-    var layer_name = layer && (isString$1(layer) || isNumber(layer)) ? layer : this.meta.last_layer;
+    var layer_name = layer && (isString(layer) || isNumber(layer)) ? layer : this.meta.last_layer;
         layer = this.layers[layer_name];
 
     // Update the fit property in the layer, setting the fit property in all other to false.
@@ -7453,7 +7707,7 @@
         scale = band().rangeRound([0, orientation == "horizontal" ? width : height]).domain(data);
 
     function keyCategorical(str){
-      parent = isString$1(str) ? str : "body";
+      parent = isString(str) ? str : "body";
       selection$$1 = select(parent);
       width = +jz.str.keepNumber(selection$$1.style("width")) - marginLeft - marginRight;
       height = +jz.str.keepNumber(selection$$1.style("height")) - marginTop - marginBottom;
@@ -7461,11 +7715,11 @@
     }
 
     keyCategorical.shape = function(str){
-      return arguments.length ? (shape = isString$1(str) ? str : shape, keyCategorical) : shape;
+      return arguments.length ? (shape = isString(str) ? str : shape, keyCategorical) : shape;
     };
 
     keyCategorical.orientation = function(str){
-      orientation = isString$1(str) && (str.toLowerCase() == "horizontal" || str.toLowerCase() == "vertical") ? str : orientation;
+      orientation = isString(str) && (str.toLowerCase() == "horizontal" || str.toLowerCase() == "vertical") ? str : orientation;
       scale.rangeRound([0, orientation == "horizontal" ? width : height]);
       return arguments.length ? keyCategorical : orientation;
     };
@@ -7551,7 +7805,7 @@
 
     keyCategorical.style = function(str, val){
       styles.push({
-        style: isString$1(str) ? str : null,
+        style: isString(str) ? str : null,
         value: val
       });
 
@@ -7561,7 +7815,7 @@
     keyCategorical.attr = function(str, val){
       if (str == "r") radius = val;
       attrs.push({
-        attr: isString$1(str) ? str : null,
+        attr: isString(str) ? str : null,
         value: val
       });
 
@@ -7817,7 +8071,7 @@
         labelFormat = function(d){ return d; };
     
     function keyNested(str){
-      parent = isString$1(str) ? str : "body";
+      parent = isString(str) ? str : "body";
       selection$$1 = select(parent);
       width = +jz.str.keepNumber(selection$$1.style("width")) - marginLeft - marginRight;
       height = +jz.str.keepNumber(selection$$1.style("height")) - marginTop - marginBottom;
@@ -7992,7 +8246,7 @@
     };
 
     schemeCategorical.toOther = function(string){
-      return arguments.length ? (toOther = isString$1(string) ? string : toOther, schemeCategorical) : toOther;
+      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeCategorical) : toOther;
     };
 
     return schemeCategorical;
@@ -8017,7 +8271,7 @@
         .range(to);
 
       // Lab interpolation for colors.
-      if (isString$1(to[0])) {
+      if (isString(to[0])) {
         scale.interpolate(lab$1);
       }
 
@@ -8053,7 +8307,7 @@
     };
 
     schemeContinuous.toOther = function(string){
-      return arguments.length ? (toOther = isString$1(string) ? string : toOther, schemeContinuous) : toOther;
+      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeContinuous) : toOther;
     };
 
     return schemeContinuous;
@@ -8068,7 +8322,7 @@
         all_limits = [];
 
     function calcLimits(){
-      all_limits = isString$1(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : isArray(breaks) ? breaks : all_limits;
+      all_limits = isString(breaks) && data.length > 0 && to && from ? limits(data.map(from), breaks, to.length) : isArray(breaks) ? breaks : all_limits;
     }
 
     function schemeSequential(d, i, els){
@@ -8089,7 +8343,7 @@
 
     schemeSequential.breaks = function(breaktype){
       if (arguments.length){
-        breaks = isString$1(breaktype) || isArray(breaktype) ? breaktype : "e";
+        breaks = isString(breaktype) || isArray(breaktype) ? breaktype : "e";
         calcLimits();
         return (schemeSequential);
       }
@@ -8145,7 +8399,7 @@
     };
 
     schemeSequential.toOther = function(string){
-      return arguments.length ? (toOther = isString$1(string) ? string : toOther, schemeSequential) : toOther;
+      return arguments.length ? (toOther = isString(string) ? string : toOther, schemeSequential) : toOther;
     };
 
     return schemeSequential;

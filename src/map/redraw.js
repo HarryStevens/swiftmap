@@ -1,4 +1,5 @@
 import drawTiles from "./drawTiles";
+import pointsUtility from "./pointsUtility"
 
 // Redraws all map layers.
 export default function redraw(swiftmap){
@@ -6,15 +7,10 @@ export default function redraw(swiftmap){
   swiftmap.svg.selectAll("path").attr("d", swiftmap.path);
 
   // Redraw the text and points.
-  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + getPoints(d) + ")"; });
+  swiftmap.svg.selectAll("text").attr("transform", function(d) { return "translate(" + pointsUtility(swiftmap, d) + ")"; });
   swiftmap.svg.selectAll("circle.point")
-      .attr("cx", function(d) { return getPoints(d)[0]; })
-      .attr("cy", function(d) { return getPoints(d)[1]; });
-  
-  // Determines the coordinates of text or points, depending on if the layer is polygons or points.
-  function getPoints(d){
-    return d.properties.swiftmap.layer == "polygons" ? swiftmap.path.centroid(d) : swiftmap.meta.projection.function(d.geometry.coordinates);
-  }
+      .attr("cx", function(d) { return pointsUtility(swiftmap, d)[0]; })
+      .attr("cy", function(d) { return pointsUtility(swiftmap, d)[1]; });
 
   // Redraw the tiles, if any.
   if (swiftmap.meta.tiles) drawTiles(swiftmap);

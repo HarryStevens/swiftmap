@@ -10,6 +10,10 @@
         width: 100%;
         height: 100vh;
       }
+      .label {
+        text-shadow: 1px 1px 1px #fff, 0 -1px 0 #eee, -1px 0 0 #fff;
+        fill: #000;
+      }
     </style>
   </head>
   <body>
@@ -25,17 +29,25 @@
       // Create the map.
       var map = swiftmap.map("#map");
 
+      var scheme = swiftmap.schemeContinuous()
+          .from(d => +d.pop_2011 / +d.area_km2)
+          .to(['#ffffcc','#a1dab4','#41b6c4','#2c7fb8','#253494']);
+
       d3.queue()
         .defer(d3.json, "delhi_1997-2012_district.json") // polygons data
+        .defer(d3.csv, "delhi_district_data.csv") // polygons data
         .await(ready);
 
-      function ready(error, districts, schools, data){
+      function ready(error, districts, data){
+
+        scheme.data(data, d => d.district)
 
         map
-          .layerPolygons(districts)
+          .layerPolygons(districts, d => d.properties.DISTRICT)
             .draw()
-            .drawPoints()
-            .drawLabels(d => d.properties.DISTRICT, true);
+            .drawLabels(d => d.properties.DISTRICT);
+
+        map.layers[0].polygons.style("fill", scheme);
 
         // It's easy to resize a Swiftmap.
         window.onresize = () => map.resize();
