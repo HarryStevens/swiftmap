@@ -7336,9 +7336,7 @@
 
   // Determines the coordinates of text or points, depending on if the layer is polygons or points.
   function pointsUtility(swiftmap, d){
-    // In geometries of type MultiPolygon,
-    // get the polylabel that is closest to centroid.
-
+    // In geometries of type MultiPolygon, get the polylabel that is closest to centroid.
     // TODO: Use a while loop for multi-multi polgyons.
     var closest;
 

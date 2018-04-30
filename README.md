@@ -223,7 +223,7 @@ Sets or gets a points layer. See [<i>map</i>.polygons()](#polygons) for descript
 
 <a name="drawLabels-polygons" href="#drawLabels-polygons">#</a> <i>polygons</i>.<b>drawLabels</b>(<i>key</i>[,<i>offset</i>][, <i>layer</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/drawLabels.js "Source")
 
-Labels the polygons at their centroid. Labels are rendered as SVG `text` elements, can be accessed as D3 selections via `map.layers.< layername >.labels`, and can be styled with the CSS class `.label` or `.label-< layername >` or both.
+Labels each polygon at its [pole of inaccessibility](https://github.com/mapbox/polylabel) or, in the case of complex multipolygons, its [centroid](https://en.wikipedia.org/wiki/Centroid). Labels are rendered as SVG `text` elements, can be accessed as D3 selections via `map.layers.< layername >.labels`, and can be styled with the CSS class `.label` or `.label-< layername >` or both.
 
 <i>key</i><br />
 A <i>key</i> function tells Swiftmap how each datum should be labeled.
