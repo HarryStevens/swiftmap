@@ -2,6 +2,8 @@ import * as d3 from "../../lib/d3";
 
 import layerPoints from "./layerPoints";
 import layerPolygons from "./layerPolygons";
+
+import graticule from "./graticule";
 import projection from "./projection";
 import tiles from "./tiles";
 
@@ -33,7 +35,8 @@ export default function map(parent){
         function: d3.geoMercator(),
         name: "mercator"
       },
-      tiles: false
+      tiles: false,
+      graticule: false
     };
 
     // A layers object to store the geospatial layers.
@@ -55,6 +58,7 @@ export default function map(parent){
     // Map functions.
     this.layerPoints = layerPoints;
     this.layerPolygons = layerPolygons;
+    this.graticule = graticule;
     this.projection = projection;
     this.tiles = tiles;
 
