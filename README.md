@@ -81,7 +81,7 @@ If <i>parent</i> is specified, the map will be placed in the DOM element referen
 
 <a name="graticule" href="#graticule">#</a> <i>map</i>.<b>graticule</b>([<i>step</i>]) [<>](https://github.com/HarryStevens/swiftmap/tree/master/src/map/graticule.js "Source")
 
-Adds a graticule to the map.
+Adds a graticule to the map. [See it in action](https://bl.ocks.org/HarryStevens/30daa8a31d0d444aceb55a58adedf7c8).
 
 <i>step</i><br />
 To set the frequency of the graticule's lines, a <i>step</i> may be specified as an array of two numbers, where the first number is the frequency in degrees of the lines of longitude, and the second number is the frequency in degrees of latitude. Defaults to `[10, 10]`.
